@@ -12,3 +12,7 @@
 #py clutter (idk google said to)
 __pycache__/
 *.pyc
+
+#virtual environments
+.venv/
+venv/
