@@ -1,0 +1,10 @@
+# latex clutter
+**/*.aux
+**/*.log
+**/*.toc
+**/*.synctex.gz
+**/*.fdb_latexmk
+**/*.fls
+
+# macOS clutter
+**/.DS_Store
