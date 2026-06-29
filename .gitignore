@@ -1,4 +1,4 @@
-# latex clutter
+#latex clutter
 **/*.aux
 **/*.log
 **/*.toc
@@ -6,5 +6,9 @@
 **/*.fdb_latexmk
 **/*.fls
 
-# macOS clutter
+#macOS clutter
 **/.DS_Store
+
+#py clutter (idk google said to)
+__pycache__/
+*.pyc
