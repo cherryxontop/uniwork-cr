@@ -28,7 +28,7 @@ plt.plot(n, m*n + c_t1, color = "blue")
 plt.xlabel("n(number of bounces)")
 plt.ylabel("ln(T_n) (s)")
 plt.title("tennis ball – run 1")
-plt.savefig("tennis1.png", dpi=300)
+plt.savefig("/Users/chhaya/Documents/uniwork-cr/year 1/sem 1/phys1101/week 11/tennis1.png", dpi=300)
 plt.show()
 
 
@@ -54,7 +54,7 @@ plt.plot(n, m*n + c_t2, color = "blue")
 plt.xlabel("n(number of bounces)")
 plt.ylabel("ln(T_n) (s)")
 plt.title("tennis ball – run 2")
-plt.savefig("tennis2.png", dpi=300)
+plt.savefig("/Users/chhaya/Documents/uniwork-cr/year 1/sem 1/phys1101/week 11/tennis2.png", dpi=300)
 plt.show()
 
 
@@ -80,7 +80,7 @@ plt.plot(n, m*n + c_tt1, color = "blue")
 plt.xlabel("n(number of bounces)")
 plt.ylabel("ln(T_n) (s)")
 plt.title("table tennis ball – run 1")
-plt.savefig("tt1.png", dpi=300)
+plt.savefig("/Users/chhaya/Documents/uniwork-cr/year 1/sem 1/phys1101/week 11/tt1.png", dpi=300)
 plt.show()
 
 #plotting residuals
@@ -93,7 +93,7 @@ plt.axhline(0, color="r", ls="--")
 plt.xlabel("n(number of bounces)")
 plt.ylabel("residual")
 plt.title("residuals – table tennis ball – run 1")
-plt.savefig("residuals_tt1.png", dpi=300)
+plt.savefig("/Users/chhaya/Documents/uniwork-cr/year 1/sem 1/phys1101/week 11/residuals_tt1.png", dpi=300)
 plt.show()
 
 #table tennis ball run 2
@@ -118,7 +118,7 @@ plt.plot(n, m*n + c_tt2, color = "blue")
 plt.xlabel("n(number of bounces)")
 plt.ylabel("ln(T_n) (s)")
 plt.title("table tennis ball – run 2")
-plt.savefig("tt2.png", dpi=300)
+plt.savefig("/Users/chhaya/Documents/uniwork-cr/year 1/sem 1/phys1101/week 11/tt2.png", dpi=300)
 plt.show()
 
 #sigma tests for comparing epsilon values
