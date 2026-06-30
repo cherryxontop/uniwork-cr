@@ -10,7 +10,7 @@ x = ufloat(10.34,0.04)
 y = ufloat(7.66,0.03)
 G = 6.67e-11
 print((x**2 + y**2)**0.5)
-print((4*x)/exp(y))
+print((4*x)/np.exp(y))
 print((G*x)/y)
 
 
