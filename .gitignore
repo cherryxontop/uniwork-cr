@@ -5,6 +5,10 @@
 **/*.synctex.gz
 **/*.fdb_latexmk
 **/*.fls
+**/*.bbl
+**/*.bcf
+**/*.blg
+**/*.run.xml
 
 #macOS clutter
 **/.DS_Store
