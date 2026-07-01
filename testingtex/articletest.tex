@@ -1,6 +1,15 @@
 \documentclass{article}
 \usepackage[T1]{fontenc}
+\usepackage[style=authoryear, backend=biber]{biblatex} %load package
+\addbibresource{references.bib} %points to bib file
+
+\title{testinglatex}
+\author{me}
+\date{\today}
+
 \begin{document}
+
+\maketitle % <--- THIS IS THE MISSING LINK! This prints your title block.
 
 trying to lock in and learn latex xx
 \bigskip
@@ -31,11 +40,14 @@ unordered list
 \item wow this is fun
 \end{itemize}
 
+this is a sample document with some dummy
+text\footnote{and a footnote}.
 
+\section{citing sources}
 
+according to cosmology, time has a beginning \cite{hawking1988}. 
+albert einstein also made massive contributions to physics \cite{einstein1905}.
 
-
-
-
+\printbibliography
 
 \end{document}
