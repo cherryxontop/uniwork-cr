@@ -1,0 +1,106 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[style=authoryear, backend=biber]{biblatex} %load package
+\addbibresource{references.bib} %points to bib file
+\usepackage{array} %tables
+\usepackage{booktabs} %line rules
+
+\title{testinglatex}
+\author{me}
+\date{\today}
+
+\begin{document}
+
+\maketitle 
+trying to lock in and learn latex xx
+\bigskip
+
+emph is context-aware. \emph{it makes text \emph{stand out} from whatever text surrounds it}.
+
+textit is a font-switch. it \textit{blindly forces} whatever is in it to be italic
+
+textbf is also a font-switch. it \textbf{converts text to boldface}.
+
+\section{title of the section}
+some text
+\subsection{title of the subsection}
+some text
+\bigskip
+
+ordered list
+\begin{enumerate}
+\item an entry
+\item ooh another one
+\item 3rd one
+\end{enumerate}
+
+unordered list
+\begin{itemize}
+\item an entry
+\item 2nd one
+\item wow this is fun
+\end{itemize}
+
+this is a sample document with some dummy
+text\footnote{and a footnote}.
+
+\section{tables}
+
+\subsection{simple tables}
+
+\begin{tabular}{lll}
+flower & color & price \\
+rose & red & 2 \\
+peony & pink & 3 \\
+\end{tabular}
+
+\subsection{text-wrap tables}
+
+\begin{tabular}{cp{9cm}}
+    \toprule
+    something & something \\
+    \midrule
+    hi    & this format is basically for long text. if we use the previous format, we end up with the text running off the paper\\
+    \cmidrule{1-2}
+    bye   & also makes it look super clean and i dont know what to type anymore- my stomach hurts and i miss my dog so yes ok bye\\
+    \cmidrule{1-2}
+    wait  & oh also i added rules bc i think it looks better. {1-2} gives an complete line, {1-1} for the first column, {2-2} for the second column\\
+    \bottomrule
+\end{tabular}
+
+\section{math}
+
+two forms of math mode: inline and display. inline is used for eqns part of a sentence, display is pretty math
+like, sentence with inline mathematics: $y = mx + c$.
+another sentence with inline mathematics: $5^{2}=3^{2}+4^{2}$.
+\bigskip
+
+PRETTY MATHHH
+\[
+  y = mx + c
+\]
+
+superscripts $x^{y}$ and subscripts $x_{y}$.
+\medskip
+
+trig: $y = 2 \sin \theta^{2}$.
+\medskip
+
+\begin{equation}
+    \int_{-\infty}^{+\infty} e^{-x^2} \, dx
+\end{equation}
+
+note so i don't lose my mind later: the asmath package has more stuff
+
+\section{citing sources}
+
+according to cosmology, time has a beginning \cite{hawking1988}. 
+albert einstein also made massive contributions to physics \cite{einstein1905}.
+\bigskip
+\bigskip
+
+okay i think this is enough for now i hope i dont need anything more. YAY latex!! time to sleep byeeeeeeeeee
+
+\printbibliography
+
+\end{document}
