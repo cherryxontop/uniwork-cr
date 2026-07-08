@@ -1,0 +1,221 @@
+---
+title: "Redshift Distributions of Galaxy and Cluster Gravitational Lenses"
+subtitle: "STAT1003 Assignment"
+author: "Chhaya Gopal Ramnani (SID: u8336188)"
+email: "u8336188@anu.edu.au"
+date: today
+format:
+  pdf: 
+    number-sections: true
+    colorlinks: true
+  html:
+    embed-resources: true
+    number-sections: true
+execute: 
+  echo: false
+  warning: false
+  message: false
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+nocite: |
+  @*
+---
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+library(ggplot2)
+
+
+df <- read_csv("gravitational_lenses.csv")
+
+filtered_df <- df |>
+  filter(
+    !is.na(lens_redshift),
+    lens_type %in% c("galaxy", "cluster"))
+
+```
+
+## Introduction
+
+Gravitational lensing is a phenomenon predicted by Einstein's General Theory of Relativity, where the gravity of a massive foreground object bends the light from a distant background source. When this bending is strong enough, it produces visible effects such as arcs, multiple images or Einstein rings (a luminous circle of perfect alignment between the source and the lens). The foreground object causing this effect is called a gravitational lens.
+
+These systems are useful in astrophysics for a number of reasons. they provide evidence for dark matter, help estimate cosmic distances, and allow us to study galaxies that would otherwise be too faint to observe. Gravitational lenses can be individual galaxies or entire galaxy clusters, and these two types differ considerably in mass, size, and physical properties.
+
+The redshift measures how much the light from an object has been stretched as the universe expands. It is commonly used as a measure for distance. Higher redshift means the object is further away and we are seeing it at an earlier point in time. Since galaxies and clusters are such different objects, it is worth questioning whether they tend to be found at different redshifts, or whether they are distributed similarly across spatial distance.
+
+This report investigates the question: **Is the mean redshift of galaxy lenses different from that of cluster lenses?** The analysis includes data analysis followed by a two-sample t-test to formally answer this question.
+
+## Data Description
+
+The dataset used in this report is sourced from the lenscat project, a catalogue of confirmed and probable strong gravitational lenses compiled from dozens of surveys and publications. It was accessed via Hugging Face at `https://huggingface.co/datasets/juliensimon/gravitational-lenses`. The catalogue consolidates discoveries from major astronomical surveys including SDSS, DES, HSC, CLASH, and RELICS.
+
+The dataset contains 32,838 observations, each representing a single lensing system. data collection was conducted through multiple independent astronomical surveys over several decades and is not the result of a single controlled study. As a result, there may be observational biases, for example, certain regions of the sky are more heavily surveyed than others and lower redshift systems may be easier to detect and classify.
+
+The following variables are used in this analysis:
+
+| variable | type | description |
+|---|---|---|
+| lens_redshift | continuous | cosmological redshift of the lensing object |
+| ra_deg | continuous | right ascension of the lensing system in degrees |
+| dec_deg | continuous | declination of the lensing system in degrees |
+| lens_type | categorical | type of lens: galaxy, cluster, or group |
+| grading | categorical | confidence of identification: probable or confident |
+
+```{r}
+df |>
+  filter(lens_type %in% c("galaxy", "cluster")) |>
+  summarise(ra_mean = mean(ra_deg),
+            ra_sd = sd(ra_deg),
+            dec_mean = mean(dec_deg),
+            dec_sd = sd(dec_deg))
+```
+
+The mean right ascension of the lenses is approximately 160 degrees and the mean declination is approximately 5.6 degrees, reflecting the uneven sky coverage of the surveys contributing to this catalogue. Most observations are concentrated toward certain regions rather than being uniformly distributed across the sky.
+
+```{r}
+sum(is.na(df$lens_redshift))
+
+filtered_df |>
+  count(lens_type)
+```
+
+Of the 32,838 observations, 18,864 have missing redshift values. For the hypothesis test, the data was filtered to galaxy and cluster lenses with non-missing redshift values which yielded 13,974 observations — 13,144 galaxy lenses and 830 cluster lenses.
+
+```{r}
+filtered_df |>
+  group_by(lens_type) |>
+  summarise(
+    n = n(),
+    mean = mean(lens_redshift),
+    SD = sd(lens_redshift),
+    min = min(lens_redshift),
+    median = median(lens_redshift),
+    max = max(lens_redshift))
+```
+
+
+```{r}
+#bar chart
+
+df |>
+  filter(lens_type %in% c("galaxy", "cluster")) |>
+  group_by(lens_type, grading) |>
+  summarise(n = n()) |>
+  mutate(pct = round(100*n/sum(n), 1))
+
+ggplot(df |> 
+         filter(lens_type %in% c("galaxy", "cluster")), 
+       aes(x = lens_type, fill = grading)) +
+  geom_bar(position = "dodge") +
+  labs(x = "lens type", y = "count", fill = "grading")
+```
+The bar chart shows the number of galaxy and cluster lenses in the dataset broken down by confidence grading. Galaxy lenses are far more in number, but cluster lenses have a higher proportion of "confident" gradings compared to galaxy lenses.
+
+
+```{r}
+#histogram
+ggplot(filtered_df, aes(x = lens_redshift, fill = lens_type)) +
+  geom_histogram(bins = 40, alpha = 0.6, position = "identity") +
+  labs(x = "lens redshift", y = "count", fill = "lens type")
+```
+The histogram shows the redshift distribution for both lens types. Both distributions are right-skewed, with most lenses concentrated at lower redshifts. However, because galaxy lenses (n = 13,144) outnumber cluster lenses (n = 830), the cluster distribution is difficult to read on the same scale leading to the galaxy bars domnating the plot. Despite this, the cluster distribution appears to follow a broadly similar shape.
+
+
+```{r}
+#boxplot
+ggplot(filtered_df, aes(x = lens_type, y = lens_redshift, fill = lens_type)) +
+  geom_boxplot() +
+  labs(x = "lens type", y = "lens redshift", fill = "lens type")
+```
+The boxplot compares the redshift of galaxy and cluster lenses side by side. The cluster group has a wider spread and more outliers than the galaxy group, indicating greater variance in cluster redshifts. This means galaxy and cluster lenses have similar typical redshift values.
+
+```{r}
+ggplot(df |> 
+         filter(lens_type %in% c("galaxy", "cluster")),
+       aes(x = ra_deg, y = dec_deg, colour = lens_type)) +
+  geom_point(alpha = 0.3, size = 0.5) +
+  labs(x = "right ascension (degrees)", 
+       y = "declination (degrees)", 
+       colour = "lens type")
+```
+The scatter plot shows the sky distribution of galaxy and cluster lenses by their celestial coordinates. Galaxy lenses are spread across the full sky, while cluster lenses appear more concentrated in certain regions, demonstrating the coverage of specific surveys.
+
+## Statistical Methods
+
+To answer the question, we do a two-sample t-test to compare the mean redshift of galaxy lenses against that of cluster lenses. Welch's t-test is chosen here because the two groups have very different sample sizes (13,144 galaxy lenses v/s 830 cluster lenses) and it does not require the assumption that both groups have equal variance.
+
+The hypotheses are:
+
+$$H_0: \mu_{\text{galaxy}} = \mu_{\text{cluster}}$$
+$$H_A: \mu_{\text{galaxy}} \neq \mu_{\text{cluster}}$$
+
+where $\mu_{\text{galaxy}}$ and $\mu_{\text{cluster}}$ are the true mean redshifts of galaxy and cluster lenses respectively. A significance level of $\alpha = 0.05$ is used- meaning we would need a p-value below 0.05 to reject the null hypothesis.
+
+The test statistic is calculated as:
+
+$$t^* = \frac{\bar{x}_{\text{galaxy}} - \bar{x}_{\text{cluster}}}{\sqrt{\dfrac{s^2_{\text{galaxy}}}{n_{\text{galaxy}}} + \dfrac{s^2_{\text{cluster}}}{n_{\text{cluster}}}}}$$
+For this test to be valid, three assumptions need to hold: 
+
+Independence: each lensing system comes from a different part of the sky and was observed separately, so it is reasonable to treat the observations as independent.
+
+Normality: with 13,144 galaxy lenses and 830 cluster lenses, the sample sizes are large enough that the Central Limit Theorem kicks in so we don't need to worry about whether the redshift values themselves are normally distributed.
+
+Equal variances: galaxy lenses (sd = 0.260) and cluster lenses (sd = 0.221) have different spreads, so assuming equal variances would not be appropriate here. Welch's t-test does not make that assumption.
+
+## Results
+
+```{r}
+galaxy_z <- filtered_df |> 
+  filter(lens_type == "galaxy") |> 
+  pull(lens_redshift)
+
+cluster_z <- filtered_df |> 
+  filter(lens_type == "cluster") |> 
+  pull(lens_redshift)
+
+t.test(galaxy_z, cluster_z)
+```
+
+The two-sample Welch t-test gives $t^* = -0.49504$, $df = 980.62$ and a p-value of $0.6207$. Since $p = 0.6207 > \alpha = 0.05$, we fail to reject the null hypothesis. There is not enough evidence to conclude that the mean redshift of galaxy lenses is different from that of cluster lenses.
+
+## Discussion
+
+The result was a bit surprising. Galaxy clusters are far more massive than individual galaxies, so we might expect them to show up at greater distances and therefore higher redshifts. But the mean redshift for galaxy lenses was 0.483 and for cluster lenses was 0.487- which is barely any difference at all.
+
+One explanation could be that the dataset is compiled from many different surveys, each with their own detection limits. what we're seeing in the redshift distributions may reflect what each survey was able to detect, rather than the true distribution of lenses in the universe.
+
+Note: around 55% of redshift values are missing. If high-redshift systems are harder to measure, the sample may be skewed toward lower redshifts and may not be fully representative of all gravitational lenses. Additionally, the severe imbalance between groups (13,144 galaxy lenses versus only 830 cluster lenses) is a notable limitation. With so few cluster observations relative to galaxies, the t-test result may not be robust. A larger cluster sample might reveal a true difference in mean redshift that this dataset doesn't detect.
+
+Future analysis could restrict the sample to confidently classified lenses only, removing probable gradings that may introduce noise, or repeat the test separately for each survey to check whether the null result holds across different observations.
+
+## Conclusion
+
+This report investigated whether galaxy-scale and cluster-scale gravitational lenses tend to occur at different redshifts. A two-sample Welch t-test found no statistically significant difference in mean redshift between the two groups ($t^* = -0.4950$, $p = 0.6207$), and the null hypothesis was not rejected. Despite being physically very different objects, both lens types appear to be distributed at similar cosmological distances in this dataset.
+
+The high proportion of missing redshift values and the multi-survey nature of the dataset are some  of the limitations that may affect how representative the sample is.
+
+## Acknowledgement
+
+I acknowledge the use of Claude (claude.ai) to assist in preparing this report. I used Claude to (1) help convert .parquet file format to a .csv file, (2) in advising whether the above graphs would be sufficent to reason with the question. The full conversation log can be viewed at (1)  `https://claude.ai/share/5f72823c-30f4-4c76-9339-1d4f549f75e6` and (2i) `https://claude.ai/share/99b435c4-35a0-45da-aca8-28076da48787` (2ii) `https://claude.ai/share/5dbd59a8-2515-417e-8643-8305ba50e2de`
+
+
+## Appendix
+
+### Software Information
+
+```{r}
+#| echo: false
+grateful::cite_packages(output = "paragraph", out.dir = ".", pkgs = "Session")
+```
+
+### Session Information
+
+```{r}
+#| echo: false
+sessioninfo::session_info()
+```
+
+## References
