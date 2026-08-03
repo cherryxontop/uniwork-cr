@@ -7,16 +7,16 @@ g = 9.796
 
 # static method
 x_0 = 0.150  
-m_static = np.array([0.05, 0.10, 0.15, 0.20, 0.25])         # mass in kg
+m_static = np.array([])         # mass in kg
 x_total = np.array([0.171, 0.192, 0.213, 0.235, 0.254])     # total length in me
 
 x_static = x_total - x_0
 sx_static = np.array([0.001] * len(m_static))  
 
 # dynamic method
-m_dynamic = np.array([0.05, 0.10, 0.15, 0.20, 0.25])    # mass in kg
-T_dynamic = np.array([0.45, 0.58, 0.69, 0.78, 0.86])    # period T in s
-sT = np.array([0.01] * len(m_dynamic))                  # period uncertainty in s
+m_dynamic = np.array([])    # mass in kg
+T_dynamic = np.array([])    # period T in s
+sT = np.array([] * len(m_dynamic))                  # period uncertainty in s
 
 T2 = T_dynamic**2
 sT2 = 2 * T_dynamic * sT  
