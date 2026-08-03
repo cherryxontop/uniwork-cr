@@ -105,3 +105,5 @@ print("sigma test")
 print(f"k (static)  = {k_stat} N/m")
 print(f"k (dynamic) = {k_dyn} N/m")
 print(f"t-score = {t_score:.4f}")
+
+#done
