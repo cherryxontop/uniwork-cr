@@ -8,10 +8,10 @@ g = 9.796
 # static method
 x_0 = 0.150  
 m_static = np.array([])         # mass in kg
-x_total = np.array([0.171, 0.192, 0.213, 0.235, 0.254])     # total length in me
+x_total = np.array([])     # total length in me
 
 x_static = x_total - x_0
-sx_static = np.array([0.001] * len(m_static))  
+sx_static = np.array([] * len(m_static))  
 
 # dynamic method
 m_dynamic = np.array([])    # mass in kg
