@@ -1,0 +1,35 @@
+---
+title: "Lab Report: Week 2 - Spring Constant"
+author: "Chhaya Ramnani (UID: u8336188)"
+date: "2026-08-05"
+format: 
+  pdf:
+    code-fold: true
+    toc: true
+jupyter: python3
+---
+
+## Introduction
+aim
+
+## Theory
+
+### Static Method
+ok
+
+### Dynamic Method
+eh
+
+## Experimental Setup
+For a demonstration of how you can code and visualize experimental setups, see @fig-setup.
+
+```{python}
+#| label: fig-setup
+#| fig-cap: "Example schematic visualization of equipment setup"
+import schemdraw
+schemdraw.use('matplotlib')
+import schemdraw.elements as elm
+with schemdraw.Drawing() as d:
+    d += elm.SourceV().up().label('Support')
+    d += elm.Resistor().right().label('Spring')
+    d += elm.Line().down().label('Mass (m)')

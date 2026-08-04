@@ -2,6 +2,16 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{listings}  % For code blocks
+\usepackage{xcolor}    % For code block background color
+
+% Setup simple code block styling
+\lstset{
+    backgroundcolor=\color{gray!10},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=none
+}
 
 \begin{document}
 
@@ -18,6 +28,14 @@ aim
 
 \subsection{Static Method}
 
+\begin{lstlisting}[language=Python]
+import numpy as np
+# Example calculation of spring constant
+m = np.array([0.05, 0.10, 0.15]) # mass in kg
+x = np.array([0.012, 0.024, 0.037]) # extension in m
+k = (m * 9.796) / x
+print("Calculated k:", k)
+\end{lstlisting}
 
 \subsection{Dynamic Method}
 
