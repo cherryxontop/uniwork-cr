@@ -21,3 +21,6 @@ __pycache__/
 .venv/
 venv/
 ENV/
+
+#quarto cache
+lab_report_files
