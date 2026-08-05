@@ -1,0 +1,384 @@
+---
+title: "Lab Report: Week 2 - Spring Constant"
+subtitle: "_Chhaya Ramnani (UID: u8336188)_"
+author: "_Lab partners: Tsz Wing Candice Ng, Chinatsu Komada_"
+date: "2026-08-05"
+format: 
+  typst:
+    toc: false
+jupyter: python3
+---
+
+## Imports and Functions
+All calculations were done in Python. Starting with imports:
+
+```{python}
+import matplotlib.pyplot as plt
+from uncertainties import ufloat
+import numpy as np
+from scipy import odr
+import pandas as pd
+```
+
+Defining the gravity constant in Canberra:
+
+```{python}
+g = 9.796
+```
+
+To handle our data properly, we used a custom Python function (`odr_fit`) leveraging `scipy.odr`. Because our measurements have uncertainties in both the x and y axes, standard linear regression won't cut it. This function extracts the nominal values and errors from our `uncertainties` objects, sets up a linear model ($y = mx + c$), and performs an ODR to find the best-fit slope, its uncertainty, and the y-intercept.
+
+```{python}
+def odr_fit(x_data, y_data):
+    x = np.array([v.n for v in x_data])
+    sx = np.array([v.s for v in x_data])
+    y = np.array([v.n for v in y_data])
+    sy = np.array([v.s for v in y_data])
+
+    linear_model = odr.Model(lambda p, x: p[0] * x + p[1])
+    data = odr.RealData(x, y, sx=sx, sy=sy)
+
+    odr_result = odr.ODR(data, linear_model, beta0=[10.0, 0.0]).run()
+
+    slope = odr_result.beta[0]
+    slope_err = odr_result.sd_beta[0]
+    intercept = odr_result.beta[1]
+    intercept_err = odr_result.sd_beta[1]
+
+    return slope, slope_err, intercept, intercept_err, (x, y, sx, sy)
+```
+
+To visualize our results, we wrote a plotting function (`plot`) using `matplotlib`. This function creates a clear scatter plot of our data complete with error bars on both axes, overlays the best-fit line calculated from our ODR regression, and formats the legend to display our final spring constant value and its uncertainty.
+
+```{python}
+def plot(
+    x,
+    y,
+    sx,
+    sy,
+    slope,
+    slope_err,
+    intercept,
+    xlabel,
+    ylabel,
+    title,
+    filename,
+):
+    x_fit = np.linspace(min(x), max(x), 100)
+    y_fit = slope * x_fit + intercept
+
+    plt.figure(figsize=(7, 5))
+    plt.errorbar(
+        x,
+        y,
+        xerr=sx,
+        yerr=sy,
+        fmt="o",
+        color="navy",
+        ecolor="crimson",
+        capsize=3,
+        label="Experimental Data",
+    )
+    plt.plot(
+        x_fit,
+        y_fit,
+        "k--",
+        label=f"Fit: $k = {slope:.2f} \\pm {slope_err:.2f}$ N/m",
+    )
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.grid(True, alpha=0.6)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.show()
+```
+
+To check if both methods gave consistent results, we run a sigma test (`sigma_test`). It calculates the statistical difference between the two spring constant values relative to their combined uncertainties. If the difference is less than or equal to 3 standard deviations ($3\sigma$), it indicates our results agree within experimental error.
+```{python}
+def sigma_test(k1, sk1, k2, sk2):
+    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
+    print("SIGMA TEST")
+    print(f"Static k  : {k1:.3f} +/- {sk1:.3f} N/m")
+    print(f"Dynamic k : {k2:.3f} +/- {sk2:.3f} N/m")
+    print(f"Discrepancy: {sigma_diff:.2f} sigma")
+
+    if sigma_diff <= 3.0:
+        print("results AGREE within experimental uncertainty")
+    else:
+        print("results DISAGREE")
+```
+
+## EXPERIMENT 1
+
+### Aim
+To find the spring constant of the spring provided using the static method: measuring the extension for a given applied force.
+
+### Method
+We start with Hooke's Law:
+$$F = kx$$
+Where $F = \text{Force}$, $k = \text{spring constant}$, and $x = \text{displacement}$.
+
+For an initial length $x_0$ and the displacement $x$, the extension of the string is given by $(x_0 - x)$.
+
+Equating the two equations for $F$:
+$$mg = k(x_0 - x)$$
+
+Comparing this to the linear equation $y = mx + c$, we get:
+$$y = mg$$
+$$x_{\text{axis}} = (x_0 - x)$$
+
+Therefore, the spring constant $k$ corresponds to the gradient of the slope.
+
+### Procedure
+We start by measuring the unstretched length $x_0$ of the spring that we will use to dangle the weights from. Since we are using a ruler to measure the length in half centimeters, we take 0.25 cm as the uncertainty in measurement.
+
+```{python}
+x0 = ufloat(0.30, 0.0025)       # initial spring length (m)
+print(f"x0 = {x0} m")
+```
+
+We then measured the mass of our initial mass slot and each mass slot = $50g$. Accounting for the fluctuation of exactly 1 gram,
+
+```{python}
+m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+print(f"m_slot = {m_slot} kg")
+```
+```{python}
+total_lengths_cm = [32.4,
+                    34.7,
+                    37.1,
+                    39.4,
+                    41.8,
+                    44.3,
+                    46.5,
+                    48.9,
+                    51.5,
+                    53.8]
+```
+
+Because our measurements are in $cm$, we convert them to $m$ and also input the uncertainties
+```{python}
+total_lengths_m = [ufloat(L / 100.0, 0.0025) for L in total_lengths_cm]
+```
+
+Now, calculating force and extension:
+```{python}
+total_masses = [i * m_slot for i in range(1, 11)] 
+            # computes cumulative mass for each step
+force = [m * g for m in total_masses]             
+            # multiplies total mass by 'g' to get downward force
+extension = [L - x0 for L in total_lengths_m]     
+            # measured lengths after mass suspended - initial length (x_0)
+```
+
+```{python}
+#| echo: false
+static_table = pd.DataFrame({
+    "Slots": range(1, 11),
+    "Mass (kg)": [f"{m.n:.4f} ± {m.s:.4f}" for m in total_masses],
+    "Length (m)": [f"{L.n:.4f} ± {L.s:.4f}" for L in total_lengths_m],
+    "Extension (m)": [f"{e.n:.4f} ± {e.s:.4f}" for e in extension],
+    "Force (N)": [f"{f.n:.4f} ± {f.s:.4f}" for f in force],
+})
+static_table
+```
+
+Using the plot function defined in __Imports and Functions__ and combining everything we have,
+```{python}
+def static_method():
+    x0 = ufloat(0.30, 0.0025)       # initial spring length (m)
+    m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+
+    # measured total lengths (cm)
+    total_lengths_cm = [32.4,
+                        34.7,
+                        37.1,
+                        39.4,
+                        41.8,
+                        44.3,
+                        46.5,
+                        48.9,
+                        51.5,]
+    total_lengths_m = [ufloat(L / 100.0, 0.0025) for L in total_lengths_cm]
+    total_masses = [i * m_slot for i in range(1, 10)]
+    force = [m * g for m in total_masses]
+    extension = [L - x0 for L in total_lengths_m]
+
+    k, sk, intercept, intercept_err, plot_data = odr_fit(extension, force)
+    x, y, sx, sy = plot_data
+    print("static method xerrs and yerrs")
+    for i in range(len(x)):
+        print(f"point {i+1}: x = {x[i]:.4f} ± {sx[i]:.4f} | y = {y[i]:.4f} ± {sy[i]:.4f}")
+    print(f"slope (k)     = {k:.4f} ± {sk:.4f} N/m")
+    print(f"intercept     = {intercept:.4f} ± {intercept_err:.4f} N")
+    
+    plot(
+        *plot_data,
+        k,
+        sk,
+        intercept,
+        xlabel="Extension $x$ (m)",
+        ylabel="Applied Force $mg$ (N)",
+        title="Static Determination of Spring Constant ($k$)",
+        filename="/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 2/graphs/static_k_plot.png",
+    )
+
+    return k, sk, intercept, intercept_err, total_masses
+```
+
+
+## EXPERIMENT 2
+
+### Aim
+To find the spring constant of the spring provided using the dynamic method: measuring the period for different applied forces
+### Method
+Applying Hooke's Law, we have been given the following equation:
+$$T = 2\pi\sqrt{\frac{m + \frac{m_s}{3}}{k}}$$
+where T is the period of the bounce, m is the mass, $m_s$ is the mass of the spring and k is the spring constant.
+
+Rearranging, we get
+$$k(\frac{T}{2\pi})^2 = m + \frac{m_s}{3}$$
+
+Comparing to $y=mx + c$, we get:
+$$y=m+\frac{m_s}{3}$$
+$$x=(\frac{T}{2\pi})^2$$
+
+And the gradient will be k.
+
+
+### Procedure
+
+We have everything we need for this recipe, except $T$. We can obtain it by measuring the time taken by the spring to bounce 20 times. We choose to count bounces rather than time because we can get a more accurate measurement if we only have to keep track of the number of bounces, rather than tracking both, say, 20 bounces and 20 seconds.  
+The ground for errors is further minimized by having one person starting the timer and initiating the bounce.  
+
+We first started by measuring the mas of the spring on the laboratory scale. We account for the slight seldom fluctuation of the mass as the uncertainity.
+
+```{python}
+spring_mass = ufloat(0.0473, 0.000001)  # spring mass in kg
+m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+total_masses = [i * m_slot for i in range(1, 10)] # mass per addition of weight
+print(f"spring_mass = {spring_mass} kg")
+print(f"m_slot = {m_slot} kg")
+```
+
+Then, we measure the time taken in seconds for each mass to bounce 20 times and we get
+```{python}
+time_20_bounces_s =   [7.55,
+                        9.05,
+                        10.85,
+                        12.48,
+                        13.75,
+                        15.38,
+                        16.53,
+                        17.64,
+                        18.28]
+```
+
+To find period, we divide time recorded for 20 bounces _by_ 20 to find the period. Taking 0.2s as an uncertainty accounting for delay in reflex, since the reflex delay applies once at the start and once at the stop of the stopwatch.
+```{python}
+periods = [ufloat(t, 0.20) / 20.0 for t in time_20_bounces_s]
+print(periods)
+```
+
+From the __Method__ section,  
+we had $x=(\frac{T}{2\pi})^2$, so scaling our values from the `periods` to find `x_dynamic`
+```{python}
+x_dynamic = [(T / (2 * np.pi)) ** 2 for T in periods]
+print(x_dynamic)
+```
+
+and $y=m+\frac{m_s}{3}$, scaling from `total masses` to find `y_dynamic`
+```{python}
+y_dynamic = [m + (spring_mass / 3.0) for m in total_masses]
+print(y_dynamic)
+```
+
+```{python}
+#| echo: false
+dynamic_table = pd.DataFrame({
+    "Slots": range(1, 10),
+    "Mass (kg)": [f"{m.n:.4f} ± {m.s:.4f}" for m in total_masses],
+    "Time for 20 bounces (s)": time_20_bounces_s,
+    "Period (s)": [f"{T.n:.4f} ± {T.s:.4f}" for T in periods],
+    "Effective mass (kg)": [f"{m.n:.4f} ± {m.s:.4f}" for m in y_dynamic],
+})
+dynamic_table
+```
+
+Using the plot function defined in __Imports and Functions__ and combining everything we have,
+```{python}
+def dynamic_method():
+    spring_mass = ufloat(0.0473, 0.000001)  # spring mass in kg
+    m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+    total_masses = [i * m_slot for i in range(1, 10)]
+    time_20_bounces_s = [7.55,
+                        9.05,
+                        10.85,
+                        12.48,
+                        13.75,
+                        15.38,
+                        16.53,
+                        17.64,
+                        18.28]
+    periods = [ufloat(t, 0.20) / 20.0 for t in time_20_bounces_s]
+    print(periods)
+    x_dynamic = [(T / (2 * np.pi)) ** 2 for T in periods]
+    y_dynamic = [m + (spring_mass / 3.0) for m in total_masses]
+
+    k, sk, intercept, intercept_err, plot_data = odr_fit(x_dynamic, y_dynamic)
+    x, y, sx, sy = plot_data
+        
+    print("dynamic method xerrs and yerrs")
+    for i in range(len(x)):
+        print(f"point {i+1}: x = {x[i]:.4f} ± {sx[i]:.4f} | y = {y[i]:.4f} ± {sy[i]:.4f}")
+    print(f"slope (k)     = {k:.4f} ± {sk:.4f} N/m")
+    print(f"intercept     = {intercept:.4f} ± {intercept_err:.4f} kg")
+
+    plot(
+      *plot_data,
+        k,
+        sk,
+        intercept,
+        xlabel=r"$(T / 2\pi)^2$ ($\text{s}^2$)",
+        ylabel=r"Effective Mass $m + m_s/3$ (kg)",
+        title="Dynamic Determination of Spring Constant ($k$)",
+        filename="/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 2/graphs/dynamic_k_plot.png",
+    )
+
+    return k, sk, intercept, intercept_err
+```
+
+## Results and Observations
+
+```{python}
+k_static, sk_static, intercept_static, intercept_err_static, total_masses = static_method()
+print(f"static method result: k = {k_static:.3f} +/- {sk_static:.3f} N/m")
+
+k_dynamic, sk_dynamic, intercept_dynamic, intercept_err_dynamic = dynamic_method()
+print(f"dynamic method result: k = {k_dynamic:.3f} +/- {sk_dynamic:.3f} N/m")
+
+sigma_test(k_static, sk_static, k_dynamic, sk_dynamic)
+```
+
+```{python}
+#| echo: false
+summary_table = pd.DataFrame({
+    "Method": ["Static", "Dynamic"],
+    "k (N/m)": [f"{k_static:.4f} ± {sk_static:.4f}", f"{k_dynamic:.4f} ± {sk_dynamic:.4f}"],
+    "Intercept": [f"{intercept_static:.4f} ± {intercept_err_static:.4f}",
+                  f"{intercept_dynamic:.4f} ± {intercept_err_dynamic:.4f}"],
+})
+summary_table
+```
+
+The fit intercepts are a useful sanity check: physically, both should be consistent with zero (the static line should pass through the origin, since zero applied force should give zero extension; the dynamic line's intercept represents any residual mass offset unaccounted for by the $m_s/3$ correction). Both intercepts above are shown to confirm this.
+
+The static method gave $k_{\text{static}} = 20.60 \pm 0.10$ N/m, and the dynamic method gave $k_{\text{dynamic}} = 21.98 \pm 0.53$ N/m, a discrepancy of $2.56\sigma$. By our $3\sigma$ threshold, the two methods **agree** within uncertainty, though the gap is still notable and the dynamic method's much larger uncertainty (roughly 5x that of the static method) reflects that timing measurements are inherently less precise than the ruler-based length measurements.
+
+Likely contributors to this discrepancy:
+
+- **Reflex-timing uncertainty.** Timing a trial means starting the stopwatch on the first bounce and stopping it on the 20th, so there are two separate moments where reaction time can throw off the reading, not just one. A typical human reaction time is around $+/-0.1s$, so with two independent chances for that delay to creep in, the total timing uncertainty is closer to $+/-0.2s$ than the $+/-0.1s$ you'd get from only counting one reaction. This matters because $(T/2\pi)^2$ is the x-value in the dynamic fit — if this uncertainty is underestimated, the fit's error bars end up too tight, making the two methods look more disagreeing than they really are.
+- **The $m_s/3$ effective mass correction is itself an approximation**, exact only for an idealised uniform spring. Real lab springs are not perfectly uniform, and this could introduce a small systematic offset between the two methods.
+- **Air resistance causing the spring to sway slightly while bouncing, and errors introduced by human obersevation (eye-level reading and counting vertical oscillations)**
