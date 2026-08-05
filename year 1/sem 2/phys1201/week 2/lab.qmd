@@ -131,6 +131,8 @@ $$x_{\text{axis}} = (x_0 - x)$$
 
 Therefore, the spring constant $k$ corresponds to the gradient of the slope.
 
+![static setup](images/setup1.png)
+
 ### Procedure
 We start by measuring the unstretched length $x_0$ of the spring that we will use to dangle the weights from. Since we are using a ruler to measure the length in half centimeters, we take 0.25 cm as the uncertainty in measurement.
 
@@ -139,7 +141,7 @@ x0 = ufloat(0.30, 0.0025)       # initial spring length (m)
 print(f"x0 = {x0} m")
 ```
 
-We then measured the mass of our initial mass slot and each mass slot = $50g$. Accounting for the fluctuation of exactly 1 gram,
+We then measured the mass of our initial mass slot and consequently each mass slot that was added = $50g$. Accounting for the fluctuation of exactly 1 gram,
 
 ```{python}
 m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
@@ -246,6 +248,8 @@ $$y=m+\frac{m_s}{3}$$
 $$x=(\frac{T}{2\pi})^2$$
 
 And the gradient will be k.
+
+![dynamic setup](/images/setup2.png)
 
 
 ### Procedure
@@ -372,8 +376,6 @@ summary_table = pd.DataFrame({
 })
 summary_table
 ```
-
-The fit intercepts are a useful sanity check: physically, both should be consistent with zero (the static line should pass through the origin, since zero applied force should give zero extension; the dynamic line's intercept represents any residual mass offset unaccounted for by the $m_s/3$ correction). Both intercepts above are shown to confirm this.
 
 The static method gave $k_{\text{static}} = 20.60 \pm 0.10$ N/m, and the dynamic method gave $k_{\text{dynamic}} = 21.98 \pm 0.53$ N/m, a discrepancy of $2.56\sigma$. By our $3\sigma$ threshold, the two methods **agree** within uncertainty, though the gap is still notable and the dynamic method's much larger uncertainty (roughly 5x that of the static method) reflects that timing measurements are inherently less precise than the ruler-based length measurements.
 
