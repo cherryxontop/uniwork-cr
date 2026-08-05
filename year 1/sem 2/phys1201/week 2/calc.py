@@ -95,7 +95,8 @@ def static_method():
                         41.8,
                         44.3,
                         46.5,
-                        48.9]
+                        48.9,
+                        51.5]
     total_lengths_m = [ufloat(L / 100.0, 0.0025) for L in total_lengths_cm]
     total_masses = [i * m_slot for i in range(1, 10)]
     force = [m * g for m in total_masses]
