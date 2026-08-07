@@ -18,9 +18,9 @@ __pycache__/
 *.pyc
 
 #virtual environments
-.venv/
-venv/
-ENV/
+**/*.venv/
+**/*venv/
+**/*ENV/
 
 #quarto cache
 **/*lab_report_files
