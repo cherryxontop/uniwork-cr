@@ -11,5 +11,9 @@ iteration is the ability to repeatedly run a block a statements in a controlled 
     `continue` to go around again
     `pass` to do nothing
 
+STRING VARIABLES AND LISTS ARE SEQUENCES- to access each character in a string, we use index values enclosed in []. starts from 0
+
+
+
 
 """

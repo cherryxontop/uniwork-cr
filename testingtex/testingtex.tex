@@ -4,6 +4,7 @@
 \addbibresource{references.bib} %points to bib file
 \usepackage{array} %tables
 \usepackage{booktabs} %line rules
+\usepackage{graphicx} %duh
 
 \title{testinglatex}
 \author{me}
@@ -33,6 +34,13 @@ ordered list
 \item ooh another one
 \item 3rd one
 \end{enumerate}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{bleh.jpg}
+    \caption{mwah}
+    \label{fig:mwah}
+\end{figure}
 
 unordered list
 \begin{itemize}
