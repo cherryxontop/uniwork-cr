@@ -28,9 +28,9 @@ def estimate_race_time_refined(time_25km, wind_level, temperature_c):
     base_time = time_25km * 4
 
     #account for fatigue => 8% always
-    fatigue = 1 + 0.8
+    fatigue = 1 + 0.08
 
-    if wind_level == "moderate":
+    if wind_level == "moderate wind":
         fatigue += 0.05
     elif wind_level == "very windy":
         fatigue += 0.1
