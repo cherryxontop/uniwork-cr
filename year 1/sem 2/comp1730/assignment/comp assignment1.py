@@ -2,19 +2,63 @@
 
 """
 ANU ID: u8336188
-NAME: Chhaya Gopal Ramnani
+NAME: Chhaya Ramnani
 
 By inputting my UID and name, I declare that this submission is my own work.
 I am able to explain and justify all parts of this submission if asked.
 https://www.anu.edu.au/students/academic-skills/academic-integrity
 """
 def estimate_race_time(time_25km, windy, hot):
+    # baseline time is taken as 25km => 4 * the 25km time = 100km base time
+    base_time = time_25km * 4
+
+    #account for fatigue => 8% always + (windy > 5% / hot > 4%)
+    fatigue = 1 + 0.08
+    if windy:
+        fatigue += 0.05
+    if hot:
+        fatigue += 0.04
+
+    base_time * fatigue
+
     pass
 
 def estimate_race_time_refined(time_25km, wind_level, temperature_c):
+    # baseline time is taken as 25km => 4 * the 25km time = 100km base time
+    base_time = time_25km * 4
+
+    #account for fatigue => 8% always
+    fatigue = 1+0.8
+
+    if wind_level == "moderate":
+        fatigue += 0.05
+    elif wind_level == "very windy":
+        fatigue += 0.1
     pass
 
 def simulate_training_block(time_25km):
+    total_time = 0
+    days = [
+        ("no wind", 15),
+        ("moderate wind", 22),
+        ("very windy", 31),
+        ("moderate wind", 18)
+    ]
+
+    for wind, temp in days:
+        # skip if pleasant temperature and no wind
+        if 10 <= temp <= 20 and wind == "no wind":
+            continue
+            
+        day_time = estimate_race_time_refined(time_25km, wind, temp)
+        
+        # stop if overexertion risk
+        if day_time > 260:
+            break
+            
+        total_time += day_time
+        
+    return total_time
     pass
 
 ################################################################################
