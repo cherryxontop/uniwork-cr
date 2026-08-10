@@ -19,7 +19,7 @@ def estimate_race_time(time_25km, windy, hot):
     if hot:
         fatigue += 0.04
 
-    base_time * fatigue
+    return base_time * fatigue
 
     pass
 
@@ -28,12 +28,27 @@ def estimate_race_time_refined(time_25km, wind_level, temperature_c):
     base_time = time_25km * 4
 
     #account for fatigue => 8% always
-    fatigue = 1+0.8
+    fatigue = 1 + 0.8
 
     if wind_level == "moderate":
         fatigue += 0.05
     elif wind_level == "very windy":
         fatigue += 0.1
+
+    if 10 <= temperature_c <= 20:
+        fatigue += 0.00
+    elif 21 <= temperature_c <= 30:
+        fatigue += 0.03
+    elif temperature_c > 30:
+        fatigue += 0.07
+    elif temperature_c < 10:
+        fatigue += 0.02
+    
+    # additional condition for "very windy"
+    if temperature_c > 30 and wind_level == "very windy":
+        fatigue += 0.03
+    
+    return base_time * fatigue
     pass
 
 def simulate_training_block(time_25km):
