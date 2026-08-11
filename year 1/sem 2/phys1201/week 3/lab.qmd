@@ -125,5 +125,7 @@ Rearranging,
 $$\sigma_g = \pm \left(\frac{4(\pi)^2(L\pm\sigma_L)}{(T\pm\sigma_T)}-g\right)$$
 
 
-##
+## Experiment 1
+The aim of this experiment is to measure the period of a simple pendulum with respect to some initial angle to highlight the connection between angle, oscillatory period, and the local acceleration due to gravity.
 
+## Experiment 2

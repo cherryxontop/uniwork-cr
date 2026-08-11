@@ -124,7 +124,7 @@ def static_method():
 
 def dynamic_method():
     spring_mass = ufloat(0.0473, 0.000001)  # spring mass in kg
-    m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+    m_slot = ufloat(0.050, 0.001)  # mass per slot (kg)
     total_masses = [i * m_slot for i in range(1, 10)]
     time_20_bounces_s = [7.55,
                         9.05,
