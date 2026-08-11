@@ -77,18 +77,15 @@ def sigma_test(k1, sk1, k2, sk2):
         print("results DISAGREE")
 
 
-
-"""
-
 # EXPERIMENT 1: angle dependence of g
 
-# Measured data for 3 initial angles (low, medium, high)
+# measured data for 3 initial angles (low, medium, high)
 # angles in degrees, lengths in meters, time for 10 oscillations in seconds
 angles_deg = [5.0, 25.0, 40.0]
 lengths_p1_cm = [99.5, 99.5, 99.5]  # measured length
 time_10_oscillations = [20.06, 20.25, 20.85]
 
-# Uncertainties
+# uncertainties
 sigma_L = 0.001  # length uncertainty in meters (1 mm)
 sigma_t = 0.20   # total time uncertainty for 10 oscillations in seconds
 
@@ -135,7 +132,7 @@ y_dynamic = [T**2 for T in periods]
 slope, slope_err, intercept, intercept_err, plot_data = odr_fit(x_dynamic, y_dynamic)
 
 # Calculate g from slope
-g_experimental = 4.0 * (PI**2) / slope
+g_experimental = 4.0 * (np.pi**2) / slope
 # Propagate error: sigma_g = g * (sigma_slope / slope)
 g_experimental_err = g_experimental * (slope_err / slope)
 
@@ -144,7 +141,7 @@ print(f"Derived g: {g_experimental:.4f} ± {g_experimental_err:.4f} m/s²")
 print(f"Intercept: {intercept:.4f} ± {intercept_err:.4f} s²")
 
 # Test agreement with accepted Canberra value (9.7976 m/s^2)
-sigma_test(g_experimental.n, g_experimental.s, G_ACCEPTED, 0.0001, name1="Derived g", name2="Accepted g")
+sigma_test(g_experimental.n, g_experimental.s, g, 0.0001, name1="Derived g", name2="Accepted g")
 
 # Plotting results for Part 2
 plot(
@@ -159,10 +156,7 @@ plot(
 )
 
 
-if __name__ == "__main__":
-    main()
 
-"""
 
 
 

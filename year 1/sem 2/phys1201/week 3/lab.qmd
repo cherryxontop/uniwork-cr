@@ -126,6 +126,43 @@ $$\sigma_g = \pm \left(\frac{4(\pi)^2(L\pm\sigma_L)}{(T\pm\sigma_T)}-g\right)$$
 
 
 ## Experiment 1
-The aim of this experiment is to measure the period of a simple pendulum with respect to some initial angle to highlight the connection between angle, oscillatory period, and the local acceleration due to gravity.
+
+### Aim
+
+The aim of this experiment is to measure the period of a simple pendulum with respect to some (small, medium and large) initial release angle to highlight the connection between angle, oscillatory period, and acceleration due to gravity.
+
+### Method
+
+For small angles, the period of a simple pendulum is given by:
+  $$T = 2\pi\sqrt{\frac{L}{g}},$$
+where $L$ is the length of the string atttached to a point of mass $m$.
+
+For larger angles up to approximately $40^\circ$, analytical corrections must be applied:
+  $$T = 2\pi\sqrt{\frac{L}{g}}\left(1 + \frac{1}{16}\theta_0^2\right)$$
+
+where $\theta_0$ is the initial angle in radians, when the pendulum is released from rest. 
+
+Rearranging this expression isolates the gravitational acceleration $
+g$:$$g = \frac{4\pi^2 L}{T^2}\left(1 + \frac{1}{16}\theta_0^2\right)^2$$
+
+### Procedure
+
 
 ## Experiment 2
+
+### Aim
+
+To investigate how the period of a simple pendulum depends on its length ($L$) under small-angle conditions ($\theta_0 < 10^\circ$), and to obtain a highly precise value for $g$ using a linearised graph.
+
+### Method
+
+Starting from Equation 3, 
+$$T=2\pi\sqrt{\frac{L}{g}}$$
+$$\frac{T}{2\pi}=\sqrt{\frac{L}{g}}$$
+
+Squaring both sides yields a linear relationship ($y = mx + c$):
+  $$T^2 = \left(\frac{4\pi^2}{g}\right)L$$
+where
+  $$y = T^2 (\text{s}^2),$$
+  $$x = L (\text{m}),$$
+  $$m (gradient): \frac{4\pi^2}{g} \implies g = \frac{4\pi^2}{\text{slope}}$$
