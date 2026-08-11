@@ -85,7 +85,7 @@ def sigma_test(k1, sk1, k2, sk2):
 
 def static_method():
     x0 = ufloat(0.30, 0.0025)       # initial spring length (m)
-    m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+    m_slot = ufloat(0.050, 0.001)  # mass per slot (kg)
 
     # measured total lengths (cm)
     total_lengths_cm = [32.4,

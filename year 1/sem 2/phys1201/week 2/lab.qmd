@@ -144,7 +144,7 @@ print(f"x0 = {x0} m")
 We then measured the mass of our initial mass slot and consequently each mass slot that was added = $50g$. Accounting for the fluctuation of exactly 1 gram,
 
 ```{python}
-m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+m_slot = ufloat(0.050, 0.001)  # mass per slot (kg)
 print(f"m_slot = {m_slot} kg")
 ```
 ```{python}
@@ -156,8 +156,7 @@ total_lengths_cm = [32.4,
                     44.3,
                     46.5,
                     48.9,
-                    51.5,
-                    53.8]
+                    51.5]
 ```
 
 Because our measurements are in $cm$, we convert them to $m$ and also input the uncertainties
@@ -167,7 +166,7 @@ total_lengths_m = [ufloat(L / 100.0, 0.0025) for L in total_lengths_cm]
 
 Now, calculating force and extension:
 ```{python}
-total_masses = [i * m_slot for i in range(1, 11)] 
+total_masses = [i * m_slot for i in range(1, 10)] 
             # computes cumulative mass for each step
 force = [m * g for m in total_masses]             
             # multiplies total mass by 'g' to get downward force
@@ -178,7 +177,7 @@ extension = [L - x0 for L in total_lengths_m]
 ```{python}
 #| echo: false
 static_table = pd.DataFrame({
-    "Slots": range(1, 11),
+    "Slots": range(1, 10),
     "Mass (kg)": [f"{m.n:.4f} ± {m.s:.4f}" for m in total_masses],
     "Length (m)": [f"{L.n:.4f} ± {L.s:.4f}" for L in total_lengths_m],
     "Extension (m)": [f"{e.n:.4f} ± {e.s:.4f}" for e in extension],
@@ -191,7 +190,7 @@ Using the plot function defined in __Imports and Functions__ and combining every
 ```{python}
 def static_method():
     x0 = ufloat(0.30, 0.0025)       # initial spring length (m)
-    m_slot = ufloat(0.050, 0.0001)  # mass per slot (kg)
+    m_slot = ufloat(0.050, 0.001)  # mass per slot (kg)
 
     # measured total lengths (cm)
     total_lengths_cm = [32.4,
@@ -202,7 +201,7 @@ def static_method():
                         44.3,
                         46.5,
                         48.9,
-                        51.5,]
+                        51.5]
     total_lengths_m = [ufloat(L / 100.0, 0.0025) for L in total_lengths_cm]
     total_masses = [i * m_slot for i in range(1, 10)]
     force = [m * g for m in total_masses]
@@ -327,7 +326,7 @@ def dynamic_method():
                         16.53,
                         17.64,
                         18.28]
-    periods = [ufloat(t, 0.20) / 20.0 for t in time_20_bounces_s]
+    periods = [ufloat(t, 0.20) / 19.0 for t in time_20_bounces_s]
     print(periods)
     x_dynamic = [(T / (2 * np.pi)) ** 2 for T in periods]
     y_dynamic = [m + (spring_mass / 3.0) for m in total_masses]
@@ -378,7 +377,7 @@ summary_table = pd.DataFrame({
 summary_table
 ```
 
-The static method gave $k_{\text{static}} = 20.60 \pm 0.10$ N/m, and the dynamic method gave $k_{\text{dynamic}} = 21.98 \pm 0.53$ N/m, a discrepancy of $2.56\sigma$. By our $3\sigma$ threshold, the two methods **agree** within uncertainty, though the gap is still notable and the dynamic method's much larger uncertainty (roughly 5x that of the static method) reflects that timing measurements are inherently less precise than the ruler-based length measurements.
+The static method gave $k_{\text{static}} = 20.628 \pm 0.090 N/m$, and the dynamic method gave $k_{\text{dynamic}} = 19.923 \pm 0.508$ N/m, a discrepancy of $1.37\sigma$. which is within the $3\sigma$ criterion and therefore indicates that the two methods are in agreement within experimental uncertainty. Although the results agree, the dynamic method produced a substantially larger uncertainty.
 
 Likely contributors to this discrepancy:
 
