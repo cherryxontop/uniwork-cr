@@ -235,17 +235,18 @@ def static_method():
 
 ### Aim
 To find the spring constant of the spring provided using the dynamic method: measuring the period for different applied forces
+
 ### Method
 Applying Hooke's Law, we have been given the following equation:
 $$T = 2\pi\sqrt{\frac{m + \frac{m_s}{3}}{k}}$$
 where T is the period of the bounce, m is the mass, $m_s$ is the mass of the spring and k is the spring constant.
 
 Rearranging, we get
-$$k(\frac{T}{2\pi})^2 = m + \frac{m_s}{3}$$
+$$k\left(\frac{T}{2\pi}\right)^2 = m + \frac{m_s}{3}$$
 
 Comparing to $y=mx + c$, we get:
 $$y=m+\frac{m_s}{3}$$
-$$x=(\frac{T}{2\pi})^2$$
+$$x=\left(\frac{T}{2\pi}\right)^2$$
 
 And the gradient will be k.
 
@@ -254,7 +255,7 @@ And the gradient will be k.
 
 ### Procedure
 
-We have everything we need for this recipe, except $T$. We can obtain it by measuring the time taken by the spring to bounce 20 times. We choose to count bounces rather than time because we can get a more accurate measurement if we only have to keep track of the number of bounces, rather than tracking both, say, 20 bounces and 20 seconds.  
+We have everything we need for this recipe, except $T$. We can obtain it by measuring the time taken by the spring to bounce 20 times. We choose to count bounces rather than time because we can get a more accurate measurement if we only have to keep track of the number of bounces, rather than tracking both, say, 20 bounces (19 periods) and 20 seconds.  
 The ground for errors is further minimized by having one person starting the timer and initiating the bounce.  
 
 We first started by measuring the mas of the spring on the laboratory scale. We account for the slight seldom fluctuation of the mass as the uncertainity.
@@ -280,9 +281,9 @@ time_20_bounces_s =   [7.55,
                         18.28]
 ```
 
-To find period, we divide time recorded for 20 bounces _by_ 20 to find the period. Taking 0.2s as an uncertainty accounting for delay in reflex, since the reflex delay applies once at the start and once at the stop of the stopwatch.
+To find period, we divide time recorded for 20 bounces by 19 to find the period. Taking 0.2s as an uncertainty accounting for delay in reflex, since the reflex delay applies once at the start and once at the stop of the stopwatch.
 ```{python}
-periods = [ufloat(t, 0.20) / 20.0 for t in time_20_bounces_s]
+periods = [ufloat(t, 0.20) / 19.0 for t in time_20_bounces_s]
 print(periods)
 ```
 
