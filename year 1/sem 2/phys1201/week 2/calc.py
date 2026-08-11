@@ -135,7 +135,7 @@ def dynamic_method():
                         16.53,
                         17.64,
                         18.28]
-    periods = [ufloat(t, 0.20) / 20.0 for t in time_20_bounces_s]
+    periods = [ufloat(t, 0.20) / 19.0 for t in time_20_bounces_s]
     print(periods)
     x_dynamic = [(T / (2 * np.pi)) ** 2 for T in periods]
     y_dynamic = [m + (spring_mass / 3.0) for m in total_masses]
