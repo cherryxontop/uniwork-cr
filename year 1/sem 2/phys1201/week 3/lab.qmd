@@ -364,7 +364,7 @@ Same setup as Part 1. g-clamp, rigid pendulum clamp, string with a metal bob. We
 ```{=typst}
 #figure(
   image("images/sketch2.png", width: 50%),
-  caption: [Sketch 2 (yeah its pretty bad i know)],
+  caption: [Sketch 2],
 )
 ```
 
