@@ -15,6 +15,7 @@ jupyter: python3
 All calculations were done in Python. Starting with imports:
 
 ```{python}
+from dataclasses import dataclass
 import matplotlib.pyplot as plt
 from uncertainties import ufloat
 import numpy as np
@@ -28,62 +29,81 @@ Defining the gravity constant in Canberra:
 g_accepted = 9.7976
 ```
 
-To handle our data properly, we used a custom Python function (`odr_fit`) leveraging `scipy.odr`. Because our measurements have uncertainties in both the x and y axes, standard linear regression won't cut it. This function extracts the nominal values and errors from our `uncertainties` objects, sets up a linear model ($y = mx + c$), and performs an ODR to find the best-fit slope, its uncertainty, and the y-intercept.
+Since our measurements have uncertainty in both x and y, a normal linear regression won't cut it. We need to account for error on both axes at once. So I wrote a custom `odr_fit` function using `scipy.odr`instead. It extracts the nominal values and uncertainties from the ufloat data, performs the ODR linear fit, and returns the slope and intercept with their uncertainties. It also calculates (R^2) and RMSE from the resulting vertical residuals.
 
 ```{python}
-def odr_fit(x_data, y_data, zero_intercept: bool = False):
-    x = np.array([v.n for v in x_data])
-    sx = np.array([v.s for v in x_data])
-    y = np.array([v.n for v in y_data])
-    sy = np.array([v.s for v in y_data])
+@dataclass
+class odr_fit_result:
+    slope: ufloat
+    intercept: ufloat
+    r_squared: float
+    rmse: float
+    x_nom: np.ndarray
+    y_nom: np.ndarray
+    x_err: np.ndarray
+    y_err: np.ndarray
 
-    data = odr.RealData(x, y, sx=sx, sy=sy)
+def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
 
-    if zero_intercept:
-        linear_model = odr.Model(lambda p, x: p[0] * x)
-        beta0 = [10.0]
-    else:
-        linear_model = odr.Model(lambda p, x: p[0] * x + p[1])
-        beta0 = [10.0, 0.0]
+    x_nom = np.array([v.n for v in x])
+    x_err = np.array([v.s for v in x])
+    y_nom = np.array([v.n for v in y])
+    y_err = np.array([v.s for v in y])
 
-    odr_result = odr.ODR(data, linear_model, beta0=beta0).run()
+    data = odr.RealData(x_nom, y_nom, sx=x_err, sy=y_err)
 
-    slope = odr_result.beta[0]
-    slope_err = odr_result.sd_beta[0]
-    
-    if zero_intercept:
-        intercept = 0.0
-        intercept_err = 0.0
-    else:
-        intercept = odr_result.beta[1]
-        intercept_err = odr_result.sd_beta[1]
+    model = odr.Model(lambda p, x: p[0] * x + p[1])
+    beta0 = [4.0, 0.0] # rough initial guess; true slope ≈ 4pi²/g ≈ 4
 
-    return slope, slope_err, intercept, intercept_err, (x, y, sx, sy)
+    odr_result = odr.ODR(data, model, beta0=beta0).run()
 
+    slope = ufloat(odr_result.beta[0], odr_result.sd_beta[0])
+    intercept = ufloat(odr_result.beta[1], odr_result.sd_beta[1])
+
+    y_pred = model.fcn(odr_result.beta, x_nom)
+    residuals = y_nom - y_pred
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((y_nom - np.mean(y_nom))**2)
+    r_squared = 1 - ss_res / ss_tot if ss_tot != 0 else np.nan
+    rmse = np.sqrt(np.mean(residuals**2))
+
+    return odr_fit_result(
+    slope=slope,
+    intercept=intercept,
+    r_squared=r_squared,
+    rmse=rmse,
+    x_nom=x_nom,
+    y_nom=y_nom,
+    x_err=x_err,
+    y_err=y_err,
+)
 ```
 
-To visualize our results, we wrote a plotting function (`plot`) using `matplotlib`. This function creates a clear scatter plot of our data complete with error bars on both axes, overlays the best-fit line calculated from our ODR regression, and formats the legend to display our final spring constant value and its uncertainty.
+To actually see our fits, I wrote a `plot` function using `matplotlib`. It scatters our data with error bars on both axes, overlays the best-fit line on top, and drops the slope with its uncertainty into the legend.
 
 ```{python}
-def plot(x, y, sx, sy, slope, slope_err, intercept, xlabel, ylabel, title, filename,  zero_intercept=False):
+def plot(x, y, sx, sy, slope, slope_err, intercept, xlabel, ylabel, title, filename):
     x_fit = np.linspace(min(x), max(x), 100)
     y_fit = slope * x_fit + intercept
-    
+
     plt.figure(figsize=(7, 5))
+
     plt.errorbar(
         x, y,
-        xerr=sx, yerr=sy,
-        fmt='o',
-        color="navy",
-        ecolor="crimson",
+        xerr=sx,
+        yerr=sy,
+        fmt="o",
         capsize=3,
         label="Experimental Data"
     )
+
     plt.plot(
-        x_fit, y_fit,
+        x_fit,
+        y_fit,
         "k--",
         label=f"Fit: Slope = {slope:.3f} ± {slope_err:.3f}"
     )
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
@@ -94,19 +114,23 @@ def plot(x, y, sx, sy, slope, slope_err, intercept, xlabel, ylabel, title, filen
     plt.show()
 ```
 
-To check if both methods gave consistent results, we run a sigma test (`sigma_test`). It calculates the statistical difference between the two spring constant values relative to their combined uncertainties. If the difference is less than or equal to 3 standard deviations ($3\sigma$), it indicates our results agree within experimental error.
+The way of checking whether our experimental $g$ agrees with the accepted value. It works out the discrepancy in units of standard deviations ($\sigma$), and if that's under 3, we call it agreement. otherwise, it's flagged as a disagreement.
+
 ```{python}
-def sigma_test(k1, sk1, k2, sk2):
-    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
+def sigma_test(k1, sk1, k2):
+    sigma_diff = abs(k1 - k2) / sk1
+
     print("SIGMA TEST")
-    print(f"Static k  : {k1:.3f} +/- {sk1:.3f} N/m")
-    print(f"Dynamic k : {k2:.3f} +/- {sk2:.3f} N/m")
-    print(f"Discrepancy: {sigma_diff:.2f} sigma")
+    print(f"derived g  : {k1:.3f} +/- {sk1:.3f} m/s²")
+    print(f"accepted g : {k2:.4f} m/s²")
+    print(f"discrepancy: {sigma_diff:.2f} sigma")
 
     if sigma_diff <= 3.0:
         print("results AGREE within experimental uncertainty")
     else:
         print("results DISAGREE")
+
+    return sigma_diff
 ```
 
 ## Pre-lab Questions
@@ -116,13 +140,12 @@ Using equation (3),
 $$T=2\pi\sqrt{\frac{L}{g}}$$
 $$\frac{T}{2\pi}=\sqrt{\frac{L}{g}}$$
 $$\left(\frac{T}{2\pi}\right)^2=\frac{L}{g}$$
-$$g=\frac{4(\pi)^2L}{T}$$
+$$g=\frac{4(\pi)^2L}{T^2}$$
 
 ### Question 2-
 Using the above obtained equation for $g$, and substituting measured values with their absolute errors, $L \pm \sigma_L$ and $T\pm\sigma_T$,
-$$g\pm\sigma_g = \frac{4(\pi)^2(L\pm\sigma_L)}{(T\pm\sigma_T)}$$
-Rearranging,
-$$\sigma_g = \pm \left(\frac{4(\pi)^2(L\pm\sigma_L)}{(T\pm\sigma_T)}-g\right)$$
+
+$$\sigma_g = g\sqrt{\left(\frac{\sigma_L}{L}\right)^2 + \left(2\frac{\sigma_T}{T}\right)^2}$$
 
 
 ## Experiment 1
@@ -137,13 +160,13 @@ For small angles, the period of a simple pendulum is given by:
   $$T = 2\pi\sqrt{\frac{L}{g}},$$
 where $L$ is the length of the string atttached to a point of mass $m$.
 
-For larger angles up to approximately $40^\circ$, analytical corrections must be applied:
+For larger angles up to approximately $40^\circ$, a correction can be applied:
   $$T = 2\pi\sqrt{\frac{L}{g}}\left(1 + \frac{1}{16}\theta_0^2\right)$$
 
 where $\theta_0$ is the initial angle in radians, when the pendulum is released from rest. 
 
-Rearranging this expression isolates the gravitational acceleration $
-g$:$$g = \frac{4\pi^2 L}{T^2}\left(1 + \frac{1}{16}\theta_0^2\right)^2$$
+Rearranging this expression isolates the gravitational acceleration $g$:
+$$g = \frac{4\pi^2 L}{T^2}\left(1 + \frac{1}{16}\theta_0^2\right)^2$$
 
 ### Procedure
 
@@ -155,13 +178,27 @@ As an effort to minimize human error, we had the person that swings the pendulum
 
 We repeat this process for the 3 angles we're asked to measure: 5, 25, and 40, with 3 trials each.
 
+```{=typst}
+#figure(
+  image("images/setup.png", width: 50%),
+  caption: [Setup for the experiment.],
+)
+```
+
+```{=typst}
+#figure(
+  image("images/sketch1.png", width: 50%),
+  caption: [Sketch 1 (yeah its pretty bad i know)],
+)
+```
+
 ### Results
 
 As previously stated, all calculations and interpretations were done using python. I've defined all my used fuctions in the __Imports and Functions__ section. Lets starttt
 
-Our measured length of the string turned out to be $51.2cm$ or $0.512m$. We measured the length of the string in increments of $0.5 cm$, so we account the uncertainty as half of that, $0.25cm$. Uh there are 3 values because i'm using arrays instead of ufloats so its a bit messy.
+Our measured length of the string turned out to be $51.2cm$ or $0.512m$. We measured the length of the string in increments of $0.5 cm$, so we account the uncertainty as half of that, $0.25cm$.
 ```{python}
-L_p1_cm = [51.2, 51.2, 51.2]  # measured length
+L_p1_cm = 51.2  # measured length
 sigma_L = 0.25 / 100  # m
 ```
 
@@ -195,7 +232,6 @@ The following code block does the following:
 g_results_p1 = []
 table_data = []
 
-print("~~~PART 1 RESULTS~~~")
 for i in range(len(angles_deg)):
     theta_deg = ufloat(angles_deg[i], sigma_theta_deg)
     theta_rad = theta_deg * np.pi / 180.0
@@ -205,7 +241,7 @@ for i in range(len(angles_deg)):
     std_err_time = np.std(trials, ddof=1) / np.sqrt(len(trials))
     total_time_err = max(std_err_time, sigma_t)
 
-    L = ufloat(L_p1_cm[i] / 100.0, sigma_L)
+    L = ufloat(L_p1_cm / 100.0, sigma_L)
     t_total = ufloat(mean_time, total_time_err)
     T = t_total / 10.0  # period for one oscillation
 
@@ -219,17 +255,80 @@ for i in range(len(angles_deg)):
     g_results_p1.append(g_val)
 
     table_data.append({
-        "Angle (°)": f"{theta_deg.n:.1f} ± {theta_deg.s:.1f}",
-        "Correction Factor": f"{correction_factor.n:.4f} ± {correction_factor.s:.4f}",
+        "angle (°)": f"{theta_deg.n:.1f} ± {theta_deg.s:.1f}",
+        "correction Factor": f"{correction_factor.n:.4f} ± {correction_factor.s:.4f}",
         "g (m/s²)": f"{g_val.n:.3f} ± {g_val.s:.3f}",
-        "Discrepancy (σ)": f"{abs(g_val.n - g_accepted) / g_val.s:.2f}"
+        "discrepancy": f"{abs(g_val.n - g_accepted) / g_val.s:.2f}"
     })
 
 df_p1 = pd.DataFrame(table_data)
 df_p1
 ```
 
-All three agree with $g = 9.7976$ well within $3\sigma$. So the correction is doing its job — even at $40\deg$, we're not seeing the pendulum "break." Worth noting though, the correction factor's own uncertainty is basically negligible next to our timing uncertainty (0.0005–0.0008 vs the ~0.02s timing error dominating everything) — so whether we bother propagating $\sigma_\theta$ through at all barely changes our final $g$ uncertainty. It was merely a for-the-process thing.
+
+For a clearer visual on how our derived $g$ values held up across the three angles, we plot $g$ against $\theta_0$, with error bars in both directions (angle uncertainty on x, propagated $g$ uncertainty on y), and a horizontal dashed line marking the accepted Canberra $g$ value. The idea here isn't to fit anything- there's no expected linear relationship between $g$ and $\theta_0$. it's purely a visual check for whether our correction is actually holding up as angle increases, or whether we start drifting away from $g_{accepted}$ at the larger angles.
+
+```{python}
+theta_nom = angles_deg
+theta_err = [sigma_theta_deg] * len(angles_deg)
+g_nom = [g.n for g in g_results_p1]
+g_err = [g.s for g in g_results_p1]
+
+plt.figure(figsize=(7, 5))
+plt.errorbar(
+    theta_nom, g_nom,
+    xerr=theta_err, yerr=g_err,
+    fmt='o',
+    color="navy",
+    ecolor="crimson",
+    capsize=3,
+    label="Experimental $g$"
+)
+plt.axhline(g_accepted, color="black", linestyle="--", label=f"Accepted $g$ = {g_accepted} m/s²")
+plt.xlabel("Release Angle (°)")
+plt.ylabel("Derived $g$ (m/s²)")
+plt.title("Part 1: Derived $g$ vs Release Angle")
+plt.grid(True, alpha=0.6)
+plt.legend()
+plt.tight_layout()
+plt.savefig("graphs/pendulum_angle_dependence.png", dpi=300)
+plt.show()
+```
+
+To formalise the "agreement" rather than just eyeballing the plot, we run the sigma test per angle.
+```{python}
+sigma_table_data = []
+
+for i in range(len(angles_deg)):
+    diff = sigma_test(g_results_p1[i].n, g_results_p1[i].s, g_accepted)  # <- captures the return
+    verdict = "AGREE" if diff <= 3.0 else "DISAGREE"
+    sigma_table_data.append({
+        "angle (°)": angles_deg[i],
+        "derived g (m/s²)": f"{g_results_p1[i].n:.3f} ± {g_results_p1[i].s:.3f}",
+        "accepted g (m/s²)": f"{g_accepted:.4f}",
+        "discrepancy": f"{diff:.2f}",
+        "verdict!!": verdict
+    })
+
+df_sigma_p1 = pd.DataFrame(sigma_table_data)
+df_sigma_p1
+```
+
+
+
+### Observations
+
+Honestly, all three of our derived $g$ values held up pretty well: $9.703 \pm 0.273$ at 5°, $9.617 \pm 0.267$ at 25°, and $9.646 \pm 0.263$ at 40°, all comfortably under $1\sigma$ from the accepted $9.7976$. Everything agrees within experimental uncertainty, no exceptions.
+
+What's actually kind of nice is that there's no obvious trend with angle. If the correction factor were slacking off at larger angles, we'd expect $g$ to drift further and further from the accepted value as $\theta_0$ increases. Instead, 25° and 40° land basically as close to $g_{accepted}$ as 5° does- so whatever's limiting us here, it's clearly timing, not angle.
+
+**Limitations & possible sources of discrepancy:**
+
+- **Stopwatch reflexes:** Our 0.20-second timing error completely overshadows any natural variation between trials. We were basically limited by our own reaction speeds, not anything cool happening in the physics.
+- **Tiny sample size for trials:** Calculating our error with just 3 trials is pretty rough. It’s a super loose guess of our actual spread rather than a tight, accurate measurement.
+- **Not many angles checked:** We only tested three specific angles, so while the correction factor held up there, we can't say for sure what happens right at the 10-degree cutoff or way higher up. Three points is just enough for a quick sanity check.
+- **Ideal vs reality:** The math assumes a magical point-mass on a weightless string, but our actual bob and string have real size and mass. We completely ignored that, and it's probably dragging down our $g$ value.
+- **Friction and draaaaag:** We didn't account for air resistance or pivot friction anywhere. They slow things down and can actually stretch out the period a bit over a bunch of swings.
 
 
 ## Experiment 2
@@ -252,4 +351,104 @@ where
   $$m (gradient): \frac{4\pi^2}{g} \implies g = \frac{4\pi^2}{\text{slope}}$$
 
 ### Procedure
-Same setup as Part 1— g-clamp, rigid pendulum clamp, string with a metal bob. But this time we keep the release angle small, $10\deg$ and instead vary the string length across 4 values, $20, 40, 60 & 80 cm$ For each length we again time 10 oscillations, repeated 3 times, and divide by 10 to get the period.
+
+Same setup as Part 1. g-clamp, rigid pendulum clamp, string with a metal bob. We kept the release angle at approximately $10\deg$ or below. and instead vary the string length across 4 values, $20, 40, 60, 80 cm$. For each length we again time 10 oscillations, repeated 3 times, and divide by 10 to get the period.
+
+```{=typst}
+#figure(
+  image("images/setup.png", width: 50%),
+  caption: [Setup for the experiment.],
+)
+```
+
+```{=typst}
+#figure(
+  image("images/sketch2.png", width: 50%),
+  caption: [Sketch 2 (yeah its pretty bad i know)],
+)
+```
+
+### Results
+
+Length uncertainty is the same as before $(\pm 0.25 cm)$ from our measuring increments, and timing uncertainty is the same $(\pm 0.20 s)$ floor. There are 4 arrays for 4 string lengths and within that, 3 measurements for the 3 repeated trials. Next line converts everything to metres and ufloats.
+
+```{python}
+lengths_p2_cm = [20.0, 40.0, 60.0, 80.0]
+time_10_p2 = [
+    [9.33, 9.33, 9.41],
+    [13.08, 13.08, 13.01],
+    [15.68, 15.63, 15.80],
+    [18.08, 18.09, 18.08]
+]
+lengths_m = [ufloat(l / 100.0, sigma_L) for l in lengths_p2_cm]
+```
+
+The below code block does:
+
+- takes the mean of time measurements and errors, converts them into periods and ufloat
+- calls `odr_fit(x, y)`, which returns an `odr_fit_result` containing `slope`, `intercept`, `r_squared`, and `rmse`, all as ufloats
+- derives our experimental $g$ from the slope, since $g = \frac{4\pi^2}{\text{slope}}$
+- computes the discrepancy in $\sigma$ against the accepted value
+
+```{python}
+periods = []
+table_data_p2 = []
+for trials in time_10_p2:
+    mean_time = np.mean(trials)
+    std_err_time = np.std(trials, ddof=1) / np.sqrt(len(trials))
+    total_time_err = max(std_err_time, sigma_t)
+
+    t_total = ufloat(mean_time, total_time_err)
+    periods.append(t_total / 10.0)
+
+x = lengths_m
+y = [T**2 for T in periods]
+
+result = odr_fit(x, y)
+
+g_experimental = 4.0 * (np.pi**2) / result.slope
+discrepancy_p2 = sigma_test(g_experimental.n, g_experimental.s, g_accepted)  # <- replaces manual calc
+
+table_data_p2 = [{
+    "slope (s²/m)": f"{result.slope.n:.4f} ± {result.slope.s:.4f}",
+    "intercept (s²)": f"{result.intercept.n:.4f} ± {result.intercept.s:.4f}",
+    "R²": f"{result.r_squared:.4f}",
+    "g (m/s²)": f"{g_experimental.n:.3f} ± {g_experimental.s:.3f}",
+    "discrepancy": f"{discrepancy_p2:.2f}"
+}]
+
+df_p2 = pd.DataFrame(table_data_p2)
+df_p2
+```
+
+```{python}
+plot(
+    result.x_nom,
+    result.y_nom,
+    result.x_err,
+    result.y_err,
+    result.slope.n,
+    result.slope.s,
+    result.intercept.n,
+    xlabel="Length $L$ (m)",
+    ylabel=r"Period Squared $T^2$ (s$^2$)",
+    title="Simple Pendulum: $T^2$ vs Length $L$",
+    filename="graphs/pendulum_length_dependence.png"
+)
+```
+
+### Observations
+
+The fit here is genuinely great (which is what i've been hoping for all this time that i've been typing) $R^2 = 0.9997$, so $T^2$ vs $L$ is about as linear as we could hope for, which tracks since we kept ourselves safely under 10° this whole time. Slope comes out to $3.99 \pm 0.05$ s²/m, which flips through $g = 4\pi^2/\text{slope}$ into $g_{exp} = 9.90 \pm 0.12$ m/s². running that against the accepted value gives us a discrepancy of just $0.89\sigma$ which is still within agreement, and honestly our tightest, most precise result out of both experiments.
+
+That said, not everything is perfect. Our fitted intercept is $0.085 \pm 0.021$ s², which is about $4\sigma$ away from zero. Theoretically the intercept should be exactly zero, since $T^2 = \frac{4\pi^2}{g}L$ has no constant term. A $4\sigma$ deviation is too consistent to just be random scatter, so there's probably a small systematic offset somewhere. It's not enough to throw off our derived $g$ (our RMSE is tiny, 0.0143 s², so residuals are small in absolute terms), but it's something worth noting
+
+**Limitations & possible sources of discrepancy:**
+
+- **Measuring from the wrong spot:** If we measured length from the top of the pendulum bob instead of its exact center, every single measurement is off by the same tiny amount. That messes up our starting point on the graph.
+
+- **Slow fingers:** If we consistently started the stopwatch a split-second late every time, it adds a uniform delay across the board, which also ruins our intercept.
+
+- **Not enough data:** We only used 4 different lengths. Four points are enough to draw a line, but if even one measurement was a little sloppy, it throws off our whole result.
+
+- **Guessing on the angle:** We assumed we kept the swing under 10 degrees every time, but we didn't actually check or measure it. If a few of our swings got too wide, it would secretly mess up our math.
