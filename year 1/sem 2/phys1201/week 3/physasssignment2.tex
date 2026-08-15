@@ -1,0 +1,105 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+
+\title{Assignment 2}
+
+\begin{document}
+\maketitle
+
+\section{Part 1}
+For a particle of mass $m$ moving with a velocity $v$, the action $S$ along a path is given by the integral of the Lagrangian. Since the potential energy here is $0$, the kinetic energy is given by:
+\[
+  \frac{1}{2}mv^2
+\]
+The Lagrangian is:
+\[
+  L = T - V = \frac{1}{2}mv^2
+\]
+The action is:
+\[
+  S = \int L dt = \int \frac{1}{2}mv^2 dt = \frac{1}{2}mv^2 \left(\frac{s}{v}\right) = \frac{1}{2}mvs
+\]
+Path B is slightly longer than Path A because the neutron travels an extra distance $d$. in Figure 1, that extra distance forms a right triangle with the nucleus's diameter $D$ and the scattering angle $\theta$, giving 
+\[
+d = D \sin\theta
+\]
+Because action depends directly on distance, the difference in action between the two paths is:
+\[
+\Delta S = mvD \sin\theta
+\]
+
+\section{Part 2}
+
+Total wave probability amplitude $W_{A\rightarrow B}$ is the sum of the wave functions for path A and path B
+    \[
+    W_{A\rightarrow B} = W_A + W_B
+    \]
+    
+The probability amplitude for a particle traveling along a specific classical path is:
+    \[
+    W_A = N e^{iS_A/\hbar}, \quad w_B = N e^{iS_B/\hbar}
+    \]
+    where $N$ is a normalization constant.
+    
+The probability $P$ is given by the squared absolute value of the total amplitude:
+    \[
+    P_{A\rightarrow B} = \left( N e^{iS_A/\hbar} + N e^{iS_B/\hbar} \right)^* \left( N e^{iS_A/\hbar} + N e^{iS_B/\hbar} \right)
+    \]
+    \[
+    P_{A\rightarrow B} = N^2 \left( e^{-iS_A/\hbar} + e^{-iS_B/\hbar} \right) \left( e^{iS_A/\hbar} + e^{iS_B/\hbar} \right)
+    \]
+    \[
+    P{A\rightarrow B} = N^2 \left( 1 + e^{i(S_B - S_A)/\hbar} + e^{-i(S_B - S_A)/\hbar} + 1 \right)
+    \]
+    but $\Delta S = S_B - S_A$:
+    \[
+    P{A\rightarrow B} = N^2 \left( 2 + e^{i\Delta S/\hbar} + e^{-i\Delta S/\hbar} \right)
+    \]
+    
+Applying the identity $\cos z = \frac{e^{iz} + e^{-iz}}{2}$:  
+    \[
+    P = 2N^2 \left( 1 + \cos\frac{\Delta S}{\hbar} \right)
+    \]
+    Thus the probability to detect a neutron is proportional to $(1 + \cos \frac{\Delta S}{\hbar})$
+
+\section {Part 3}
+
+The detection probability depends on the term $(1 + \cos \frac{\Delta S}{\hbar})$. A destructive interference minimum occurs when the cosine term reaches its minimum value of $-1$. This requires the argument of cosine:
+    \[
+    \frac{\Delta S}{\hbar} = \pi \Rightarrow |\Delta S| = \pi\hbar
+    \]
+At this angle ($\theta \approx 18^\circ$), $\Delta S = \pi\hbar$, meaning the phase difference between the two path amplitudes is $\pi$ radians ($180^\circ$). Also, the two phasors associated with paths $A$ and $B$ point in opposite directions, leading to destructive interference. 
+
+\section {Part 4}
+
+At the first minimum angle $\theta_0$, the action difference satisfies $\Delta S = \pi\hbar$[cite: 1]. Substituting for $\Delta S$:
+    \[
+    m v D \sin\theta_0 = \pi\hbar
+    \]
+    Solving for $D$:
+    \[
+    D = \frac{\pi\hbar}{m v \sin\theta_0}
+    \]
+    Since $\hbar = \frac{h}{2\pi}$, substituting this gives:
+    \[
+    D = \frac{h}{2 m v \sin\theta_0}
+    \]
+Given:
+
+Planck constant $h \approx 6.63 \times 10^{-34} J\cdot{s}$
+
+neutron mass $m = 1.67 \times 10^{-27} { kg}$
+
+neutron velocity $v = 10^8 { m/s}$
+
+angle $\theta_0 = 18^\circ$, $\sin(18^\circ) \approx 0.309017$:
+    \[
+    D = \frac{6.63 \times 10^{-34}}{2 \times (1.67 \times 10^{-27}) \times (10^8) \times 0.309017} = \frac{6.63 \times 10^{-34}}{1.03218 \times 10^{-19}}
+    \]
+    \[
+    D \approx 6.42 \times 10^{-15} { m}
+    \]
+
+
+
+\end{document}
