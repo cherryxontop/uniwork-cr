@@ -23,6 +23,6 @@ __pycache__/
 **/*ENV/
 
 #quarto cache
-**/*lab_report_files
+**/*lab_files
 **/*.quarto/typst
 **/*.ipnyb
