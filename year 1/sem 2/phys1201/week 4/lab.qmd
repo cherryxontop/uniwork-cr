@@ -1,8 +1,8 @@
 ---
-title: "Lab Report: Week 3 - Magnetic field in a Solenoid"
+title: "Lab Report: Magnetic Field of a Solenoid"
 subtitle: "_Chhaya Ramnani (UID: u8336188)_"
 author: "_Lab partners: Tsz Wing Candice Ng, Chinatsu Komada_"
-date: "2026-08-12"
+date: "2026-08-19"
 format: 
   typst:
     toc: false
@@ -12,32 +12,40 @@ jupyter: python3
 ---
 
 ## Imports and Functions
-All calculations were done in Python. Starting with imports:
+
+Same deal as last time- errors on both axes, so it's `scipy.odr` again, not a plain linear fit. Starting with imports:
 
 ```{python}
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
-from uncertainties import ufloat
 import numpy as np
-from scipy import odr
-import pandas as pd
+from scipy import odr, constants, stats
+from uncertainties import ufloat
 ```
 
-Defining the physical constants and parameters for the solenoid setup:
+Defining the constants for the solenoid setup. $N$ is fixed (given: 700 turns) and $\mu_0$ we're pulling straight from `scipy.constants` instead of typing out (whimsy).
+
+Then measured the length of the solenoid. For the radius, we measured both the outer and inner radius of the coil form and took the average of the two as our effective $R$. We had no current pass through the probe and measured the atmospherical $V_0$.
+
+For all of our length measurements, we measure in increments of 0.5cm, so our uncertainty is half of that, 0.25cm. From the lab equipment notes our current has a 1% error in our ammeter and our voltage_0 we have a 1.2% error plus the smallest digit. 
+
 
 ```{python}
-N = 700 # no. of turns in the solenoid
-mu_0 = 4 * np.pi * 10**-7  # permeability of free space (Wb / A m)
+N = 700  
+mu_0 = constants.mu_0  # (Wb/A m)
 
-L_solenoid = ufloat(0.15, 0.002)  # length of solenoid in (m)
-R_solenoid = ufloat(0.015, 0.001)  # radius of solenoid (m))
-I_solenoid = ufloat(2.0, 0.02)   # solenoid current (A)
+r_outer = ufloat(5.7, 0.25) / 100
+r_inner = ufloat(3.8, 0.25) / 100
 
-V_0 = ufloat(2.50, 0.01)  # measured output voltage with no magnetic field (V)
-S_sensor = ufloat(3.13, 0.09) * 0.001 / 0.0001  # sensitivity in V/T (converted from 3.13 mV/G)
+R_solenoid = (r_outer + r_inner) / 2  # m
+L_solenoid = ufloat(14.9, 0.25) / 100  # m
+I_solenoid = ufloat(2.32, 2.32 * 0.01)  # A
+
+V_0 = ufloat(2.52, 2.52 * 0.01)  # V
+S_sensor = ufloat(3.13, 0.09) * 0.001 / 0.0001  # manufacturer sensitivity, mV/G -> V/T
 ```
 
-Since the magnetic field of a finite solenoid follows a non-linear relationship with respect to axial distance, standard linear regression is insufficient. our measurements have uncertainties in both distance and measured voltage/magnetic field, so I made a custom non-linear odr_fit function using `scipy.odr`. It extracts nominal values and errors, fits a custom theoretical model, and returns the optimized parameters along with fit metrics like $R^2$, RMSE, and the reduced chi-squared statistic ($\chi_\nu^2$).
+`solenoid_model` is just equation 1 typed out directly with `scale` and `offset`. `scale` lets the fit stretch the whole predicted curve up or down (should land near 1 if the raw theory already matches), and `offset` lets it slide up or down by a constant (mostly there to catch a slightly-off $V_0$ measurement). 
 
 ```{python}
 @dataclass
@@ -58,31 +66,35 @@ def solenoid_model(p, d):
     L = L_solenoid.n
     R = R_solenoid.n
     I = I_solenoid.n
- 
+
     term1 = (d + L / 2) / np.sqrt((d + L / 2) ** 2 + R ** 2)
     term2 = (d - L / 2) / np.sqrt((d - L / 2) ** 2 + R ** 2)
     B_z = (mu_0 / (4 * np.pi)) * (2 * np.pi * N * I / L) * (term1 - term2)
- 
-    return scale * B_z + offset
 
+    return scale * B_z + offset
+```
+
+`odr_fit` does what it did in Week 3- extracts nominal values and uncertainties out of our ufloats, runs the fit, and this time also computes a proper reduced chi-squared straight from `odr_result.res_var` (scipy's own internal number), rather than recomputing it by hand and risking only weighting by one axis's uncertainty.
+
+```{python}
 def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
     x_nom = np.array([v.n for v in x])
     x_err = np.array([v.s for v in x])
     y_nom = np.array([v.n for v in y])
     y_err = np.array([v.s for v in y])
- 
+
     data = odr.RealData(x_nom, y_nom, sx=x_err, sy=y_err)
     model = odr.Model(solenoid_model)
     beta0 = [1.0, 0.0]
- 
+
     odr_result = odr.ODR(data, model, beta0=beta0).run()
- 
+
     parameters = odr_result.beta
     parameter_errors = odr_result.sd_beta
     converged = odr_result.info in (1, 2, 3)
     if not converged:
-        print(f"WARNING: ODR did not clearly converge (info={odr_result.info})")
- 
+        print(f"did not converge (info={odr_result.info})")
+
     y_pred = solenoid_model(parameters, x_nom)
     residuals = y_nom - y_pred
     ss_res = np.sum(residuals**2)
@@ -90,7 +102,7 @@ def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
     r_squared = 1 - ss_res / ss_tot if ss_tot != 0 else np.nan
     rmse = np.sqrt(np.mean(residuals**2))
     reduced_chi_squared = odr_result.res_var
- 
+
     return odr_fit_result(
         parameters=parameters,
         parameter_errors=parameter_errors,
@@ -105,51 +117,56 @@ def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
     )
 ```
 
-To visualize our results, a custom plot function produces both the experimental data with the fitted theoretical curve and a residual plot.
+two plotting functions this time !! yay. `plot_field` fits our data against the theoretical curve, and `plot_residuals` shows just the leftover gaps between data and fit.
 
 ```{python}
-def plot(x, y, sx, sy, fit_result, xlabel, ylabel, title, filename):
+def plot_field(x, y, sx, sy, fit_result, xlabel, ylabel, title, filename):
     x_fit = np.linspace(min(x), max(x), 200)
     y_fit = solenoid_model(fit_result.parameters, x_fit)
-    residuals = y - solenoid_model(fit_result.parameters, x)
- 
-    fig, (ax1, ax2) = plt.subplots(
-        2, 1, figsize=(7, 7), sharex=True,
-        gridspec_kw={"height_ratios": [3, 1]}
-    )
- 
-    ax1.errorbar(x, y, xerr=sx, yerr=sy, fmt="o", capsize=3,
+
+    plt.figure(figsize=(7, 5))
+    plt.errorbar(x, y, xerr=sx, yerr=sy, fmt="o", capsize=3, markersize=3,
                  label="Experimental Data (Hall Sensor)")
-    ax1.plot(x_fit, y_fit, "k--",
+    plt.plot(x_fit, y_fit, "k--",
              label=f"Fit ($\\chi_v^2$ = {fit_result.reduced_chi_squared:.2f})")
-    ax1.set_ylabel(ylabel)
-    ax1.set_title(title)
-    ax1.grid(True, alpha=0.6)
-    ax1.legend()
- 
-    ax2.errorbar(x, residuals, yerr=sy, fmt="o", capsize=3, color="crimson")
-    ax2.axhline(0, color="black", linestyle="--")
-    ax2.set_xlabel(xlabel)
-    ax2.set_ylabel("Residual (T)")
-    ax2.grid(True, alpha=0.6)
- 
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.grid(True, alpha=0.6)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.show()
+
+
+def plot_residuals(x, y, sy, fit_result, xlabel, filename):
+    residuals = y - solenoid_model(fit_result.parameters, x)
+
+    plt.figure(figsize=(7, 4))
+    plt.errorbar(x, residuals, yerr=sy, fmt="o", capsize=3, markersize=3, color="crimson")
+    plt.axhline(0, color="black", linestyle="--")
+    plt.xlabel(xlabel)
+    plt.ylabel("Residual (T)")
+    plt.title("Residuals")
+    plt.grid(True, alpha=0.6)
     plt.tight_layout()
     plt.savefig(filename, dpi=300)
     plt.show()
 ```
 
-This unction checks the reduced chi-squared ($\chi_\nu^2$) value to determine if the experimental data agrees with the theoretical model:
+instead of the sigma test, we're using `scipy.stats.chi2` to get an actual p-value out of it rather than eyeballing a "is it between 0.5 and 1.5" rule of thumb. the p-value is the probability of seeing a mismatch this big (or bigger) between data and theory.
 
 ```{python}
-def chi_squared_test(red_chi2):
-    print(f"reduced chi-squared (chi_v^2): {red_chi2:.3f}")
-    if 0.5 <= red_chi2 <= 1.5:
-        print("results AGREE")
-    elif red_chi2 < 0.5:
-        print("chi_v^2 << 1: uncertainties may be overestimated")
+def chi_squared_test(chi2_stat, dof):
+    p_value = stats.chi2.sf(chi2_stat, dof) 
+    print(f"chi-squared: {chi2_stat:.3f}  (dof = {dof})")
+    print(f"reduced chi-squared: {chi2_stat/dof:.3f}")
+    print(f"p-value: {p_value:.4f}")
+    if p_value > 0.05:
+        print("results AGREE with the model (p > 0.05)")
     else:
-        print("chi_v^2 >> 1: results DISAGREE")
-    return red_chi2
+        print("results DISAGREE with the model (p <= 0.05)")
+    return p_value
 ```
 
 ## Pre-lab Questions
@@ -170,36 +187,91 @@ $$\vert{}B\vert{} = \frac{\vert{}2.18\text{ V} - 2.55\text{ V}\vert{}}{31.3\text
 
 ### Question 2- 
 
-The equation for the reduced chi-squared value ($\chi_\nu^2$) is given by:
-$$\chi_\nu^2 = \frac{1}{\nu} \sum_{i=1}^{N} \left( \frac{y_i - y_{\text{model}}(x_i)}{\sigma_{y, i}} \right)^2$$
+$$\chi_\nu^2 = \frac{1}{\nu} \sum_{i} \frac{(O_i - E_i)^2}{\sigma_i^2}$$
 
-where:
-
-$\chi_\nu^2$: The reduced chi-squared statistic.
-
-$\nu$: The number of degrees of freedom, typically defined as $\nu = N - m$, where $N$ is the total number of data points and $m$ is the number of fitted parameters.
-
-$N$: Total number of experimental observations/data points.
-
-$y_i$: The measured value of the dependent variable for the $i$-th data point.
-
-$y_{\text{model}}(x_i)$: The theoretical or expected value predicted by the model at the $i$-th data point.
-
-$\sigma_{y, i}$: The experimental uncertainty (standard error) associated with the $i$-th measurement $y_i$.
+* $\chi_\nu^2$: the reduced chi-squared statistic
+* $\nu$: number of degrees of freedom (total data points - no. of fitted parameters)
+* $O_i$: The $i$-th observed data point
+* $E_i$: expected value corresponding to the $i$-th data point
+* $\sigma_i$: experimental uncertainty or SE associated with the $i$-th data point
 
 ## Aim:
-To measure the magnetic field strength along the axis of a solenoid using a Hall effect sensor and compare the spatial distribution against theoretical predictions.
+To highlight the connection between the distance from the axial centre of a solenoid and its magnetic field strength and and compare our measurements to equation 1 using residuals and the reduced chi-squared statistic.
 
 ## Theory:
-### Theoretical Model
-The theoretical magnetic field $B_z$ along the central axis of a finite solenoid of length $L$, radius $R$, with $N$ turns carrying current $I$ is given by:
-$$B_z = \frac{\mu_0 N I}{2L} \left( \frac{d + L/2}{\sqrt{(d + L/2)^2 + R^2}} - \frac{d - L/2}{\sqrt{(d - L/2)^2 + R^2}} \right)$$
-where $d$ represents the axial distance from the center of the solenoid.
 
-### Sensor Conversion
-The Hall effect sensor translates magnetic fields into a transverse voltage. The magnitude of the magnetic field is determined from the measured voltage $V_{\text{meas}}$ and the zero-field baseline voltage $V_0$ using the sensor sensitivity $S$:
-$$\vert{}B\vert{} = \frac{\vert{}V_{\text{meas}} - V_0}{S}$$
+the axial field of a solenoid of length $L$, radius $R$, $N$ turns, and current $I$, at a distance $d$ from the centre, is:
 
-### Procedure
+$$B_z = \frac{\mu_0}{4\pi}\frac{2\pi I N}{L}\left[\frac{d + L/2}{\sqrt{(d+L/2)^2 + R^2}} - \frac{d - L/2}{\sqrt{(d-L/2)^2+R^2}}\right]$$
+
+We measure the field using a "Honeywell SS495A1" Hall effect sensor.
+
+## Procedure:
+
+We first used a magnetic compass to probe the field direction around the energised solenoid and sketched the field lines relative to the direction of conventional current. this confirmed the usual "north out one end, south out the other" pattern you'd expect from the right-hand rule, and that the field is basically uniform through the middle and curls back around outside.
+
+For the next part, we set the solenoid current to $2.32$ A, and measured $V_0$ with the probe held at (1) exactly at the axial centre of the solenoid and (2) range of distances swept along the central axis. distance was read off a ruler taped alongside the probe (probe sounds like a rocket thing), so we take $\pm 0.25$ cm as our length uncertainty (as mentioned earlier)
+
+Lab equipment spec sheet gives 0.5% of reading + last digit
+
+```{python}
+distances_cm = [-5, -4, -3, -1, 0, 1, 2, 2.5, 3, 4, 5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12, 13, 15, 15, 18]
+sigma_d_cm = 0.25  # cm
+distances_m = [ufloat(d / 100.0, sigma_d_cm / 100.0) for d in distances_cm]
+
+
+voltages_measured = np.array([2.90, 2.91, 2.92, 2.91, 2.91, 2.91, 2.92, 2.92, 2.93, 2.92, 2.91, 2.90, 2.88, 2.84, 2.79, 2.74, 2.69, 2.66, 2.62, 2.61, 2.58, 2.56, 2.54, 2.54, 2.53, 2.53])  # V
+sigma_v = voltages_measured * (1.2 / 100) + 0.01  # V
+```
 
 ### Results
+
+Converting each voltage reading into a field using equation 2:
+
+```{python}
+distances_m = [ufloat(d / 100.0, sigma_d_cm / 100.0) for d in distances_cm]
+magnetic_fields = []
+
+for d, v_val, sv in zip(distances_m, voltages_measured, sigma_v):
+    V_meas = ufloat(v_val, sv)
+    diff = V_meas - V_0
+    B_val = ufloat(abs(diff.n), diff.s) / S_sensor  # eq2
+    magnetic_fields.append(B_val)
+```
+
+Then straight into the fit:
+
+```{python}
+result = odr_fit(distances_m, magnetic_fields)
+
+print(f"scale factor : {result.parameters[0]:.4f} +/- {result.parameter_errors[0]:.4f}")
+print(f"offset : {result.parameters[1]:.6f} +/- {result.parameter_errors[1]:.6f} T")
+print(f"R^2          : {result.r_squared:.4f}")
+print(f"RMSE         : {result.rmse:.6f} T")
+
+dof = len(distances_m) - 2  
+chi2_stat = result.reduced_chi_squared * dof
+p_value = chi_squared_test(chi2_stat, dof)
+```
+
+Our fit came out with a scale factor of $1.2379 \pm 0.0540$, a field offset of essentially zero- $-0.3 \pm 0.4$ mT (so we weren't sloppy with our readings. yay), **$R^2 = 0.9508$**, and a **reduced $\chi_\nu^2$ of $0.915$**, giving a **p-value of $0.5811$**. By the p > 0.05 rule that's a clean AGREE.
+
+```{python}
+plot_field(
+    result.x_nom, result.y_nom, result.x_err, result.y_err,
+    result,
+    xlabel="Axial Distance $d$ (m)",
+    ylabel="Magnetic Field Strength $B_z$ (T)",
+    title="Magnetic Field Along the Axis of a Solenoid",
+    filename="graphs/solenoid_magnetic_field.png",
+)
+```
+
+```{python}
+plot_residuals(
+    result.x_nom, result.y_nom, result.y_err,
+    result,
+    xlabel="Axial Distance $d$ (m)",
+    filename="graphs/solenoid_residuals.png",
+)
+```
