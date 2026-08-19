@@ -23,7 +23,7 @@ from scipy import odr, constants, stats
 from uncertainties import ufloat
 ```
 
-Defining the constants for the solenoid setup. $N$ is fixed (given: 700 turns) and $\mu_0$ we're pulling straight from `scipy.constants` instead of typing out (whimsy).
+Defining the constants for the solenoid setup. $N$ is fixed (given: 700 turns) and $\mu_0$ we're pulling straight from `scipy.constants` instead of typing out (because whimsy and why not).
 
 Then measured the length of the solenoid. For the radius, we measured both the outer and inner radius of the coil form and took the average of the two as our effective $R$. We had no current pass through the probe and measured the atmospherical $V_0$.
 
@@ -31,8 +31,8 @@ For all of our length measurements, we measure in increments of 0.5cm, so our un
 
 
 ```{python}
-N = 700  
-mu_0 = constants.mu_0  # (Wb/A m)
+N = 700 
+mu_0 = constants.mu_0  # (Wb / A m)
 
 r_outer = ufloat(5.7, 0.25) / 100
 r_inner = ufloat(3.8, 0.25) / 100
@@ -41,8 +41,8 @@ R_solenoid = (r_outer + r_inner) / 2  # m
 L_solenoid = ufloat(14.9, 0.25) / 100  # m
 I_solenoid = ufloat(2.32, 2.32 * 0.01)  # A
 
-V_0 = ufloat(2.52, 2.52 * 0.01)  # V
-S_sensor = ufloat(3.13, 0.09) * 0.001 / 0.0001  # manufacturer sensitivity, mV/G -> V/T
+V_0 = ufloat(2.52, 2.52*0.01)  # V
+S_sensor = ufloat(3.13, 0.09) * 0.001 / 0.0001  # sensitivity
 ```
 
 `solenoid_model` is just equation 1 typed out directly with `scale` and `offset`. `scale` lets the fit stretch the whole predicted curve up or down (should land near 1 if the raw theory already matches), and `offset` lets it slide up or down by a constant (mostly there to catch a slightly-off $V_0$ measurement). 
@@ -104,16 +104,16 @@ def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
     reduced_chi_squared = odr_result.res_var
 
     return odr_fit_result(
-        parameters=parameters,
-        parameter_errors=parameter_errors,
-        r_squared=r_squared,
-        rmse=rmse,
-        reduced_chi_squared=reduced_chi_squared,
-        converged=converged,
-        x_nom=x_nom,
-        y_nom=y_nom,
-        x_err=x_err,
-        y_err=y_err,
+   parameters=parameters,
+   parameter_errors=parameter_errors,
+   r_squared=r_squared,
+   rmse=rmse,
+   reduced_chi_squared=reduced_chi_squared,
+   converged=converged,
+   x_nom=x_nom,
+   y_nom=y_nom,
+   x_err=x_err,
+   y_err=y_err,
     )
 ```
 
@@ -125,10 +125,9 @@ def plot_field(x, y, sx, sy, fit_result, xlabel, ylabel, title, filename):
     y_fit = solenoid_model(fit_result.parameters, x_fit)
 
     plt.figure(figsize=(7, 5))
-    plt.errorbar(x, y, xerr=sx, yerr=sy, fmt="o", capsize=3, markersize=3,
-                 label="Experimental Data (Hall Sensor)")
+    plt.errorbar(x, y, xerr=sx, yerr=sy, fmt="o", capsize=3, label="Experimental Data (Hall Sensor)")
     plt.plot(x_fit, y_fit, "k--",
-             label=f"Fit ($\\chi_v^2$ = {fit_result.reduced_chi_squared:.2f})")
+   label=f"Fit ($\\chi_v^2$ = {fit_result.reduced_chi_squared:.2f})")
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
@@ -138,12 +137,11 @@ def plot_field(x, y, sx, sy, fit_result, xlabel, ylabel, title, filename):
     plt.savefig(filename, dpi=300)
     plt.show()
 
-
 def plot_residuals(x, y, sy, fit_result, xlabel, filename):
     residuals = y - solenoid_model(fit_result.parameters, x)
 
     plt.figure(figsize=(7, 4))
-    plt.errorbar(x, residuals, yerr=sy, fmt="o", capsize=3, markersize=3, color="crimson")
+    plt.errorbar(x, residuals, yerr=sy, fmt="o", capsize=3, color="crimson")
     plt.axhline(0, color="black", linestyle="--")
     plt.xlabel(xlabel)
     plt.ylabel("Residual (T)")
@@ -154,11 +152,11 @@ def plot_residuals(x, y, sy, fit_result, xlabel, filename):
     plt.show()
 ```
 
-instead of the sigma test, we're using `scipy.stats.chi2` to get an actual p-value out of it rather than eyeballing a "is it between 0.5 and 1.5" rule of thumb. the p-value is the probability of seeing a mismatch this big (or bigger) between data and theory.
+along with the sigma test, we're using `scipy.stats.chi2` to get an actual p-value out of it rather than eyeballing a "is it between 0.5 and 1.5" rule of thumb. the p-value is the probability of seeing a mismatch this big (or bigger) between data and theory.
 
 ```{python}
 def chi_squared_test(chi2_stat, dof):
-    p_value = stats.chi2.sf(chi2_stat, dof) 
+    p_value = stats.chi2.sf(chi2_stat, dof)  # sf = 1 - cdf, "survival function"
     print(f"chi-squared: {chi2_stat:.3f}  (dof = {dof})")
     print(f"reduced chi-squared: {chi2_stat/dof:.3f}")
     print(f"p-value: {p_value:.4f}")
@@ -167,6 +165,21 @@ def chi_squared_test(chi2_stat, dof):
     else:
         print("results DISAGREE with the model (p <= 0.05)")
     return p_value
+
+def sigma_test(k1, sk1, k2, sk2):
+    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
+
+    print("\nSIGMA TEST")
+    print(f"measured scale factor    : {k1:.3f} +/- {sk1:.3f}")
+    print(f"theoretical scale factor : {k2:.3f} +/- {sk2:.3f}")
+    print(f"discrepancy    : {sigma_diff:.2f} sigma")
+
+    if sigma_diff <= 3.0:
+        print("results AGREE within experimental uncertainty")
+    else:
+        print("results DISAGREE")
+
+    return sigma_diff
 ```
 
 ## Pre-lab Questions
@@ -215,28 +228,26 @@ For the next part, we set the solenoid current to $2.32$ A, and measured $V_0$ w
 Lab equipment spec sheet gives 0.5% of reading + last digit
 
 ```{python}
-distances_cm = [-5, -4, -3, -1, 0, 1, 2, 2.5, 3, 4, 5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12, 13, 15, 15, 18]
-sigma_d_cm = 0.25  # cm
+distances_cm = [-5, -4, -3, -1, 0, 1, 2, 2.5, 3, 4, 5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12, 13, 14 ,15, 18]
+sigma_d_cm = 0.25  # uncertainty in position (cm)
 distances_m = [ufloat(d / 100.0, sigma_d_cm / 100.0) for d in distances_cm]
-
-
-voltages_measured = np.array([2.90, 2.91, 2.92, 2.91, 2.91, 2.91, 2.92, 2.92, 2.93, 2.92, 2.91, 2.90, 2.88, 2.84, 2.79, 2.74, 2.69, 2.66, 2.62, 2.61, 2.58, 2.56, 2.54, 2.54, 2.53, 2.53])  # V
-sigma_v = voltages_measured * (1.2 / 100) + 0.01  # V
+voltages_measured = np.array([2.90, 2.91, 2.92 ,2.91 ,2.91 ,2.91, 2.92, 2.92, 2.93, 2.92, 2.91, 2.90, 2.88, 2.84, 2.79, 2.74, 2.69, 2.66, 2.62, 2.61, 2.58, 2.56, 2.54, 2.54, 2.53, 2.53]) # V
+sigma_v = voltages_measured * (0.5 / 100) + 0.01  # uncertainty in voltage (V)
 ```
 
-### Results
+## Results
 
 Converting each voltage reading into a field using equation 2:
 
 ```{python}
-distances_m = [ufloat(d / 100.0, sigma_d_cm / 100.0) for d in distances_cm]
 magnetic_fields = []
-
+print("~~~SOLENOID MAGNETIC FIELD RESULTS~~~")
 for d, v_val, sv in zip(distances_m, voltages_measured, sigma_v):
     V_meas = ufloat(v_val, sv)
     diff = V_meas - V_0
     B_val = ufloat(abs(diff.n), diff.s) / S_sensor  # eq2
     magnetic_fields.append(B_val)
+    print(f"d = {d} m | V = {V_meas} V | B = {B_val * 1000:.2f} mT")
 ```
 
 Then straight into the fit:
@@ -244,17 +255,25 @@ Then straight into the fit:
 ```{python}
 result = odr_fit(distances_m, magnetic_fields)
 
-print(f"scale factor : {result.parameters[0]:.4f} +/- {result.parameter_errors[0]:.4f}")
-print(f"offset : {result.parameters[1]:.6f} +/- {result.parameter_errors[1]:.6f} T")
+print("\n~~~FIT SUMMARY~~~")
+print(f"Scale factor : {result.parameters[0]:.4f} +/- {result.parameter_errors[0]:.4f}")
+print(f"Field offset : {result.parameters[1]:.6f} +/- {result.parameter_errors[1]:.6f} T")
 print(f"R^2          : {result.r_squared:.4f}")
 print(f"RMSE         : {result.rmse:.6f} T")
 
-dof = len(distances_m) - 2  
+dof = len(distances_m) - 2 
 chi2_stat = result.reduced_chi_squared * dof
-p_value = chi_squared_test(chi2_stat, dof)
+chi_squared_test(chi2_stat, dof)
+
+sigma_test(
+    k1=result.parameters[0],
+    sk1=result.parameter_errors[0],
+    k2=1.0,
+    sk2=0.0,
+)
 ```
 
-Our fit came out with a scale factor of $1.2379 \pm 0.0540$, a field offset of essentially zero- $-0.3 \pm 0.4$ mT (so we weren't sloppy with our readings. yay), **$R^2 = 0.9508$**, and a **reduced $\chi_\nu^2$ of $0.915$**, giving a **p-value of $0.5811$**. By the p > 0.05 rule that's a clean AGREE.
+Our fit came out with a scale factor of $1.2421 +/- 0.0544$, a field offset of essentially zero- $-0.3 \pm 0.4$ mT (so we weren't sloppy with our readings. yay), **$R^2 = 0.9505$**, and a **reduced $\chi_\nu^2$ of $0.921$**, giving a **p-value of $0.5728$**. By the p > 0.05 rule that's a clean AGREE.
 
 ```{python}
 plot_field(
@@ -277,9 +296,9 @@ plot_residuals(
 ```
 
 ## Observations
-pretty happy with how this one turned out. The shape is exactly what equation 1 says it should be- flat through the middle, then it rolls off nice and smooth once the probe passes about $d = 6.5$ cm and starts leaving the coil. $R^2 = 0.9508$, p-value of $0.581$, reduced $\chi_\nu^2$ sitting right at $0.915$- basically bang on 1.
+pretty happy with how this one turned out. The shape is exactly what equation 1 says it should be- flat through the middle, then it rolls off nice and smooth once the probe passes about $d = 6.5$ cm and starts leaving the coil. **$R^2 = 0.9505$**, **p-value of $0.5728$**, **reduced $\chi_\nu^2$ = $0.921$**- basically bang on 1.
 
-but our fitted **scale factor came out at $1.238 \pm 0.054$**, and that's $~4\sigma$ away from the $1.0$ we'd want if the raw theory already matched us with zero adjustment. So even though the shape is great, that's a systematic offset, and a pretty confidently resolved one given how tight that uncertainty is.
+but our fitted **scale factor came out at $1.2421 \pm 0.0544$**, and that's $~4.5\sigma$ away from the $1.0$ we'd want if the raw theory already matched us with zero adjustment. So even though the shape is great, that's a systematic offset, and a pretty resolved one given how tight that uncertainty is.
 
 Where's it coming from? We used the average of the inner and outer coil radius as our effective $R$, but the actual windings could easily sit closer to one edge than dead centre, and since $R$ shows up nonlinearly in Equation 1, getting it even a little wrong tilts the whole predicted curve. second, we just took the manufacturer's $3.13 \pm 0.09$ mV/G sensitivity at face value- if our specific probe runs a bit off spec, that'd mess it up a bit.
 

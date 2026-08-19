@@ -44,7 +44,6 @@ def solenoid_model(p, d):
 
     return scale * B_z + offset
 
-
 def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
     x_nom = np.array([v.n for v in x])
     x_err = np.array([v.s for v in x])
@@ -87,7 +86,6 @@ def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
         y_err=y_err,
     )
 
-
 def plot_field(x, y, sx, sy, fit_result, xlabel, ylabel, title, filename):
     x_fit = np.linspace(min(x), max(x), 200)
     y_fit = solenoid_model(fit_result.parameters, x_fit)
@@ -106,7 +104,6 @@ def plot_field(x, y, sx, sy, fit_result, xlabel, ylabel, title, filename):
     plt.savefig(filename, dpi=300)
     plt.show()
 
-
 def plot_residuals(x, y, sy, fit_result, xlabel, filename):
     residuals = y - solenoid_model(fit_result.parameters, x)
 
@@ -121,7 +118,6 @@ def plot_residuals(x, y, sy, fit_result, xlabel, filename):
     plt.savefig(filename, dpi=300)
     plt.show()
 
-
 def chi_squared_test(chi2_stat, dof):
     p_value = stats.chi2.sf(chi2_stat, dof)  # sf = 1 - cdf, "survival function"
     print(f"chi-squared: {chi2_stat:.3f}  (dof = {dof})")
@@ -133,14 +129,13 @@ def chi_squared_test(chi2_stat, dof):
         print("results DISAGREE with the model (p <= 0.05)")
     return p_value
 
+def sigma_test(k1, sk1, k2, sk2):
+    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
 
-def sigma_test(k1, sk1, k2):
-    sigma_diff = abs(k1 - k2) / sk1
-
-    print("SIGMA TEST")
-    print(f"derived g  : {k1:.3f} +/- {sk1:.3f} m/s^2")
-    print(f"accepted g : {k2:.4f} m/s^2")
-    print(f"discrepancy: {sigma_diff:.2f} sigma")
+    print("\nSIGMA TEST")
+    print(f"measured scale factor    : {k1:.3f} +/- {sk1:.3f}")
+    print(f"theoretical scale factor : {k2:.3f} +/- {sk2:.3f}")
+    print(f"discrepancy              : {sigma_diff:.2f} sigma")
 
     if sigma_diff <= 3.0:
         print("results AGREE within experimental uncertainty")
@@ -173,7 +168,7 @@ distances_cm = [-5,
                 11, 
                 12,
                 13,
-                15,
+                14,
                 15, 
                 18]
 sigma_d_cm = 0.25  # uncertainty in position (cm)
@@ -227,6 +222,13 @@ print(f"RMSE         : {result.rmse:.6f} T")
 dof = len(distances_m) - 2  # number of points minus number of fit params
 chi2_stat = result.reduced_chi_squared * dof
 chi_squared_test(chi2_stat, dof)
+
+sigma_test(
+    k1=result.parameters[0],
+    sk1=result.parameter_errors[0],
+    k2=1.0,
+    sk2=0.0,
+)
 
 plot_field(
     result.x_nom, result.y_nom, result.x_err, result.y_err,
