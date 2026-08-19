@@ -13,7 +13,9 @@ jupyter: python3
 
 ## Imports and Functions
 
-Same deal as last time- errors on both axes, so it's `scipy.odr` again, not a plain linear fit. Starting with imports:
+Same deal as last time- errors on both axes, so it's `scipy.odr` again, but not a linear fit
+
+Starting with imports:
 
 ```{python}
 from dataclasses import dataclass
@@ -218,6 +220,20 @@ the axial field of a solenoid of length $L$, radius $R$, $N$ turns, and current 
 $$B_z = \frac{\mu_0}{4\pi}\frac{2\pi I N}{L}\left[\frac{d + L/2}{\sqrt{(d+L/2)^2 + R^2}} - \frac{d - L/2}{\sqrt{(d-L/2)^2+R^2}}\right]$$
 
 We measure the field using a "Honeywell SS495A1" Hall effect sensor.
+
+```{=typst}
+#figure(
+  image("images/diag.png", width: 55%),
+  caption: [Setup for the experiment.],
+)
+```
+
+```{=typst}
+#figure(
+  image("images/setup.png", width: 55%),
+  caption: [Sketch 1 (yeah its pretty bad i know)],
+)
+```
 
 ## Procedure:
 
