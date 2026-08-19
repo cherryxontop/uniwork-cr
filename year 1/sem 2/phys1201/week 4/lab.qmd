@@ -224,14 +224,14 @@ We measure the field using a "Honeywell SS495A1" Hall effect sensor.
 ```{=typst}
 #figure(
   image("images/diag.png", width: 55%),
-  caption: [Setup for the experiment.],
+  caption: [Sketch],
 )
 ```
 
 ```{=typst}
 #figure(
   image("images/setup.png", width: 55%),
-  caption: [Sketch 1 (yeah its pretty bad i know)],
+  caption: [Setup],
 )
 ```
 
