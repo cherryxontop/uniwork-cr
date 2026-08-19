@@ -275,3 +275,17 @@ plot_residuals(
     filename="graphs/solenoid_residuals.png",
 )
 ```
+
+## Observations
+pretty happy with how this one turned out. The shape is exactly what equation 1 says it should be- flat through the middle, then it rolls off nice and smooth once the probe passes about $d = 6.5$ cm and starts leaving the coil. $R^2 = 0.9508$, p-value of $0.581$, reduced $\chi_\nu^2$ sitting right at $0.915$- basically bang on 1.
+
+but our fitted **scale factor came out at $1.238 \pm 0.054$**, and that's $~4\sigma$ away from the $1.0$ we'd want if the raw theory already matched us with zero adjustment. So even though the shape is great, that's a systematic offset, and a pretty confidently resolved one given how tight that uncertainty is.
+
+Where's it coming from? We used the average of the inner and outer coil radius as our effective $R$, but the actual windings could easily sit closer to one edge than dead centre, and since $R$ shows up nonlinearly in Equation 1, getting it even a little wrong tilts the whole predicted curve. second, we just took the manufacturer's $3.13 \pm 0.09$ mV/G sensitivity at face value- if our specific probe runs a bit off spec, that'd mess it up a bit.
+
+**Limitations & possible sources of discrepancy:**
+
+- Radius is a guess, not a measurement of the windings themselves. Averaging inner and outer radius is a reasonable stand-in, but it's not the same as actually knowing where the current loops sit.
+- Data isn't symmetric about the centre. We only really swept in detail from $-5$ cm to $+18$ cm, with denser sampling on the positive side past the coil's edge- so our fit is leaning more heavily on one side of the solenoid than the other, which could bias the fitted scale factor if there's any asymmetry in the coil itself or uneven winding, slightly tilted probe, etc etc.
+- Only one current setting tested. We fixed $I = 2.32$ A the whole time. If our scale-factor mismatch is actually a current-reading issue, we'd have no way to tell from this data alone- repeating at a couple of different currents and checking if the same scale factor shows up each time would help isolate it.
+- The sensor only picks up the field component perpendicular to its flat face. if the probe wasn't held perfectly parallel to the solenoid's axis the whole time, we'd be undercounting the true axial field, which would push the scale factor. not the main culprit, but a possible source of error
