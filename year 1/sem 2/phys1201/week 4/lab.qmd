@@ -76,7 +76,7 @@ def solenoid_model(p, d):
     return scale * B_z + offset
 ```
 
-`odr_fit` does what it did in Week 3- extracts nominal values and uncertainties out of our ufloats, runs the fit, and this time also computes a proper reduced chi-squared straight from `odr_result.res_var` (scipy's own internal number), rather than recomputing it by hand and risking only weighting by one axis's uncertainty.
+`odr_fit` extracts nominal values and uncertainties out of our ufloats, runs the fit, and this time also computes a proper reduced chi-squared straight from `odr_result.res_var`
 
 ```{python}
 def odr_fit(x: list[ufloat], y: list[ufloat]) -> odr_fit_result:
@@ -241,7 +241,7 @@ We first used a magnetic compass to probe the field direction around the energis
 
 For the next part, we set the solenoid current to $2.32$ A, and measured $V_0$ with the probe held at (1) exactly at the axial centre of the solenoid and (2) range of distances swept along the central axis. distance was read off a ruler taped alongside the probe (probe sounds like a rocket thing), so we take $\pm 0.25$ cm as our length uncertainty (as mentioned earlier)
 
-Lab equipment spec sheet gives 0.5% of reading + last digit
+Lab equipment spec sheet gives voltage readig uncertainty as 0.5% of reading + last digit
 
 ```{python}
 distances_cm = [-5, -4, -3, -1, 0, 1, 2, 2.5, 3, 4, 5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12, 13, 14 ,15, 18]
