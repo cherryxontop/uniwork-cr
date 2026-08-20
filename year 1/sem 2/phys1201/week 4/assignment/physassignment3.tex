@@ -1,0 +1,143 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+
+\title{Assignment 3}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle
+
+\section{Part 1}
+
+We're given $V(x) = B\left(1 - 4\frac{x^2}{D^2}\right)$
+
+We know that force is given by $F = -\frac{dV}{dx}$
+
+taking derivative:
+\[
+\frac{dV}{dx} = \frac{d}{dx} \left[ B - \frac{4Bx^2}{D^2} \right] = -\frac{8Bx}{D^2}
+\]
+
+therefore, force is:
+\[
+F = - \left(-\frac{8Bx}{D^2}\right) = \frac{8Bx}{D^2}
+\]
+
+Applying Newton's second law of motion, $F=ma \implies F=m\ddot{x}$:
+\[
+m\ddot{x} = \frac{8Bx}{D^2} \implies \ddot{x} = \left(\frac{8B}{mD^2}\right)x
+\]
+
+comparing to $\ddot{x} = \Omega^2 x$,
+\[
+\Omega^2 = \frac{8B}{mD^2}
+\]
+\[
+\Omega = \sqrt{\frac{8B}{mD^2}}
+\]
+
+\section{Part 2}
+
+this path represents a forced or fake motion pushed through an upside-down barrier instead of a natural motion that follows Newton's laws.
+
+\section{Part 3}
+
+kinetic energy is:
+\[
+\frac{1}{2}m\dot{x}^2
+\]
+
+The action $S$ over a time interval from $0$ to $T$ is the integral of the Lagrangian $L = T - V$:
+\[
+S = \int_{0}^{T} \left( \frac{1}{2}m\dot{x}^2 - V(x) \right) dt
+\]
+
+Differentiating $x(t) = -\frac{D}{2}\cos\left(\frac{\pi t}{T}\right)$ with respect to time $t$:
+\[
+\dot{x}(t) = \frac{D\pi}{2T} \sin\left(\frac{\pi t}{T}\right)
+\]
+
+Kinetic Energy:
+\[
+\frac{1}{2}m\dot{x}^2 = \frac{1}{2}m \left( \frac{D\pi}{2T} \sin\left(\frac{\pi t}{T}\right) \right)^2 = \frac{m D^2 \pi^2}{8 T^2} \sin^2\left(\frac{\pi t}{T}\right)
+\]
+Potential Energy:
+
+substituting $x(t) = -\frac{D}{2}\cos\left(\frac{\pi t}{T}\right)$ into $V(x)$:
+\[
+V(t) = B \left(1 - \frac{4}{D^2} \left[ -\frac{D}{2}\cos\left(\frac{\pi t}{T}\right) \right]^2\right) = B \left(1 - \cos^2\left(\frac{\pi t}{T}\right)\right) = B \sin^2\left(\frac{\pi t}{T}\right)
+\]
+integrating:
+\[
+S = \int_{0}^{T} \left[ \frac{m D^2 \pi^2}{8 T^2} \sin^2\left(\frac{\pi t}{T}\right) - B \sin^2\left(\frac{\pi t}{T}\right) \right] dt
+\]
+\[S = \left( \frac{m D^2 \pi^2}{8 T^2} - B \right) \int_{0}^{T} \sin^2\left(\frac{\pi t}{T}\right) dt
+\]
+using the formula $\int_{0}^{T} \sin^2\left(\frac{\pi t}{T}\right)dt = \frac{T}{2}$:
+\[
+S = \left( \frac{m D^2 \pi^2}{8 T^2} - B \right) \frac{T}{2} = \frac{m D^2 \pi^2}{16 T} - \frac{B T}{2}
+\]
+Matching $S = \frac{C_1}{T} - C_2 T$:
+\[
+C_1 = \frac{m D^2 \pi^2}{16}, \quad C_2 = \frac{B}{2}
+\]
+
+\section {Part 4}
+
+the most probable tunnelling time $T_0$ requires the action to be stationary with respect to $T$:
+\[
+\frac{dS}{dT}\Big|_{T=T_0} = 0
+\]
+
+Differentiating $S$ with respect to $T$:
+\[
+\frac{dS}{dT} = -\frac{C_1}{T^2} - C_2
+\]
+
+at $T = T_0$,
+\[
+-\frac{C_1}{T_0^2} - C_2 = 0 \implies T_0^2 = -\frac{C_1}{C_2}
+\]
+
+$T_0^2$ is negative meaning $T_0$ must be imaginary:
+\[
+T_0 = \pm i \sqrt{\frac{C_1}{C_2}}
+\]
+where $C_3 = \sqrt{\frac{C_1}{C_2}}$ 
+
+Substituting $C_1 = \frac{m D^2 \pi^2}{16}$ and $C_2 = \frac{B}{2}$ into $C_3$:
+\[
+C_3 = \sqrt{\frac{\frac{m D^2 \pi^2}{16}}{\frac{B}{2}}} = \sqrt{\frac{2m D^2 \pi^2}{16 B}} = \frac{D\pi}{4}\sqrt{\frac{m}{2B}}
+\]
+
+\section{Part 5}
+
+Substituting $T = -iC_3$ into $S = \frac{C_1}{T} - C_2 T$ ($C_1 = C_2 C_3^2$):
+\[
+S = \frac{C_2 C_3^2}{-i C_3} - C_2(-i C_3)
+\]
+\[
+S = i C_2 C_3 + i C_2 C_3 = 2i C_2 C_3
+\]
+
+\section{Part 6}
+
+substituting $C_2 = \frac{B}{2}$ and $C_3 = \frac{D\pi}{4}\sqrt{\frac{m}{2B}}$ into our expression for $S$:
+\[
+S = 2i \left(\frac{B}{2}\right) \left(\frac{D\pi}{4}\sqrt{\frac{m}{2B}}\right)
+\]
+\[
+S = i \frac{B D \pi}{4} \sqrt{\frac{m}{2B}} = i \frac{\pi D}{4} \sqrt{\frac{mB}{2}}
+\]
+
+Assuming that only the path with tunnelling time $T_0$ contributes, the tunnelling probability $P$ is proportional to $e^{iS/\hbar}$
+\[
+P \propto e^{i \frac{\pi D}{4} \sqrt{\frac{mB}{2}}}
+\]
+let $\alpha$ incorporate the collected constants ($\frac{\pi}{4\hbar}\frac{1}{\sqrt{2}}$). we get:
+\[
+P \propto e^{- \alpha D\sqrt{mB}}
+\]
+
+\end{document}
