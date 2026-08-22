@@ -134,3 +134,18 @@ def is_perfect_square(n):
         if candidate >= 0 and candidate * candidate == n:
             return True
     return False
+
+# activity 5
+
+# task 1
+def caesar_shift(string, shift):
+    result = []
+    for char in string:
+        if char.isupper():
+            result.append(chr((ord(char)-ord('A') + shift)%26+ ord('A')))
+        elif char.islower():
+            result.append(chr((ord(char)-ord('a') + shift)%26+ ord('a')))
+        else:
+            result.append(char)
+    return''.join(result)
+    pass
