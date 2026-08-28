@@ -324,4 +324,4 @@ print(f"magnet = {MAGNET}, m = {m_dipole:.4f} +/- {sigma_m:.4f} A m^2")
 # TO DO :
 # USE CURSOR TO CHECK THE V = ACCURATE
 # TAKE CARE OF HEIGHT
-# TAKE LARGER INTERVALS THAN 1 CM in varying height
+# TAKE LARGER INTERVALS THAN 1 CM in varying heightd
