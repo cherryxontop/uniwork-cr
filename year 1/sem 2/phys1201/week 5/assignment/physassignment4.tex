@@ -92,27 +92,24 @@ substituting $x_B = \gamma_\mu v_\mu \tau_\mu$ and $t_B = \gamma_\mu \tau_\mu$,
 $$x_B' = \gamma_n (\gamma_\mu v_\mu \tau_\mu - v_n \gamma_\mu \tau_\mu)$$
 $$x_B' = \gamma_n \gamma_\mu \tau_\mu (v_\mu - v_n)$$
 
-\section{part 12}
+\section{Part 12}
 For the neutron to decay before the antimuon as observed in $S$, we require:
 $$t_A < t_B$$  
 substituting $t_A = \gamma_n \tau_n$ and $t_B = \gamma_\mu \tau_\mu$,
 $$\gamma_n \tau_n < \gamma_\mu \tau_\mu$$  
 expanding $\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$,
 $$\frac{\tau_n}{\sqrt{1 - \frac{v_n^2}{c^2}}} < \frac{\tau_\mu}{\sqrt{1 - \frac{v_\mu^2}{c^2}}}$$  
-squaring both sides and switching in $v_\mu^{min}$:
-$$\frac{\tau_n^2}{1 - \frac{v_n^2}{c^2}} = \frac{\tau_\mu^2}{1 - \frac{(v_\mu^{min})^2}{c^2}}$$  
+assuming the neutron is at rest in $S^{\prime}$ and setting $v_n = 0$, squaring both sides, and defining the threshold condition for $v_\mu^{min}$:
+$$\tau_n = \frac{\tau_\mu}{\sqrt{1 - \frac{(v_\mu^{min})^2}{c^2}}}$$
 rearranging:
-$$1 - \frac{(v_\mu^{min})^2}{c^2} = \left(\frac{\tau_n}{\tau_\mu}\right)^2 \left(1 - \frac{v_n^2}{c^2}\right)$$  
-assuming the neutron is at rest in $S'$ and setting $v_n = 0$,
-$$1 - \frac{(v_\mu^{min})^2}{c^2} = \left(\frac{\tau_n}{\tau_\mu}\right)^2$$
-$$\frac{(v_\mu^{min})^2}{c^2} = 1 - \left(\frac{\tau_n}{\tau_\mu}\right)^2$$  
-$$\frac{v_\mu^{min}}{c} = \sqrt{1 - \left(\frac{\tau_n}{\tau_\mu}\right)^2}$$
-since $\tau_n \gg \tau_\mu$, $\left(\frac{\tau_n}{\tau_\mu}\right)^2$ is much less than 1. applying binomial approximation ($\sqrt{1 - x} \approx 1 - \frac{1}{2}x \quad \text{for } x \ll 1$):
-substitute $x = \left(\frac{\tau_n}{\tau_\mu}\right)^2$,
-$$\frac{v_\mu^{min}}{c} \approx 1 - \frac{1}{2}\left(\frac{\tau_n}{\tau_\mu}\right)^2$$
-$$1 - \frac{v_\mu^{min}}{c} \approx \frac{1}{2}\left(\frac{\tau_n}{\tau_\mu}\right)^2$$
+$$1 - \frac{(v_\mu^{min})^2}{c^2} = \frac{\tau_\mu^2}{\tau_n^2}$$  
+$$\frac{v_\mu^{min}}{c} = \sqrt{1 - \frac{\tau_\mu^2}{\tau_n^2}}$$
+since $\tau_n \gg \tau_\mu$, $\frac{\tau_\mu^2}{\tau_n^2}$ is much less than 1, applying the binomial approximation ($\sqrt{1 - x} \approx 1 - \frac{1}{2}x$ for $x \ll 1$):
+substitute $x = \frac{\tau_\mu^2}{\tau_n^2}$,
+$$\frac{v_\mu^{min}}{c} \approx 1 - \frac{1}{2}\left(\frac{\tau_\mu^2}{\tau_n^2}\right)$$
+$$1 - \frac{v_\mu^{min}}{c} \approx \frac{\tau_\mu^2}{2\tau_n^2}$$
 given $\tau_n \simeq 879.4 \text{ s}$ and $\tau_\mu \simeq 2.2 \times 10^{-6} \text{ s}$,
-$$1 - \frac{v_\mu^{min}}{c} \simeq \frac{1}{2}\left(\frac{(2.2 \times 10^{-6})^2}{(879.4)^2}\right)$$
+$$1 - \frac{v_\mu^{min}}{c} \simeq \frac{(2.2 \times 10^{-6})^2}{2(879.4)^2}$$
 $$1 - \frac{v_\mu^{min}}{c} \simeq 3.13 \times 10^{-18}$$
 
 \end{document}
