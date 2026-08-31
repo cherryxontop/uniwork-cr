@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 import pandas as pd
 
 
@@ -6,10 +7,10 @@ def load_stops(path='bus_stops.csv'):
     file2 = pd.read_csv(path) #reads csv
     stops = []
     for i in range(len(file2)):
-        stop_id = int(file2['id'][i])      #values in the "id" row
-        lat = float(file2['lat'][i])       #values in the "lat" column
-        lon = float(file2['lon'][i])       #values in the "lon" column
-        name = file2['name'][i]            #values in the "name" column
+        stop_id = int(file2['id'][i]) #values in the "id" row
+        lat = float(file2['lat'][i]) #values in the "lat" column
+        lon = float(file2['lon'][i]) #values in the "lon" column
+        name = file2['name'][i] #values in the "name" column
         #converting values to a list
         stops.append((stop_id, lat, lon, name))
     return stops
@@ -62,9 +63,7 @@ def print_journey(journey):
     print('Arrived at {}.'.format(journey[-1][2]))
 
 
-# ---------------------------------------------------------------------
-# Task 1
-# ---------------------------------------------------------------------
+# task 1
  
 # approximate coordinates of CSIT
 CSIT_LATITUDE = -35.2753
@@ -72,162 +71,80 @@ CSIT_LONGITUDE = 149.12056
  
  
 def southernmost_stop(stops):
-    """name of the stop with the smallest or most negative latitude"""
-    best_stop = stops[0]
-    for stop in stops:
-        if stop[1] < best_stop[1]:
-            best_stop = stop
-    return best_stop[3]
- 
- 
+    """name of the stop with the smallest or most negative latitude."""
+    best_stop = min(stops, key=lambda s: s[1]) #filters thru the latitudes in the stop tuples to find the minimum value.
+    return best_stop[3]     #returns the 3rd index which is the name of the stop
+
+
 def closest_stop_to_csit(stops):
-    """name of the stop closest to CSIT"""
-    best_stop = stops[0]
-    best_distance = (best_stop[1] - CSIT_LATITUDE) ** 2 + (best_stop[2] - CSIT_LONGITUDE) ** 2
- 
-    for stop in stops:
-        distance = (stop[1] - CSIT_LATITUDE) ** 2 + (stop[2] - CSIT_LONGITUDE) ** 2
-        if distance < best_distance:
-            best_stop = stop
-            best_distance = distance
- 
-    return best_stop[3]
- 
- 
+    """
+    name of the stop closest to CSIT
+    using pythagoras's theorem (a^2 + b^2 = c^2) to calculate 
+    the straight-line distance between each bus stop and the CSIT building:
+    - a represents the difference in longitudes (horizontal distance).
+    - b represents the difference in latitudes (vertical distance).
+    - c represents the straight-line distance.
+    """
+    def distance(stop):
+        a = (stop[1] - CSIT_LATITUDE)
+        b = (stop[2] - CSIT_LONGITUDE)
+        c = np.sqrt(a**2 + b**2)
+        return c
+    
+    best_stop = min(stops, key=distance) #filters thru the latitudes in the stop tuples to find the minimum value.
+    return best_stop[3] #returns the 3rd index which is the name of the stop
+
+
 def most_common_number(routes):
     """the route number used by the most routes"""
     counts = {}
     for name, stop_ids in routes:
-        number = name.split(' ', 1)[0]
-        if number in counts:
-            counts[number] += 1
+        number = name.split(' ', 1)[0] # take the first word of the name, e.g. '10'
+        if number in counts: # have we seen this number before?
+            counts[number] += 1 # yes -> add one to its count
         else:
-            counts[number] = 1
+            counts[number] = 1 # no -> start its count at one
  
-    best_number = None
-    best_count = 0
-    for number in counts:
-        if counts[number] > best_count:
-            best_number = number
-            best_count = counts[number]
+    best_number = None 
+    best_count = 0  # so the highest count so far is zero
+    for number in counts: # look at every number we counted
+        if counts[number] > best_count: # does this number beat the current winner?
+            best_number = number # yes -> it's our new winner
+            best_count = counts[number] # ...and remember its count too
  
-    return best_number
- 
- 
+    return best_number # return the number with the highest count
+
+
 def most_stops(routes):
     """name of the route that visits the most bus stops"""
-    best_name = routes[0][0]
-    best_count = len(routes[0][1])
+    best_name = routes[0][0] # name of the first route (starting guess)
+    best_count = len(routes[0][1]) # how many stops that first route has
  
-    for name, stop_ids in routes:
-        if len(stop_ids) > best_count:
-            best_name = name
-            best_count = len(stop_ids)
+    for name, stop_ids in routes: # check every route
+        if len(stop_ids) > best_count: # does this route have more stops?
+            best_name = name # yes -> it's our new best guess
+            best_count = len(stop_ids) # ...and remember its stop count too
  
-    return best_name
- 
- 
-# ---------------------------------------------------------------------
-# Task 2
-# ---------------------------------------------------------------------
- 
+    return best_name # return the name of the winner
+
+
+# task 2
+
 def find_route(stops, routes, stop_a, stop_b):
     """A direct (no-transfer) journey from stop_a to stop_b, or [] if none exists."""
-    id_a = stop_a[0]
-    name_a = stop_a[3]
-    id_b = stop_b[0]
-    name_b = stop_b[3]
+    id_a = stop_a[0] # id of the stop we're starting at
+    name_a = stop_a[3] # name of the stop we're starting at
+    id_b = stop_b[0] # id of the stop we want to reach
+    name_b = stop_b[3] # name of the stop we want to reach
  
     for route_name, stop_ids in routes:
-        if id_a in stop_ids and id_b in stop_ids:
-            index_a = stop_ids.index(id_a)
-            index_b = stop_ids.index(id_b)
-            if index_a < index_b:
-                return [(route_name, name_a, name_b)]
+        if id_a in stop_ids and id_b in stop_ids:  # does this route visit both stops?
+            index_a = stop_ids.index(id_a) # where stop_a sits in the route's stop order
+            index_b = stop_ids.index(id_b) # where stop_b sits in the route's stop order
+            if index_a < index_b: # does the route reach stop_a before stop_b?
+                return [(route_name, name_a, name_b)]  # yes -> return a one-leg journey
  
-    return []
- 
- 
-# ---------------------------------------------------------------------
-# Task 3
-# ---------------------------------------------------------------------
- 
-def _to_minutes(time_str):
-    """Convert an 'HH:MM' string into minutes since midnight."""
-    hours_str, minutes_str = time_str.split(':')
-    return int(hours_str) * 60 + int(minutes_str)
- 
- 
-def time_journey(journey, stops, routes, times):
-    """
-    Minutes to travel `journey`, assuming you catch the first bus of
-    the day for the first leg, then the first bus at/after your
-    arrival time for every later leg (so connection waits count, but
-    time spent waiting for your very first bus doesn't).
-    `times` is the list produced by load_times(). Returns None if any
-    leg has no usable timetable data.
-    """
-    if len(journey) == 0:
-        return 0
- 
-    # Which stop ids belong to which route (used below to work out
-    # which stop id a name refers to - some stop names are shared by
-    # more than one stop, so we can't just look up a name on its own).
-    route_stop_ids = {}
-    for name, stop_ids in routes:
-        route_stop_ids[name] = stop_ids
- 
-    start_time = None
-    current_time = None
- 
-    for route, name_a, name_b in journey:
-        stop_ids = route_stop_ids.get(route, [])
- 
-        id_a = None
-        for stop_id, lat, lon, name in stops:
-            if name == name_a and stop_id in stop_ids:
-                id_a = stop_id
-                break
- 
-        id_b = None
-        for stop_id, lat, lon, name in stops:
-            if name == name_b and stop_id in stop_ids:
-                id_b = stop_id
-                break
- 
-        if id_a is None or id_b is None:
-            return None
- 
-        # Find the earliest departure from stop A at/after current_time.
-        best_trip = None
-        best_departure = None
-        for r, stop_id, trip, time_str in times:
-            if r == route and stop_id == id_a:
-                minutes = _to_minutes(time_str)
-                if current_time is None or minutes >= current_time:
-                    if best_departure is None or minutes < best_departure:
-                        best_departure = minutes
-                        best_trip = trip
- 
-        if best_trip is None:
-            return None
- 
-        # Find when that same trip arrives at stop B.
-        arrival_time = None
-        for r, stop_id, trip, time_str in times:
-            if r == route and stop_id == id_b and trip == best_trip:
-                arrival_time = _to_minutes(time_str)
-                break
- 
-        if arrival_time is None:
-            return None
- 
-        if start_time is None:
-            start_time = best_departure
-        current_time = arrival_time
- 
-    return current_time - start_time
- 
+    return [] # no route goes directly from a to b
  
 if __name__ == '__main__':
     pass
