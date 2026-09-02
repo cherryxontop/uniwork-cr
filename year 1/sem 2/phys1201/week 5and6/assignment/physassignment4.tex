@@ -1,0 +1,115 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+
+\title{Assignment 4}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle
+
+Given:
+
+Collision happening at the starting point (origin: $t=0, x=0$). It creates two unstable particles: a neutron and an antimuon ($\mu^+$).  
+
+* Frame $S$ is us, on Earth.  
+
+* Frame $S'$ is the neutron's rest frame, where it isn't moving. 
+
+* Frame $S''$ is the antimuon's rest frame.  
+
+* $S'$ moves at velocity $v_n$ relative to $S$:
+
+
+\section{Part 1}
+
+For the neutron, its proper frame is $S'$. Since the neutron is at rest in its own proper frame, the decay event A occurs at its origin.
+$$x_A' = 0$$
+
+For the antimuon, its proper frame is $S''$. the antimuon is at rest in this frame meaning the decay event B occurs at its origin.
+$$x_B'' = 0$$
+
+\section{Part 2}
+In $S'$, the time elapsed between creation ($t'=0$) and decay event A is its proper lifetime:
+$$t_A' = \tau_n$$
+
+\section{Part3}
+
+In $S''$, the time elapsed until decay event B is its proper lifetime:
+$$t_B'' = \tau_\mu$$
+
+\section{Part4}
+
+Using the inverse Lorentz transformation from $S'$ to $S$:
+$$t_A = \gamma_n (t_A' + \frac{v_n x_A'}{c^2})$$
+Since $x_A' = 0$ and $t_A' = \tau_n$:
+$$t_A = \gamma_n \tau_n$$
+
+\section{Part 5}
+
+Using the inverse Lorentz transformation from $S'$ to $S$:
+$$x_A = \gamma_n (x_A' + v_n t_A')$$ 
+Since $x_A' = 0$:
+$$x_A = \gamma_n v_n \tau_n$$
+
+\section{part 6}
+Using the inverse Lorentz transformation from $S''$ to $S$:
+$$t_B = \gamma_\mu (t_B'(0) + \frac{v_\mu x_B''}{c^2})$$
+Since $t_B'' = \tau_\mu$ and $x_B'' = 0$:
+$$t_B = \gamma_\mu \tau_\mu$$
+
+\section{Part 7}
+Using the inverse Lorentz transformations from $S''$ to $S$:
+$$x_B = \gamma_\mu (x_B'' + v_\mu t_B'')$$
+since $x_B'' = 0$ and $t_B = \tau_\mu$,
+$$x_B = \gamma_\mu (0 + v_\mu \tau_\mu) = \gamma_\mu v_\mu \tau_\mu$$
+
+\section{Part 8}
+Using standard Lorentz transformations from $S$ to $S''$:
+$$t_A'' = \gamma_\mu \left( t_A - \frac{v_\mu x_A}{c^2} \right)$$
+substituting $t_A = \gamma_n \tau_n$ and $x_A = \gamma_n v_n \tau_n$,
+$$t_A'' = \gamma_\mu \left( \gamma_n \tau_n - \frac{v_\mu (\gamma_n v_n \tau_n)}{c^2} \right)$$  
+$$t_A'' = \gamma_\mu \gamma_n \tau_n \left( 1 - \frac{v_\mu v_n}{c^2} \right)$$
+
+\section{Part 9}
+Using standard Lorentz transformations from $S$ to $S''$:
+$$x_A'' = \gamma_\mu (x_A - v_\mu t_A)$$
+substituting  $x_A = \gamma_n v_n \tau_n$ and $t_A = \gamma_n \tau_n$,
+$$x_A'' = \gamma_\mu (\gamma_n v_n \tau_n - v_\mu \gamma_n \tau_n)$$
+$$x_A'' = \gamma_\mu \gamma_n \tau_n (v_n - v_\mu)$$
+
+\section{Part 10}
+Using Lorentz transformations from $S$ to $S'$:
+$$t_B' = \gamma_n \left( t_B - \frac{v_n x_B}{c^2} \right)$$
+substituting $t_B = \gamma_\mu \tau_\mu$ and $x_B = \gamma_\mu v_\mu \tau_\mu$,
+$$t_B' = \gamma_n \left( \gamma_\mu \tau_\mu - \frac{v_n (\gamma_\mu v_\mu \tau_\mu)}{c^2} \right)$$  
+$$t_B' = \gamma_n \gamma_\mu \tau_\mu \left( 1 - \frac{v_n v_\mu}{c^2} \right)$$
+
+\section{Part 11}
+Using Lorentz transformations from $S$ to $S'$:
+$$x_B' = \gamma_n (x_B - v_n t_B)$$
+substituting $x_B = \gamma_\mu v_\mu \tau_\mu$ and $t_B = \gamma_\mu \tau_\mu$,
+$$x_B' = \gamma_n (\gamma_\mu v_\mu \tau_\mu - v_n \gamma_\mu \tau_\mu)$$
+$$x_B' = \gamma_n \gamma_\mu \tau_\mu (v_\mu - v_n)$$
+
+\section{part 12}
+For the neutron to decay before the antimuon as observed in $S$, we require:
+$$t_A < t_B$$  
+substituting $t_A = \gamma_n \tau_n$ and $t_B = \gamma_\mu \tau_\mu$,
+$$\gamma_n \tau_n < \gamma_\mu \tau_\mu$$  
+expanding $\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$,
+$$\frac{\tau_n}{\sqrt{1 - \frac{v_n^2}{c^2}}} < \frac{\tau_\mu}{\sqrt{1 - \frac{v_\mu^2}{c^2}}}$$  
+assuming the neutron is at rest in $S^{\prime}$ and setting $v_n = 0$, squaring both sides, and entering $v_\mu^{min}$:
+$$\tau_n = \frac{\tau_\mu}{\sqrt{1 - \frac{(v_\mu^{min})^2}{c^2}}}$$
+rearranging:
+$$1 - \frac{(v_\mu^{min})^2}{c^2} = \frac{\tau_\mu^2}{\tau_n^2}$$  
+$$\frac{v_\mu^{min}}{c} = \sqrt{1 - \frac{\tau_\mu^2}{\tau_n^2}}$$
+since $\tau_n \gg \tau_\mu$, $\frac{\tau_\mu^2}{\tau_n^2}$ is much less than 1, applying the binomial approximation ($\sqrt{1 - x} \approx 1 - \frac{1}{2}x$ for $x \ll 1$):
+substitute $x = \frac{\tau_\mu^2}{\tau_n^2}$,
+$$\frac{v_\mu^{min}}{c} \approx 1 - \frac{1}{2}\left(\frac{\tau_\mu^2}{\tau_n^2}\right)$$
+$$1 - \frac{v_\mu^{min}}{c} \approx \frac{\tau_\mu^2}{2\tau_n^2}$$
+given $\tau_n \simeq 879.4 \text{ s}$ and $\tau_\mu \simeq 2.2 \times 10^{-6} \text{ s}$,
+$$1 - \frac{v_\mu^{min}}{c} \simeq \frac{(2.2 \times 10^{-6})^2}{2(879.4)^2}$$
+$$1 - \frac{v_\mu^{min}}{c} \simeq 3.13 \times 10^{-18}$$
+
+\end{document}
