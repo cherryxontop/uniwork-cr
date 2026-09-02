@@ -2,7 +2,7 @@
 title: "Lab Report: Electromagnetic Induction"
 subtitle: "_Chhaya Ramnani (UID: u8336188)_"
 author: "_Lab partners: Tsz Wing Candice Ng, Chinatsu Komada_"
-date: "2026-08-19"
+date: "2026-09-03"
 format: 
   typst:
     toc: false
