@@ -131,7 +131,7 @@ def most_stops(routes):
 # task 2
 
 def find_route(stops, routes, stop_a, stop_b):
-    """A direct (no-transfer) journey from stop_a to stop_b, or [] if none exists."""
+    """direct journey from stop_a to stop_b"""
     id_a = stop_a[0] # id of the stop we're starting at
     name_a = stop_a[3] # name of the stop we're starting at
     id_b = stop_b[0] # id of the stop we want to reach
@@ -145,6 +145,77 @@ def find_route(stops, routes, stop_a, stop_b):
                 return [(route_name, name_a, name_b)]  # yes -> return a one-leg journey
  
     return [] # no route goes directly from a to b
+
+
+# task 3
+
+def _to_minutes(time_str):
+    """convert an 'HH:MM' string into minutes"""
+    hours_str, minutes_str = time_str.split(':')  # eg splits '08:35' into '08' and '35'
+    return int(hours_str) * 60 + int(minutes_str) #converts to minutes
+ 
+def time_journey(journey, stops, routes, times):
+    if len(journey) == 0: #nothing to travel
+        return 0
+ 
+    departures, trip_numbers = times #load_times
+
+    route_stop_ids = {}
+    for name, stop_ids in routes:   # go through every route
+        route_stop_ids[name] = stop_ids # remember its stop ids under its name
+ 
+    start_time = None  # when we boarded the very first bus
+    current_time = None # earliest time we leave the next stop
+ 
+    for route, name_a, name_b in journey: # go through the journey one leg at a time
+        stop_ids = route_stop_ids.get(route, [])  # this leg's route's list of stop ids
+ 
+        id_a = None # id of the "from" stop for this leg (not found yet)
+        for stop_id, lat, lon, name in stops:  # search every stop for a name+route match
+            if name == name_a and stop_id in stop_ids:  # right name, and on this route
+                id_a = stop_id # found it
+                break # stop searching, we only need one match
+ 
+        id_b = None # id of the "to" stop for this leg
+        for stop_id, lat, lon, name in stops:  # same search, for the destination stop
+            if name == name_b and stop_id in stop_ids:
+                id_b = stop_id
+                break
+ 
+        if id_a is None or id_b is None:   # if error
+            return None
+ 
+        #  earliest departure from stop A at/after current_time.
+        best_trip = None  # trip number of the bus we'll catch 
+        best_departure = None  # its departure time in minutes 
+        for (r, stop_id, time_str), trip in zip(departures, trip_numbers):  # scan every departure
+            if r == route and stop_id == id_a:  # a departure of this route, from stop A
+                minutes = _to_minutes(time_str)  # convert its time to minutes
+                if current_time is None or minutes >= current_time:  # early enough for us to catch?
+                    if best_departure is None or minutes < best_departure:  # earlier than our pick so far?
+                        best_departure = minutes  # yes -> remember it
+                        best_trip = trip # which trip it is
+ 
+        if best_trip is None: # no bus leaves stop A in time
+            return None
+ 
+        # when that same trip arrives at stop B.
+        arrival_time = None  
+        for (r, stop_id, time_str), trip in zip(departures, trip_numbers):  # scan every departure again
+            if r == route and stop_id == id_b and trip == best_trip:  # same route, stop B, same bus
+                arrival_time = _to_minutes(time_str)  # convert its time to minutes
+                break  # found it, stop searching
+ 
+        if arrival_time is None: # that bus never reaches stop B (shouldn't normally happen)
+            return None
+ 
+        if start_time is None: # first leg of the journey
+            start_time = best_departure # remember when we boarded, just this once
+        current_time = arrival_time           # this leg's arrival becomes the next leg's earliest departure
+ 
+    return current_time - start_time          # total minutes from boarding to final arrival
+ 
+
  
 if __name__ == '__main__':
     pass
