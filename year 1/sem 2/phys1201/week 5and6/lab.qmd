@@ -25,15 +25,15 @@ from uncertainties import ufloat
 
 # Imports and Functions
 
-The experiment was analysed using Python. I used `numpy` for numerical calculations, `matplotlib` for graphs, `scipy` for statistical tests and ODR, and `uncertainties` for propagating measured uncertainties.
+The experiment was done using Python. I used `numpy` for numerical calculations, `matplotlib` for graphs, `scipy` for statistical tests and ODR, and `uncertainties` for propagating measured uncertainties.
 
 Uncertainties are as given below:
 
 ```{python}
 sigma_N_turns = 1          # miscounting a partial turn, etc.
-sigma_R_cm = 0.1           # ruler on calculating R
-sigma_h_cm = 0.2           # ruler reading on drop height
-sigma_emf = 0.02      # 2% of oscilloscope voltage reading
+sigma_R_cm = 0.25          # ruler read in 0.5 cm increments, so half that
+sigma_h_cm = 0.25          # ruler read in 0.5 cm increments, so half that
+sigma_emf_frac = 0.02      # 2% of oscilloscope voltage reading
 ```
 
 ```{python}
@@ -142,7 +142,7 @@ def theory_emf_peak(N, v, R):
 def compare_to_theory(x_vals, y_measured_v, y_theory, title):
     x_nom = np.array([v.n for v in x_vals])
     x_err = np.array([v.s for v in x_vals])
-    sigma_y = y_measured_v * sigma_emf
+    sigma_y = y_measured_v * sigma_emf_frac
     y_nom = y_measured_v
 
     residuals = y_nom - y_theory
@@ -256,7 +256,7 @@ $$\frac{3}{4}
 
 # Procedure
 
-We wound a coil around one end of the Perspex tube, sanded enamel off both leads, hooked to scope, mounted tube vertically. We then dropped the magnet, adjusted scope scale/trigger till we got a clean two-lobed trace. The larger peak corresponded to the magnet exiting the coil, as the magnet was accelerating throughout its fall.
+We wound a coil around one end of the Perspex tube, sanded enamel off both leads, hooked to scope, mounted tube vertically. We then dropped the magnet, adjusted scope scale/trigger till we got a clean two-lobed trace. The larger peak corresponded to the magnet exiting the coil, as the magnet was accelerating throughout its fall (gravity doesn't take breaks).
 
 Peak emf read as $\frac{V_{pk-pk}}{2}$ off the scope, per demonstrator's instruction. oscilloscope reading uncertainty taken as 2% of the reading.
 
@@ -277,13 +277,13 @@ $$s=\sqrt{2gh}$$
 The number of turns and coil radius were kept constant while the drop height was varied in approximately 5 cm increments, from 4.9 cm to 44.9 cm. The magnet speed at the coil was calculated using
 $$s=\sqrt{2gh}$$
 
-The uncertainties of measured quants are as follows:
+The uncertainties of measured quants are as follows (R and h were read off a ruler marked in 0.5 cm steps, so we took half that as the reading uncertainty):
 
 | Quantity | Uncertainty |
 |---|---:|
 | Number of turns \(N\) | \(1\) turn |
-| Coil radius \(R\) | \(0.1\) cm |
-| Drop height \(h\) | \(0.2\) cm |
+| Coil radius \(R\) | \(0.25\) cm |
+| Drop height \(h\) | \(0.25\) cm |
 | Calibration distance \(z\) | \(0.2\) cm |
 | Calibration field \(B\) | \(0.005\) mT |
 | Oscilloscope emf | \(2\%\) of reading |
@@ -371,15 +371,13 @@ plt.savefig("graphs/dipole_calibration_residuals.png", dpi=300)
 plt.show()
 ```
 
-The experimental data demonstrated an approximately linear increase in peak emf as the number of turns increased from $10$ to $50$.Comparing the data to the absolute theoretical prediction yielded a chi-squared statistic of $\chi^2 = 30664.319$ ($\text{dof} = 9$, reduced $\chi^2 = 3407.147$, $p = 0.0000$).A sigma test on the data-to-theory ratio gave a measured value of $0.461 \pm 0.003$ (discrepancy of $174.58\sigma$).
-
 For each calibration point $k=Bz^3$ was calculated. If the magnetic field follows the ideal point-dipole relationship $B\propto z^{-3}$, these values should be approximately constant.
 
 The mean value of (k) was calculated from all 19 calibration points, and the standard error of the mean was used as the uncertainty in the mean. This gave a calibrated magnetic dipole moment of
 
 $$\boxed{m=(1.1784\pm0.0727)\ \mathrm{A,m^2}}$$
 
-The individual (k)-values had a spread of approximately 27% relative to their mean. The largest deviations occurred at the closest measurement points, where the measured field showed increasing deviation from the ideal $z^{-3}$ dependence.
+The individual (k)-values had a spread of approximately 27% relative to their mean. The largest deviations occurred at the closest measurement points, where the measured field showed increasing deviation from the ideal $z^{-3}$ dependence — not too surprising, since "point" dipole is a bit of a stretch up close.
 
 ### emf vs number of turns N
 
@@ -456,9 +454,7 @@ The measured peak emf increased linearly as the drop height—and consequently t
 
 ### Line of best fit
 
-Independent best-fit models were applied to each dataset to distinguish differences in scale or offset from differences in the predicted functional dependence.
-
-For the coil-radius data, a power-law model of the form $\varepsilon=aR^b$ was used. The fitted exponent was approximately (1.53), compared with the theoretical value of (-2). This represents the clearest deviation in the functional form of the experimental results and is consistent with limitations of the point-dipole approximation when the coil radius becomes comparable to the magnet's dimensions.
+For the coil-radius data, we used a power-law model $\varepsilon=aR^b$. The fitted exponent came out to $-1.53 \pm 0.07$, against a theoretical $-2$. This is the clearest shape mismatch of the three, and — as flagged above — fits neatly with the point-dipole approximation wearing thin once the coil radius gets close to the magnet's own size.
 
 ```{python}
 print("\n-- N: linear fit emf = a*N + b --")
@@ -494,7 +490,7 @@ plot_with_bestfit(xs, xerrs, ys, sys_, y_theory_s, res_s, linear_model,
                    "Magnet speed $s$ (m/s)", "Peak emf vs Magnet Speed", "graphs/emf_vs_s")
 ```
 
-All three datasets had (R^2) values above 0.94, indicating that the measurements were internally consistent and exhibited relatively little scatter. The (N) and (s) datasets showed particularly strong agreement with their predicted functional forms, while the radius data showed the main deviation in shape.
+All three datasets had (R^2) values above 0.94 indicating that the measurements were internally consistent and exhibited relatively little scatter. The (N) and (s) datasets showed strong agreement with their predicted functional forms, while the radius data showed the main deviation in shape.
 
 # Overall Observations
 
@@ -586,4 +582,4 @@ $$
 }
 $$
 
-The agreement was not perfect, mainly because the theoretical model assumes an ideal point dipole, ideal free fall, perfectly centred motion and an ideal circular coil. Despite these limitations, the experimental trends were consistent with the main predictions of Faraday's law and provided a reasonable demonstration of electromagnetic induction.
+The agreement was not perfect mainly because the theoretical model assumes an ideal point dipole, ideal free fall, perfectly centred motion and an ideal circular coil, none of which we can manage to build in a lab as of now.
