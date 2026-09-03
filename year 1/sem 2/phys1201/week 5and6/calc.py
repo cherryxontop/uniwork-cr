@@ -5,7 +5,6 @@ from scipy import odr, constants, stats
 from uncertainties import ufloat
 
 
-
 # CALIBRATION DATA (from the supplied spreadsheet, large magnet)
 
 mu_0 = constants.mu_0
