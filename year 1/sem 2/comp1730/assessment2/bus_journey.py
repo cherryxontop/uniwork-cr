@@ -162,6 +162,7 @@ def time_journey(journey, stops, routes, times):
     start_time = None # time we catch the first bus
 
     for route, stop_a, stop_b in journey: # go through each leg of the journey
+
         # find the stop IDs belonging to this route
         stop_ids = []
 
@@ -169,32 +170,33 @@ def time_journey(journey, stops, routes, times):
             if name == route:
                 stop_ids = ids
                 break
+
+        #timetable uses IDs, so we need to convert the names back to IDs
         id_a = None # ID of the starting stop
         id_b = None # ID of the destination stop
 
-        for stop_id, lat, lon, name in stops: # search through all stops
+        # find the IDs of stop A and stop B
+        for stop_id, lat, lon, name in stops:
             if name == stop_a and stop_id in stop_ids:
-                id_a = stop_id # found stop A
+                id_a = stop_id
             if name == stop_b and stop_id in stop_ids:
-                id_b = stop_id # found stop B
+                id_b = stop_id
+
         if id_a is None or id_b is None: # if either stop could not be found
             return None
 
-        # find departure times for stop A
-        times_a = []
+        times_a = [] # times for stop A
+        times_b = [] # times for stop B
+
+        # find all times for stop A and stop B
         for i in range(len(departures)):
             if departures[i][0] == route and departures[i][1] == id_a:
                 times_a.append((departures[i][2], trip_numbers[i]))
-
-        # find arrival times for stop B
-        times_b = []
-        for i in range(len(departures)):
             if departures[i][0] == route and departures[i][1] == id_b:
                 times_b.append((departures[i][2], trip_numbers[i]))
 
         if not times_a or not times_b: # if there is no timetable data
             return None
-
         # find the first bus we can catch
         for departure, trip in times_a:
             departure_time = _to_minutes(departure)
