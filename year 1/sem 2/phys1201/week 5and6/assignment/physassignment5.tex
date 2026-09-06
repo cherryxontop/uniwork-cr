@@ -11,32 +11,32 @@
 Given:
 
 \begin{itemize}
-    \item $m_{H^0}\approx125GeV/c^2$
-    \item $m_{Z^0}\approx91GeV/c^2$
-    \item $m_e=5.11\times10^{-4}GeV/c^2$
+    \item $m_{H^0}\approx 125~\mathrm{GeV}/c^2$
+    \item $m_{Z^0}\approx 91~\mathrm{GeV}/c^2$
+    \item $m_e=5.11\times10^{-4}~\mathrm{GeV}/c^2$
     \item $m_\gamma=0$
 \end{itemize}
 
 \section{Part 1}
 
-The maximum energy of the electron at LEP was
+the maximum energy of the electron at LEP was
 \[
-E = 104~\mathrm{GeV}.
+E = 104~\mathrm{GeV}
 \]
 
-The total relativistic energy of a particle is 
+the total relativistic energy of a particle is 
 \[
-E = \gamma mc^2.
+E = \gamma mc^2
 \]
 
 rearranging:
 \[
-\gamma = \frac{E}{mc^2}.
+\gamma = \frac{E}{mc^2}
 \]
 
 rest mass of the electron is
 \[
-m_e = 5.11\times10^{-4}~\mathrm{GeV}/c^2.
+m_e = 5.11\times10^{-4}~\mathrm{GeV}/c^2
 \]
 
 so, solving for $\gamma$
@@ -44,7 +44,7 @@ so, solving for $\gamma$
 \gamma = \frac{104~\mathrm{GeV}}{5.11\times10^{-4}~\mathrm{GeV}}
 \]
 \[
-\gamma \approx 2.04\times10^5.
+\gamma \approx 2.04\times10^5
 \]
 
 therefore to 1\% accuracy,
@@ -54,5 +54,309 @@ therefore to 1\% accuracy,
 
 (super close to the speed of light)
 
-\end{document}
+\section{Part 2}
 
+we know that Lorentz factor $\gamma$ is:
+\[
+\gamma = \frac{1}{\sqrt{1-\frac{v^2}{c^2}}}
+\]
+
+squaring both sides,
+\[
+\gamma^2 = \frac{1}{1-\frac{v^2}{c^2}}
+\]
+
+rearranging,
+\[
+\frac{1}{\gamma^2}=1-\frac{v^2}{c^2}
+\]
+
+factorising the RHS,
+
+\[
+1-\frac{v^2}{c^2} = \left(1-\frac{v}{c}\right) \left(1+\frac{v}{c}\right)
+\]
+
+therefore,
+
+\[
+\frac{1}{\gamma^2} = \left(1-\frac{v}{c}\right) \left(1+\frac{v}{c}\right)
+\]
+
+for a highly relativistic electron, its velocity is very close to the speed of light, so
+
+\[
+\frac{v}{c}\approx1
+\]
+
+therefore,
+
+\[
+1+\frac{v}{c}\approx2
+\]
+
+substituting this gives:
+
+\[
+\frac{1}{\gamma^2} \approx 2\left(1-\frac{v}{c}\right)
+\]
+
+rearranging,
+
+\[
+\boxed{1-\frac{v}{c} \approx \frac{1}{2\gamma^2}
+}.
+\]
+
+\section{Part 3}
+
+the dominant reaction for $H^0$ production is
+
+\[
+e^+ + e^- \rightarrow H^0 + Z^0.
+\]
+
+electron and positron have equal and opposite momenta, so the centre-of-mass frame is the same as the laboratory frame. 
+to find the minimum energy required, we consider the reaction at threshold. at threshold, the final particles have zero 
+momentum in the centre-of-mass frame, so they are produced at rest relative to each other.
+
+this means that the centre-of-mass energy is just enough to provide the rest energies of the $H^0$ and $Z^0$:
+
+\[
+m_{H^0}c^2 + m_{Z^0}c^2
+\]
+
+using
+
+\[
+m_{H^0}c^2 = 125~\mathrm{GeV}
+\]
+
+and
+
+\[
+m_{Z^0}c^2 = 91~\mathrm{GeV}
+\]
+
+we get
+
+\[125+91=216~\mathrm{GeV}\]
+
+
+since the electron and positron have equal energies,
+
+\[
+2E_e=216~\mathrm{GeV}
+\]
+
+therefore,
+
+\[
+E_e=\frac{216}{2}
+=108~\mathrm{GeV}
+\]
+
+hence, the minimum energy required for each electron and positron is
+
+\[
+\boxed{E_{e,\min}=108~\mathrm{GeV}}
+\]
+
+\section{Part 4}
+
+\subsection{(a) $H^0 \rightarrow e^- + \bar{\nu}_e$}
+
+\textbf{forbidden.} charge conservation is violated. $H^0$ is electrically neutral, 
+but in, $e^- + \bar{\nu}_e$, the electron is negatively charged and the anti-neutrino 
+is neutral, making it have a net charge of $-1$.
+
+\subsection{(b) $H^0 \rightarrow Z^0 + Z^0$}
+
+\textbf{forbidden.} this fails on energetic grounds. the invariant mass of the final state
+must satisfy $m_{\text{final}} \leq m_{H^0}$ for the decay to be kinematically allowed. here,
+
+\[
+2\,m_{Z^0}c^2 = 182~\mathrm{GeV},
+\]
+
+which exceeds $m_{H^0}c^2 = 125~\mathrm{GeV}$. there is not enough rest-mass energy
+available in the parent particle to produce two on-shell $Z^0$ bosons.
+
+\subsection{(c) $H^0 \rightarrow Z^0 + \gamma$}
+
+\textbf{allowed.} charge is conserved ($0 \rightarrow 0+0$) and the mass budget is
+satisfied ($91~\mathrm{GeV} < 125~\mathrm{GeV}$).
+
+\subsection{(d) $H^0 \rightarrow Z^0$}
+
+\textbf{forbidden.} a single particle cannot decay into a single particle of a different mass.
+since $m_{Z^0} \neq m_{H^0}$ ($91~\mathrm{GeV} \neq 125~\mathrm{GeV}$), energy and momentum cannot simultaneously be
+conserved, so this process is not possible
+
+\subsection{(e) $H^0 \rightarrow \gamma + \gamma$}
+
+\textbf{allowed.} charge conservation holds. photons are neutral and massless, so kinematics are easily satisfied 
+($125\text{ GeV} > 0$).
+
+\section{Part 5}
+
+assuming that the decay $H^0\rightarrow Z^0+\gamma$ is possible.
+
+the masses are
+
+\[
+m_{H^0}=125~\mathrm{GeV}/c^2
+\]
+
+\[
+m_{Z^0}=91~\mathrm{GeV}/c^2
+\]
+
+\[
+m_{\gamma}=0
+\]
+
+\subsection{(a) Q-value}
+
+the Q-value is given by
+
+\[
+Q=\sum m_{\mathrm{initial}}c^2 - \sum m_{\mathrm{final}}c^2
+\]
+
+there is one initial particle- the Higgs boson, and two final particles- the $Z^0$ and photon. therefore,
+
+\[
+Q = m_{H^0}c^2 - m_{Z^0}c^2 - m_{\gamma}c^2
+\]
+
+substituting in the given masses,
+
+\[
+Q = 125-91-0
+\]
+
+\[
+Q=34~\mathrm{GeV}.
+\]
+
+therefore,
+
+\[
+\boxed{Q=34.0~\mathrm{GeV}}.
+\]
+
+\subsection{(b) momentum of $\gamma$ and $Z^0$}
+
+we consider the decay in the rest frame of the Higgs.
+
+since the Higgs is initially at rest,
+
+\[
+\vec{p}_{H^0}=\vec{0}
+\]
+
+conservation of momentum gives
+
+\[
+\vec{p}_{Z^0}+\vec{p}_{\gamma}=\vec{0}
+\]
+
+the two particles have equal momentum and travel in opposite directions:
+
+\[
+p_{Z^0}=p_{\gamma}=p
+\]
+
+for a relativistic particle, the energy-momentum relation is
+
+\[
+E^2=p^2c^2+m^2c^4
+\]
+
+for the photon,
+
+\[
+m_{\gamma}=0
+\]
+
+so
+
+\[
+E_{\gamma}^2=p_{\gamma}^2c^2
+\]
+
+taking square root on both sides,
+
+\[
+E_{\gamma}=p_{\gamma}c
+\]
+
+for the $Z^0$,
+
+\[
+E_{Z^0}^2=p_{Z^0}^2c^2+m_{Z^0}^2c^4
+\]
+\[
+E_{Z^0} = \sqrt{p_{Z^0}^2c^2 + m_{Z^0}^2c^4}
+\]
+
+substituting into the energy conservation equation and using the relation defined for $p_{\gamma}$ and $p_{Z_{0}}$:
+
+\[
+pc + \sqrt{p^2c^2 + m_{Z^0}^2c^4} = 125
+\]
+
+rearranging terms,
+
+\[
+\sqrt{p^2c^2 + m_{Z^0}^2c^4} = 125 - pc
+\]
+
+squaring both sides:
+
+\[
+p^2c^2 + m_{Z^0}^2c^4 = 125^2 - 2(125)pc + p^2c^2
+\]
+
+the $p^2c^2$ terms cancel on both sides
+
+\[
+m_{Z^0}^2c^4 = 15625 - 250\,pc.
+\]
+
+substituting $m_{Z^0}c^2 = 91~\mathrm{GeV}$:
+
+\[
+91^2 = 15625 - 250\,pc
+\]
+\[
+8281 = 15625 - 250\,pc
+\]
+\[
+250\,pc = 15625 - 8281 = 7344
+\]
+\[
+pc = \frac{7344}{250} = 29.376~\mathrm{GeV}
+\]
+
+\[
+\boxed{p_\gamma = p_{Z^0} \approx 29.4~\mathrm{GeV}/c}
+\]
+
+\section{Part 6}
+
+the decay in question is
+
+\[
+Z^0\rightarrow\mu^-+\mu^+
+\]
+
+the $Z^0$ boson is a neutral gauge boson associated with the weak interaction. therefore, the 
+fundamental interaction responsible for this process is the
+
+\[
+\boxed{\text{weak interaction}}.
+\]
+
+\end{document}
