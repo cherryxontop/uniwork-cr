@@ -149,7 +149,7 @@ def find_route(stops, routes, stop_a, stop_b):
 
 # task 3
 
-def _to_minutes(time):
+def to_minutes(time):
     hours, minutes = time.split(':') # split the time into hours and minutes
     return int(hours) * 60 + int(minutes) # convert everything into minutes
 
@@ -199,12 +199,12 @@ def time_journey(journey, stops, routes, times):
             return None
         # find the first bus we can catch
         for departure, trip in times_a:
-            departure_time = _to_minutes(departure)
+            departure_time = to_minutes(departure)
             if current_time is None or departure_time >= current_time:
                 # find the same bus at stop B
                 for arrival, arrival_trip in times_b:
                     if arrival_trip == trip:
-                        arrival_time = _to_minutes(arrival)
+                        arrival_time = to_minutes(arrival)
                         if start_time is None: # first leg of the journey
                             start_time = departure_time
                         current_time = arrival_time
