@@ -1,0 +1,271 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Assignment 1: Math1014}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle
+
+\section{Linear Algebra}
+
+\subsection{Question 1}
+we are given the vector space
+\[
+V_N = \operatorname{span} \left\{\cos(2\pi kt),\sin(2\pi kt)\mid 0\leq k\leq N\right\}.
+\]
+
+\subsubsection*{(a)}
+two functions are linearly independent if the only scalars $a,b$ satisfying
+\[
+a\cos(2\pi t) + b \sin(2\pi t) = 0 \quad \text{for all } t \in [0,1]
+\]
+are $a = b = 0$. if we can find even one nontrivial choice of $t$ that forces $a=0$, and another that forces $b=0$, we're done.
+
+- at $t=0$,
+\[
+a\cos(0) + b\sin(0) = a(1) + b(0) = a = 0
+\]
+so $a$ must be $0$
+ 
+- at $t = \frac{1}{4}$
+\[
+a\cos\left(\tfrac{\pi}{2}\right) + b\sin\left(\tfrac{\pi}{2}\right) = a(0) + b(1) = b = 0
+\]
+so $b$ must be $0$ too
+ 
+since the equation forces $a=b=0$, the only linear combination equal to the zero function is the trivial one. 
+hence $\cos(2\pi t)$ and $\sin(2\pi t)$ are \textbf{linearly independent} in $V_1$.
+
+\subsubsection*{(b)}
+we need the dimension of $V_1$
+
+the definition says
+\[
+V_N= \operatorname{span} \left\{ \cos(2\pi kt),\sin(2\pi kt) \mid0\leq k\leq N \right\}
+\]
+
+if $N=1$, then $k$ can be either $0$ or $1$.
+
+so we get
+
+\[
+V_1= \operatorname{span} \left\{ \cos(0),\sin(0), \cos(2\pi t),\sin(2\pi t) \right\}
+\]
+
+now, $\cos(0)=1$ and $\sin(0)=0$
+
+so the span becomes:
+
+\[
+V_1= \operatorname{span} \left\{ 1,\cos(2\pi t),\sin(2\pi t) \right\}
+\]
+
+the zero function doesn't add anything to the span, so we can ignore it
+
+we therefore have three functions:
+\[
+1,\cos(2\pi t),\sin(2\pi t)
+\]
+
+these are linearly independent, so they form a basis for \(V_1\).
+
+therefore, \boxed{dim(V_1) = 3}
+
+\subsubsection*{(c)}
+finding the dimension of $V_2$,
+
+when $N=2$, the possible values of $k$ are $0,1,2$
+
+therefore,
+\[
+V_2 = \operatorname{span} \left\{\cos(0), \sin(0), cos(2\pi t), sin(2\pi t), cos(4\pi t), sin(4\pi t) \right\}
+\]
+
+again, $\cos(0) = 1$ and $\sin(0) = 0$, so (leaving out the $0$ terms),
+\[
+V_2 = \operatorname{span} \left\{1, cos(2\pi t), sin(2\pi t), cos(4\pi t), sin(4\pi t) \right\}
+\]
+
+there are now 5 independent functions. therefore,
+\[
+\boxed{dim(V_2) = 5}
+\]
+
+for a general $N$, we always have:
+\begin{itemize}
+    \item one constant function $1$,
+    \item $N$ cosine functions corresponding to $k=1,...,N$,
+    \item $n$ sine functions coreresponding to $K=1,...,N$
+\end{itemize}
+so, the total number of basis functions is
+\[
+1+N+N
+\]
+therefore,
+\[
+\boxed{dim(V_N) = 2N + 1}
+\]
+
+\subsection{Question 2}
+
+we have $S:V_N \rightarrow R_m$ defined by
+\[
+S(f) = 
+\begin{bmatrix}
+    f(t_1) \\
+    f(t_2) \\
+    \vdots \\
+    f(t_m)
+\end{bmatrix}
+\]
+
+\subsubsection*{(a)}
+we are given $m=3$ with sampling points $t_1=0$, $t_2=0.5$, $t_3=1$ and 
+$$f(t) = 3+\cos(2\pi t)$$
+
+since $S$ records the value of $f$ at each sampling point,
+\[
+S(f)=
+\begin{bmatrix}
+    f(0) \\
+    f(0.5) \\
+    f(1)
+\end{bmatrix}
+\]
+\begin{itemize}
+    \item at $t=0$, $$f(0) = 3+\cos(2\pi(0))$$ $$f(0)=3+\cos(0)$$
+    since $\cos(0)=1$, $$f(0) = 4$$
+    \item at $t=0.5$, $$f(0.5) = 3+\cos(2\pi(0.5))$$ $$f(0.5)=3+\cos(\pi)$$
+    since $\cos(\pi)=-1$, $$f(0.5) = 3-1=2$$
+    \item at $t=1$, $$f(1) = 3+\cos(2\pi(1))$$ $$f(1)=3+\cos(2\pi)$$
+    since $\cos(2\pi)=1$, $$f(1) = 3=1=4$$
+\end{itemize}
+
+putting all these together into the matrix, we get
+\[
+\boxed{
+    S(f) = 
+    \begin{bmatrix}
+        4\\
+        2\\
+        4
+    \end{bmatrix}
+}
+\]
+
+\subsubsection*{(b)}
+now we have $$g(t) = \sin(12\pi t)$$
+again,
+\[
+S(g) = 
+\begin{bmatrix}
+    g(0)\\
+    g(0.5)\\
+    g(1)
+\end{bmatrix}
+\]
+
+\begin{itemize}
+    \item at $t=0$, $$g(0)=\sin(12\pi(0))=\sin(0) = 0$$
+    \item at $t=05$, $$g(0.5)=\sin(12\pi(0.5))=\sin(6\pi) = 0$$
+    \item at $t=1$, $$g(1)=\sin(12\pi(1))=\sin(12\pi) = 0$$
+\end{itemize}
+
+putting all these together into the matrix, we get
+\[
+\boxed{
+    S(f) = 
+    \begin{bmatrix}
+        0\\
+        0\\
+        0
+    \end{bmatrix}
+}
+\]
+
+\subsubsection*{(c)}
+for a function to be a linear map, we need
+\[
+S(af+bg)=aS(f)+bS(g) \quad \text{for any functions } f, g \in V_N \text{ and scalars } a, b \in \mathbb{R}
+\]
+starting with the LHS,
+\[
+S(f) = 
+\begin{bmatrix}
+    (af+bg)(t_1)\\
+    (af+bg)(t_2)\\
+    \vdots\\
+    (af+bg)(t_m)
+\end{bmatrix}
+\]
+we know that at each sample point $t_i$, the addition and scalar multiplication is
+\[
+(af+bg)(t_i)=af(t_i)+bg(t_i)
+\]
+therefore,
+\[
+S(f) = 
+\begin{bmatrix}
+    af(t_1) + bg(t_1)\\
+    af(t_2) + bg(t_2)\\
+    \vdots\\
+    af(t_m) + bg(t_m)
+\end{bmatrix}
+\]
+separating into two vectors:
+\[
+S(f) = 
+a
+\begin{bmatrix}
+    f(t_1)\\
+    f(t_2)\\
+    \vdots\\
+    f(t_m)
+\end{bmatrix}
++
+b
+\begin{bmatrix}
+    g(t_1)\\
+    g(t_2)\\
+    \vdots\\
+    g(t_m)
+\end{bmatrix}
+\]
+we can see that these two vectors are exactly $S(f)$ and $S(g)$
+
+therefore, $$S(af+bg) = aS(f)+bS(g)$$
+hence, $$\boxed{\text{S is linear}}$$
+
+\subsubsection*{(d)}
+
+
+\subsubsection*{(e)}
+
+\subsubsection*{(f)}
+
+\subsubsection*{(g)}
+
+\subsubsection*{(h)}
+
+\section{Calculus}
+
+\subsection{Question 3}
+
+\subsubsection*{a}
+
+\subsubsection*{b}
+
+\subsubsection*{c}
+
+\subsection{Question 4}
+
+\subsubsection*{a}
+
+\subsubsection*{b}
+
+\subsubsection*{c}
+
+\end{document}
