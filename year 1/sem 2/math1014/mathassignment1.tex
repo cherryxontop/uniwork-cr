@@ -240,13 +240,142 @@ therefore, $$S(af+bg) = aS(f)+bS(g)$$
 hence, $$\boxed{\text{S is linear}}$$
 
 \subsubsection*{(d)}
+an element of $V_N$ can be represented as a vector in $\mathbb{R}^{2N+1}$
 
+from question 1, $dim(V_N)=2N+1$, so $[f]_\mathcal{B} \in \mathbb{R}^{2N+1}$.
+
+so there are $2N+1$ functions in this basis, meaning $[f]_\mathcal{B}$ has $2N+1$ components
+
+$S$ takes $f$ and evaluates it at $m$ sample points
+
+\[
+S(f) =
+\begin{bmatrix}
+    f(t_1)\\
+    f(t_2)\\
+    \vdots\\
+    f(t_m)
+\end{bmatrix}
+\]
+
+therefore, $S(f) \in \mathbb{R}^m$. so the output has $m$ components
+
+so we need a matrix $A$ such that
+
+\[
+\text{matrix }A \times \text{input vector} = \text{output vector}
+\]
+
+therefore, $A$ needs to take a vector with $2N+1$ entries and turn it into a vector with $m$ entries.
+
+this means $A$ needs $2N+1$ columns (one for each basis function) and $m$ rows (one for each sample point).
+
+therefore,
+
+\[
+\boxed{A\in\mathbb{R}^{m\times(2N+1)}}
+\]
 
 \subsubsection*{(e)}
+we know from 2(d) that
+
+\[
+A\in\mathbb{R}^{m\times(2N+1)}
+\]
+
+so $A$ has $m$ rows and $2N+1$ columns.
+
+the rank of a matrix cannot be bigger than the number of rows or the number of columns.
+
+therefore,
+
+\[
+rank(A)\leq m
+\]
+
+and
+
+\[
+rank(A)\leq 2N+1
+\]
+
+so the upper bound is the smaller of these two numbers:
+
+\[
+\boxed{rank(A)\leq\min(m,2N+1)}
+\]
+
+this is because the rank tells us how many independent rows or columns there are, so we cannot have more independent rows than $m$, or more independent columns than $2N+1$.
 
 \subsubsection*{(f)}
+we can use the rank-nullity theorem:
+\[
+rank(A)+nullity(A)=\text{number of columns of }A
+\]
+
+from 2(d), $A$ has $2N+1$ columns, so
+\[
+rank(A)+nullity(A)=2N+1
+\]
+
+rearranging,
+\[
+nullity(A)=2N+1-rank(A)
+\]
+
+from part (e),
+\[
+rank(A)\leq\min(m,2N+1)
+\]
+
+so the smallest possible nullity occurs when the rank is as large as possible.
+therefore,
+\[
+nullity(A)\geq 2N+1-\min(m,2N+1)
+\]
+
+so,
+\[
+\boxed{nullity(A)\geq\max(0,2N+1-m)}
+\]
+
+if $m<2N+1$, then
+\[
+\boxed{nullity(A)\geq2N+1-m>0}
+\]
 
 \subsubsection*{(g)}
+from part(f) we know that
+\[
+nullity(A)\geq2N+1-m.
+\]
+
+we want
+\[
+dim(null(A))>0.
+\]
+
+this will definitely happen when
+\[
+2N+1-m>0.
+\]
+
+so,
+\[
+2N+1>m.
+\]
+
+therefore,
+\[
+\boxed{m<2N+1}
+\]
+
+leads to
+\[
+\boxed{dim(null(A))>0}.
+\]
+
+in other words, if we have fewer sample points than the number of basis functions, there must be some non-zero functions that get mapped to the zero vector.
 
 \subsubsection*{(h)}
 
