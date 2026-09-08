@@ -580,10 +580,133 @@ so the improper integral converges and
 
 \subsection{Question 4}
 
-\subsubsection*{a}
+\subsubsection*{(a)}
+we are given
+\[
+y(t)=\sum_{n=0}^{\infty} \frac{(-1)^nt^{2n+1}}{(2n+1)!}
+\]
 
-\subsubsection*{b}
+this matches the Taylor series for $\sin(t)$:
+\[
+t-\frac{t^3}{3!} + \frac{t^5}{5!} - \frac{t^7}{7!} + \cdots
+\]
 
-\subsubsection*{c}
+so the elementary function represented by the series is
+\[
+\boxed{y(t)=\sin(t)}
+\]
+
+the Taylor series for $\sin(t)$ converges for every real value of $t$
+
+therefore, its radius of convergence is
+\[
+\boxed{R=\infty}
+\]
+
+\subsubsection*{(b)}
+for a parametric curve, the arc length is
+\[L=\int_a^b \sqrt{\left(\frac{dx}{dt}\right)^2 + \left(\frac{dy}{dt}\right)^2},dt
+\]
+
+we have
+\[
+x(t)=t
+\]
+
+so
+\[
+\frac{dx}{dt}=1
+\]
+
+from \textbf{part (a)},
+\[
+y(t)=\sin(t)
+\]
+
+so
+\[
+\frac{dy}{dt}=\cos(t)
+\]
+
+the interval is
+\[
+0\leq t\leq\pi
+\]
+
+therefore,
+\[
+\int_0^\pi \sqrt{1^2+\cos^2(t)},dt
+\]
+
+so,
+\[
+\boxed{
+L=\int_0^\pi\sqrt{1+\cos^2(t)},dt
+}
+\]
+
+\subsubsection*{(c)}
+we only want to estimate the arc length over $0\leq t\leq0.5$
+
+from the question, we have
+\[
+\cos(t)\approx1-\frac{t^2}{2}
+\]
+
+therefore,
+\[
+\cos^2(t) \approx \left(1-\frac{t^2}{2}\right)^2
+\]
+
+expanding this gives
+\[
+\cos^2(t) \approx 1-t^2+\frac{t^4}{4}
+\]
+
+so,
+\[
+1+\cos^2(t) \approx 2-t^2+\frac{t^4}{4}
+\]
+
+factor out $2$:
+\[
+1+\cos^2(t) \approx 2\left(1-\frac{t^2}{2}+\frac{t^4}{8}\right)
+\]
+
+therefore,
+\[
+\sqrt{1+\cos^2(t)} \approx \sqrt2 \sqrt{1-\frac{t^2}{2}+\frac{t^4}{8}}
+\]
+
+using
+\[
+\sqrt{1+u}\approx1+\frac{u}{2}
+\]
+
+we get
+\[
+\sqrt{1+\cos^2(t)} \approx \sqrt2 \left(1-\frac{t^2}{4}+\frac{t^4}{16}\right)
+\]
+
+therefore, the arc length is approximately
+\[
+L \approx \sqrt2\int_0^{0.5}\left(1-\frac{t^2}{4}+\frac{t^4}{16}\right),dt
+\]
+
+integrating each term gives
+\[
+L \approx \sqrt2 \left[t-\frac{t^3}{12}+\frac{t^5}{80}\right]_0^{0.5}
+\]
+
+substituting $t=0.5$:
+\[
+L \approx \sqrt2\left(0.5-\frac{(0.5)^3}{12} + \frac{(0.5)^5}{80}\right)
+\]
+
+calculating this gives
+\[
+\boxed{L\approx0.69294}
+\]
+
 
 \end{document}
