@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage[a4paper, margin=2.6cm, headsep=18pt]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage[table]{xcolor}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{setspace}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+
+% ---------- palette ----------
+\definecolor{ink}{RGB}{30,32,44}
+\definecolor{indigo}{RGB}{44,54,98}
+\definecolor{indigofaint}{RGB}{237,239,247}
+\definecolor{indigoline}{RGB}{150,160,195}
+
+\color{ink}
+
+% ---------- section styling ----------
+\titleformat{\section}
+  {\Large\bfseries\color{indigo}}
+  {\thesection}{0.6em}{}
+  [{\color{indigoline}\titlerule[0.6pt]}]
+\titlespacing*{\section}{0pt}{22pt}{10pt}
+
+\titleformat{\subsection}
+  {\large\bfseries\color{indigo}}
+  {\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{16pt}{6pt}
+
+
+% ---------- callout box for key numerical results ----------
+\newtcolorbox{keyresult}{
+  colback=indigofaint, colframe=indigo,
+  boxrule=0.6pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  before skip=10pt, after skip=10pt
+}
+
+\setstretch{1.1}
+
+\captionsetup{font={small}, labelfont={bf,color=indigo}, margin=10pt}
+
+\title{\textbf{\Large Measuring Electromagnetic Induction:\\[2pt] The Peak EMF Induced by a Magnet Falling Through a Coil}}
+\author{Chhaya Ramnani (u8336188)\\ \small Lab partners: Tsz Wing Candice Ng, Chinatsu Komada\\ \small PHYS1201 --- Physics 2, Week 5 Laboratory: Electromagnetic Induction}
+\date{Date of submission: 3 September 2026}
+
+\begin{document}
+ 
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\color{indigoline}\rule{0.5\linewidth}{0.6pt}}\\[0.6cm]
+{\Huge\bfseries\color{indigo} Measuring Electromagnetic\\[4pt] Induction}\\[10pt]
+{\Large\itshape The Peak EMF Induced by a Magnet\\ Falling Through a Coil}\\[0.6cm]
+{\color{indigoline}\rule{0.5\linewidth}{0.6pt}}\\[1.8cm]
+{\large Chhaya Ramnani \ \textnormal{(u8336188)}}\\[6pt]
+{\normalsize Lab partners: Tsz Wing Candice Ng, Chinatsu Komada}\\[1.4cm]
+{\normalsize PHYS1201 --- Physics 2}\\
+{\normalsize Week 5 Laboratory: Electromagnetic Induction}\\[1.2cm]
+{\normalsize Date of submission: 3 September 2026}
+\vfill
+\end{titlepage}
+ 
+\setcounter{page}{1}
+ 
+\section*{1.0 Abstract}
+This experiment examined how the peak electromotive force (emf) induced by a magnet falling 
+through a coil depends on three things: the number of coil turns $N$, the coil radius $R$, and 
+the magnet's speed $s$ as it passed through. The magnet's dipole moment was first found from calibration 
+measurements of its on-axis field, giving $m = (1.18 \pm 0.07)$~A\,m$^2$. This was used to build a 
+theoretical prediction for the peak emf, which the measured data from each of the three sub-experiments 
+was then compared against directly: no scaling factor was fitted anywhere. The peak emf rose 
+roughly linearly with $N$ and with $s$, and fell off roughly as $R^{-2}$ with coil radius, matching the 
+predicted shape $\varepsilon_{\text{peak}} \propto Ns/R^2$. None of the three datasets matched 
+the absolute theoretical prediction within uncertainty, and the $N$ data disagreed by far the most 
+(a measured-to-theory ratio of $0.461 \pm 0.003$). This was mainly put down to the magnet's finite size 
+breaking the point-dipole assumption the theory relies on, and, specifically for the $N$ sub-experiment, 
+to an unresolved mismatch between two setups that should have given the same reading.
+ 
+\section*{2.0 Introduction}
+ 
+\subsection*{2.1 Aims}
+This experiment set out to see how the peak emf induced by a magnet falling through a coil depends on three 
+parameters: the number of turns in the coil, $N$; the coil radius, $R$; and the magnet's speed as it passed 
+through, $s$. A dipole model of the magnet was calibrated first from independent field measurements, and the 
+resulting theoretical prediction was then compared directly against the measured emf for each sub-experiment.
+ 
+
+
+\end{document}
