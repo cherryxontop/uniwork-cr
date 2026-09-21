@@ -6,17 +6,9 @@ from uncertainties import ufloat
 
 g = 9.7976
 FPS = 30
-DT = 1 / (2 * FPS)     # timing uncertainty: half a frame
-DVY = 0.05             # m/s, velocity uncertainty from pixel-tracking resolution
+DT = 1 / (2 * FPS)
+DVY = 0.05
 
-# eq1: no drag. p = [v0], slope fixed at -g
-def no_drag_model(p, t):
-    return p[0] - g * t
-
-
-# eq4: drag. p = [v0, vT]
-def drag_model(p, t):
-    return p[1] * np.tanh(g * t / p[1] + np.arctanh(p[0] / p[1]))
 
 def load_data(path):
     df = pd.read_csv(path)
@@ -47,16 +39,16 @@ def plot(
     y,
     sx,
     sy,
-    model_func,
-    params,
-    label,
+    v0,
+    vT,
+    vT_err,
     xlabel,
     ylabel,
     title,
     filename,
 ):
     x_fit = np.linspace(min(x), max(x), 200)
-    y_fit = model_func(params, x_fit)
+    y_fit = vT * np.tanh(g * x_fit / vT + np.arctanh(v0 / vT))
 
     plt.figure(figsize=(7, 5))
     plt.errorbar(
@@ -70,7 +62,7 @@ def plot(
         capsize=3,
         label="Tracker Data",
     )
-    plt.plot(x_fit, y_fit, "k--", label=label)
+    plt.plot(x_fit, y_fit, "k--", label=f"Fit: $v_T = {vT:.2f} \\pm {vT_err:.2f}$ m/s")
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
@@ -81,9 +73,9 @@ def plot(
     plt.show()
 
 
-def residual_plot(x, y, model_func, params_nodrag, params_drag, title, filename):
-    resid_nodrag = y - no_drag_model(params_nodrag, x)
-    resid_drag = y - drag_model(params_drag, x)
+def residual_plot(x, y, v0_nodrag, v0_drag, vT_drag, title, filename):
+    resid_nodrag = y - (v0_nodrag - g * x)
+    resid_drag = y - vT_drag * np.tanh(g * x / vT_drag + np.arctanh(v0_drag / vT_drag))
 
     plt.figure(figsize=(7, 4))
     plt.axhline(0, color="grey", lw=1)
@@ -112,6 +104,16 @@ def sigma_test(ratio_measured, ratio_err, ratio_predicted):
         print("results DISAGREE")
 
 
+# no drag. p = [v0], slope fixed at -g
+def no_drag_model(p, t):
+    return p[0] - g * t
+
+
+# drag. p = [v0, vT]
+def drag_model(p, t):
+    return p[1] * np.tanh(g * t / p[1] + np.arctanh(p[0] / p[1]))
+
+
 def analyse_pan(label, csv_path, graph_dir):
     t_data, vy_data = load_data(csv_path)
     v0_guess = vy_data[0].n
@@ -123,7 +125,7 @@ def analyse_pan(label, csv_path, graph_dir):
     params_drag, err_drag, plot_data2 = odr_fit(
         t_data, vy_data, drag_model, beta0=[v0_guess, vT_guess]
     )
-    x, y, sx, sy = plot_data2  
+    x, y, sx, sy = plot_data2
 
     print(f"\n{'='*60}\n{label}\n{'='*60}")
     print("point-by-point data")
@@ -139,8 +141,7 @@ def analyse_pan(label, csv_path, graph_dir):
 
     plot(
         x, y, sx, sy,
-        drag_model, params_drag,
-        label=f"Drag fit: $v_T = {vT_drag.n:.2f} \\pm {vT_drag.s:.2f}$ m/s",
+        v0_drag.n, vT_drag.n, vT_drag.s,
         xlabel="Time $t$ (s)",
         ylabel="Velocity $v_y$ (m/s)",
         title=f"{label}: Drag Model Fit",
@@ -148,7 +149,7 @@ def analyse_pan(label, csv_path, graph_dir):
     )
 
     residual_plot(
-        x, y, drag_model, params_nodrag, params_drag,
+        x, y, v0_nodrag.n, v0_drag.n, vT_drag.n,
         title=f"{label}: Residuals (No-Drag vs Drag Model)",
         filename=f"{graph_dir}/{label.lower().replace(' ', '_')}_residuals.png",
     )
@@ -169,6 +170,7 @@ def main():
     print(f"measured vT ratio = {ratio:.3f}")
 
     sigma_test(ratio.n, ratio.s, np.sqrt(2))
+
 
 if __name__ == "__main__":
     main()
