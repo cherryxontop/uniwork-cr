@@ -1,0 +1,683 @@
+\documentclass{article}
+\author{}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Assignment 1: Math1014}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle
+
+\section*{task 0: collaboration and resources}
+
+\textit{this assignment was completed on my own, using the lecture notes as reference whenever needed :)}
+
+\section{Linear Algebra}
+
+\subsection{Question 1}
+we are given the vector space
+\[
+V_N = \operatorname{span} \left\{\cos(2\pi kt),\sin(2\pi kt)\mid 0\leq k\leq N\right\}.
+\]
+
+\subsubsection*{(a)}
+two functions are linearly independent if the only scalars $a,b$ satisfying
+\[
+a\cos(2\pi t) + b \sin(2\pi t) = 0 \quad \text{for all } t \in [0,1]
+\]
+are $a = b = 0$. if we can find even one nontrivial choice of $t$ that forces $a=0$, and another that forces $b=0$, we're done.
+
+- at $t=0$,
+\[
+a\cos(0) + b\sin(0) = a(1) + b(0) = a = 0
+\]
+so $a$ must be $0$
+ 
+- at $t = \frac{1}{4}$
+\[
+a\cos\left(\tfrac{\pi}{2}\right) + b\sin\left(\tfrac{\pi}{2}\right) = a(0) + b(1) = b = 0
+\]
+so $b$ must be $0$ too
+ 
+since the equation forces $a=b=0$, the only linear combination equal to the zero function is the trivial one. 
+hence $\cos(2\pi t)$ and $\sin(2\pi t)$ are \textbf{linearly independent} in $V_1$.
+
+\subsubsection*{(b)}
+finding the dimension of $V_1$,
+
+for $V_n$, if $N=1$, then $k$ can be either $0$ or $1$.
+
+so we get
+
+\[
+V_1= \operatorname{span} \left\{ \cos(0),\sin(0), \cos(2\pi t),\sin(2\pi t) \right\}
+\]
+
+$\cos(0)=1$ and $\sin(0)=0$
+
+so the span becomes:
+
+\[
+V_1= \operatorname{span} \left\{ 1,\cos(2\pi t),\sin(2\pi t) \right\}
+\]
+
+the zero function doesn't add anything to the span, so we can ignore it.
+
+we therefore have three functions:
+\[
+1,\cos(2\pi t),\sin(2\pi t)
+\]
+
+these are linearly independent, so they form a basis for \(V_1\).
+
+therefore, \boxed{dim(V_1) = 3}
+
+\subsubsection*{(c)}
+finding the dimension of $V_2$,
+
+when $N=2$, the possible values of $k$ are $0,1,2$
+
+therefore,
+\[
+V_2 = \operatorname{span} \left\{\cos(0), \sin(0), cos(2\pi t), sin(2\pi t), cos(4\pi t), sin(4\pi t) \right\}
+\]
+
+again, $\cos(0) = 1$ and $\sin(0) = 0$, so (leaving out the $0$ terms),
+\[
+V_2 = \operatorname{span} \left\{1, cos(2\pi t), sin(2\pi t), cos(4\pi t), sin(4\pi t) \right\}
+\]
+
+there are now 5 independent functions. therefore,
+\[
+\boxed{dim(V_2) = 5}
+\]
+
+for a general $N$, we always have:
+\begin{itemize}
+    \item one constant function $1$,
+    \item $N$ cosine functions corresponding to $k=1,...,N$,
+    \item $n$ sine functions coreresponding to $K=1,...,N$
+\end{itemize}
+so, the total number of basis functions is
+\[
+1+N+N
+\]
+therefore,
+\[
+\boxed{dim(V_N) = 2N + 1}
+\]
+
+\subsection{Question 2}
+
+we have $S:V_N \rightarrow R_m$ defined by
+\[
+S(f) = 
+\begin{bmatrix}
+    f(t_1) \\
+    f(t_2) \\
+    \vdots \\
+    f(t_m)
+\end{bmatrix}
+\]
+
+\subsubsection*{(a)}
+we are given $m=3$ with sampling points $t_1=0$, $t_2=0.5$, $t_3=1$ and 
+$$f(t) = 3+\cos(2\pi t)$$
+
+since $S$ records the value of $f$ at each sampling point,
+\[
+S(f)=
+\begin{bmatrix}
+    f(0) \\
+    f(0.5) \\
+    f(1)
+\end{bmatrix}
+\]
+\begin{itemize}
+    \item at $t=0$, $$f(0) = 3+\cos(2\pi(0))$$ $$f(0)=3+\cos(0)$$
+    since $\cos(0)=1$, $$f(0) = 4$$
+    \item at $t=0.5$, $$f(0.5) = 3+\cos(2\pi(0.5))$$ $$f(0.5)=3+\cos(\pi)$$
+    since $\cos(\pi)=-1$, $$f(0.5) = 3-1=2$$
+    \item at $t=1$, $$f(1) = 3+\cos(2\pi(1))$$ $$f(1)=3+\cos(2\pi)$$
+    since $\cos(2\pi)=1$, $$f(1) = 3=1=4$$
+\end{itemize}
+
+putting all these together into the matrix, we get
+\[
+\boxed{
+    S(f) = 
+    \begin{bmatrix}
+        4\\
+        2\\
+        4
+    \end{bmatrix}
+}
+\]
+
+\subsubsection*{(b)}
+now we have $$g(t) = \sin(12\pi t)$$
+again,
+\[
+S(g) = 
+\begin{bmatrix}
+    g(0)\\
+    g(0.5)\\
+    g(1)
+\end{bmatrix}
+\]
+
+\begin{itemize}
+    \item at $t=0$, $$g(0)=\sin(12\pi(0))=\sin(0) = 0$$
+    \item at $t=0.5$, $$g(0.5)=\sin(12\pi(0.5))=\sin(6\pi) = 0$$
+    \item at $t=1$, $$g(1)=\sin(12\pi(1))=\sin(12\pi) = 0$$
+\end{itemize}
+
+putting all these together into the matrix, we get
+\[
+\boxed{
+    S(f) = 
+    \begin{bmatrix}
+        0\\
+        0\\
+        0
+    \end{bmatrix}
+}
+\]
+
+\subsubsection*{(c)}
+for a function to be a linear map, we need
+\[
+S(af+bg)=aS(f)+bS(g) \quad \text{for any functions } f, g \in V_N \text{ and scalars } a, b \in \mathbb{R}
+\]
+starting with the LHS,
+\[
+S(af+bg) = 
+\begin{bmatrix}
+    (af+bg)(t_1)\\
+    (af+bg)(t_2)\\
+    \vdots\\
+    (af+bg)(t_m)
+\end{bmatrix}
+\]
+we know that at each sample point $t_i$, the addition and scalar multiplication is
+\[
+(af+bg)(t_i)=af(t_i)+bg(t_i)
+\]
+therefore,
+\[
+S(af+bg) = 
+\begin{bmatrix}
+    af(t_1) + bg(t_1)\\
+    af(t_2) + bg(t_2)\\
+    \vdots\\
+    af(t_m) + bg(t_m)
+\end{bmatrix}
+\]
+separating into two vectors:
+\[
+S(af+bg) = 
+a
+\begin{bmatrix}
+    f(t_1)\\
+    f(t_2)\\
+    \vdots\\
+    f(t_m)
+\end{bmatrix}
++
+b
+\begin{bmatrix}
+    g(t_1)\\
+    g(t_2)\\
+    \vdots\\
+    g(t_m)
+\end{bmatrix}
+\]
+we can see that these two vectors are exactly $S(f)$ and $S(g)$
+
+therefore, $$S(af+bg) = aS(f)+bS(g)$$
+hence, $$\boxed{\text{S is linear}}$$
+
+\subsubsection*{(d)}
+an element of $V_N$ can be represented as a vector in $\mathbb{R}^{2N+1}$
+
+from question 1, $dim(V_N)=2N+1$, so $[f]_\mathcal{B} \in \mathbb{R}^{2N+1}$.
+
+so there are $2N+1$ functions in this basis, meaning $[f]_\mathcal{B}$ has $2N+1$ components
+
+$S$ takes $f$ and evaluates it at $m$ sample points
+
+\[
+S(f) =
+\begin{bmatrix}
+    f(t_1)\\
+    f(t_2)\\
+    \vdots\\
+    f(t_m)
+\end{bmatrix}
+\]
+
+therefore, $S(f) \in \mathbb{R}^m$. so the output has $m$ components
+
+so we need a matrix $A$ such that
+
+\[
+\text{matrix }A \times \text{input vector} = \text{output vector}
+\]
+
+therefore, $A$ needs to take a vector with $2N+1$ entries and turn it into a vector with $m$ entries.
+
+this means $A$ needs $2N+1$ columns, one for each basis function, and $m$ rows, one for each sample point.
+
+therefore,
+
+\[
+\boxed{A\in\mathbb{R}^{m\times(2N+1)}}
+\]
+
+\subsubsection*{(e)}
+we know from 2(d) that
+
+\[
+A\in\mathbb{R}^{m\times(2N+1)}
+\]
+
+so $A$ has $m$ rows and $2N+1$ columns.
+
+the rank of a matrix cannot be bigger than the number of rows or the number of columns.
+
+therefore,
+
+\[
+rank(A)\leq m
+\]
+
+and
+
+\[
+rank(A)\leq 2N+1
+\]
+
+so the upper bound is the smaller of these two numbers:
+
+\[
+\boxed{rank(A)\leq\min(m,2N+1)}
+\]
+
+this is because the rank tells us how many independent rows or columns there are, so we cannot have more independent rows than $m$, or more independent columns than $2N+1$.
+
+\subsubsection*{(f)}
+we use the rank-nullity theorem:
+\[
+rank(A)+nullity(A)=\text{number of columns of }A
+\]
+
+from 2(d), $A$ has $2N+1$ columns, so
+\[
+rank(A)+nullity(A)=2N+1
+\]
+
+rearranging,
+\[
+nullity(A)=2N+1-rank(A)
+\]
+
+from \textbf{part (e)},
+\[
+rank(A)\leq\min(m,2N+1)
+\]
+
+so the smallest possible nullity occurs when the rank is as large as possible.
+therefore,
+\[
+nullity(A)\geq 2N+1-\min(m,2N+1)
+\]
+
+so,
+\[
+\boxed{nullity(A)\geq\max(0,2N+1-m)}
+\]
+
+if $m<2N+1$, then
+\[
+\boxed{nullity(A)\geq2N+1-m>0}
+\]
+
+\subsubsection*{(g)}
+from \textbf{part(f)} we know that
+\[
+nullity(A)\geq2N+1-m.
+\]
+
+we want
+\[
+dim(null(A))>0.
+\]
+
+this will definitely happen when
+\[
+2N+1-m>0.
+\]
+
+so,
+\[
+2N+1>m.
+\]
+
+therefore,
+\[
+\boxed{m<2N+1}
+\]
+
+leads to
+\[
+\boxed{dim(null(A))>0}.
+\]
+
+\subsubsection*{(h)}
+
+if $\dim(\operatorname{null}(A)) > 0$, the null space contains a non-zero $f \neq 0$ such that $S(f) = \vec{0}$
+
+since $S(g+f) = S(g) + S(f) = S(g)$, the sampler cannot distinguish between $g$ and $g+f$
+
+\textbf{therfore, $S$ is not injective and information is lost}
+
+\section{Calculus}
+
+\subsection{Question 3}
+
+\subsubsection*{(a)}
+we have
+\[
+f(x)=\cos(x)+\sin(x)
+\]
+
+to find the 4th-degree Taylor polynomial centred at $a=0$, we use
+\[
+P_4(x)=f(0)+f'(0)x+\frac{f''(0)}{2!}x^2 + \frac{f'''(0)}{3!}x^3+\frac{f^{(4)}(0)}{4!}x^4
+\]
+
+finding the derivatives:
+$$f(x)=\cos(x)+\sin(x)$$
+$$f'(x)=-\sin(x)+\cos(x)$$
+$$f''(x)=-\cos(x)-\sin(x)$$
+$$f'''(x)=\sin(x)-\cos(x)$$
+$$f^{(4)}(x)=\cos(x)+\sin(x)$$
+
+evaluating each one at $x=0$:
+$$f(0)=1$$
+$$f'(0)=1$$
+$$f''(0)=-1$$
+$$f'''(0)=-1$$
+$$f^{(4)}(0)=1$$
+
+substituting these into the Taylor formulas
+\[
+P_4(x) = 1+x-\frac{x^2}{2!}-\frac{x^3}{3!}+\frac{x^4}{4!}
+\]
+
+therefore,
+\[
+\boxed{P_4(x) = 1+x-\frac{x^2}{2}-\frac{x^3}{6}+\frac{x^4}{24}}
+\]
+
+\subsubsection*{(b)}
+we are sampling the signal at $t_1=0.1$
+
+so we use $P_4(0.1)$ (from \textbf{part (a)})
+\[
+1+(0.1)-\frac{(0.1)^2}{2} - \frac{(0.1)^3}{6} + \frac{(0.1)^4}{24}
+\]
+
+calculating,
+\[
+1+0.1-0.005-0.0001667+0.00000417
+\]
+
+therefore,
+\[
+\boxed{P_4(0.1)\approx1.09484}
+\]
+
+so the estimated sample value is
+\[
+\boxed{f(0.1)\approx1.09484}
+\]
+
+for the remainder, Taylor's formula gives
+\[
+R_4(x)=\frac{f^{(5)}(c)}{5!}x^5
+\]
+
+for some $c$ between $0$ and $x$.
+
+we already know
+\[
+f^{(4)}(x)=\cos(x)+\sin(x)
+\]
+
+so
+\[
+f^{(5)}(x)=-\sin(x)+\cos(x)
+\]
+
+therefore,
+\[
+\frac{-\sin(c)+\cos(c)}{5!}x^5
+\]
+
+so,
+\[
+\boxed{
+R_4(x)=\frac{-\sin(c)+\cos(c)}{120}x^5, \qquad 0\leq c\leq x\leq0.1
+}
+\]
+
+\subsubsection*{(c)}
+we have
+\[
+g(x)=e^{-x}f(x)
+\]
+
+and
+\[
+f(x)=\cos(x)+\sin(x)
+\]
+
+therefore,
+\[
+g(x)=e^{-x}(\cos(x)+\sin(x))
+\]
+
+so the integral is
+\[
+I=\int_0^\infty e^{-x}(\cos(x)+\sin(x)),dx
+\]
+
+\[
+I=\int_0^\infty e^{-x}\cos(x)+e^{-x}\sin(x),dx
+\]
+
+\[
+I = \int_0^\infty e^{-x}\cos(x)\,dx + \int_0^\infty e^{-x}\sin(x)\,dx
+\]
+
+\begin{itemize}
+    \item using integration by parts for the first term ($e^{-x}\cos(x)$),
+
+let:
+
+$u = \cos(x) \implies du = -\sin(x)\,dx$
+
+$dv = e^{-x}\,dx \implies v = -e^{-x}$
+
+therefore,
+$$\int e^{-x}\cos(x)\,dx = -e^{-x}\cos(x) - \int (-e^{-x})(-\sin(x))\,dx$$
+
+$$= -e^{-x}\cos(x) - \int e^{-x}\sin(x)\,dx$$
+\end{itemize}
+
+substituting above into $I$,
+
+\[
+I = \left( -e^{-x}\cos(x) - \int e^{-x}\sin(x)\,dx \right) + \int_0^\infty e^{-x}\sin(x)\,dx
+\]
+
+the sine integrals cancel out, so we have
+
+\[
+I=\left[-e^{-x}\cos(x)\right]_0^\infty
+\]
+
+as $x\to\infty$,
+\[
+e^{-x}\to0
+\]
+
+while $\cos(x)$ stays between $-1$ and $1$, so by Sqeeze Theorem,
+\[
+-e^{-x}\cos(x)\to0
+\]
+
+at $x=0$, $-e^0\cos(0)=-1$
+
+therefore,
+\[
+I=0-(-1)=1
+\]
+
+so the improper integral converges and
+\[
+\boxed{I=1}
+\]
+
+\subsection{Question 4}
+
+\subsubsection*{(a)}
+we are given
+\[
+y(t)=\sum_{n=0}^{\infty} \frac{(-1)^nt^{2n+1}}{(2n+1)!}
+\]
+
+\[
+y(t)=t-\frac{t^3}{3!} + \frac{t^5}{5!} - \frac{t^7}{7!} + \cdots
+\]
+
+this matches the Taylor series for $\sin(t)$, so the elementary function represented by the series is
+\[
+\boxed{y(t)=\sin(t)}
+\]
+
+the Taylor series for $\sin(t)$ converges for every real value of $t$
+
+therefore, its radius of convergence is
+\[
+\boxed{R=\infty}
+\]
+
+\subsubsection*{(b)}
+for a parametric curve, the arc length is
+\[L=\int_a^b \sqrt{\left(\frac{dx}{dt}\right)^2 + \left(\frac{dy}{dt}\right)^2},dt
+\]
+
+we have
+\[
+x(t)=t
+\]
+
+so
+\[
+\frac{dx}{dt}=1
+\]
+
+from \textbf{part (a)},
+\[
+y(t)=\sin(t)
+\]
+
+so
+\[
+\frac{dy}{dt}=\cos(t)
+\]
+
+the interval is
+\[
+0\leq t\leq\pi
+\]
+
+therefore,
+\[
+\int_0^\pi \sqrt{1^2+\cos^2(t)},dt
+\]
+
+so,
+\[
+\boxed{
+L=\int_0^\pi\sqrt{1+\cos^2(t)},dt
+}
+\]
+
+\subsubsection*{(c)}
+we only want to estimate the arc length over $0\leq t\leq0.5$
+
+from the question, we have
+\[
+\cos(t)\approx1-\frac{t^2}{2}
+\]
+
+therefore,
+\[
+\cos^2(t) \approx \left(1-\frac{t^2}{2}\right)^2
+\]
+
+expanding this gives
+\[
+\cos^2(t) \approx 1-t^2+\frac{t^4}{4}
+\]
+
+so,
+\[
+1+\cos^2(t) \approx 2-t^2+\frac{t^4}{4}
+\]
+
+\[
+1+\cos^2(t) \approx 2\left(1-\frac{t^2}{2}+\frac{t^4}{8}\right)
+\]
+
+\[
+\sqrt{1+\cos^2(t)} \approx \sqrt2 \sqrt{1-\frac{t^2}{2}+\frac{t^4}{8}}
+\]
+
+using
+\[
+\sqrt{1+u}\approx1+\frac{u}{2}
+\]
+
+we get
+\[
+\sqrt{1+\cos^2(t)} \approx \sqrt2 \left(1-\frac{t^2}{4}+\frac{t^4}{16}\right)
+\]
+
+therefore, the arc length is approximately
+\[
+L \approx \sqrt2\int_0^{0.5}\left(1-\frac{t^2}{4}+\frac{t^4}{16}\right),dt
+\]
+
+integrating each term gives
+\[
+L \approx \sqrt2 \left[t-\frac{t^3}{12}+\frac{t^5}{80}\right]_0^{0.5}
+\]
+
+substituting $t=0.5$:
+\[
+L \approx \sqrt2\left(0.5-\frac{(0.5)^3}{12} + \frac{(0.5)^5}{80}\right)
+\]
+
+calculating all this gives
+\[
+\boxed{L\approx0.69294}
+\]
+
+
+\end{document}
