@@ -1,0 +1,237 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+
+\title{Assignment 6}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle
+
+\section{Question 1}
+
+two masses, each of mass $m$, are connected by a spring with spring constant $k$. 
+
+\subsection*{(a)} 
+since the two masses are identical, the centre of mass is in the middle of the spring. 
+if one mass moves a distance $x$ away from the centre of mass, the other mass moves a 
+distance $x$ in the opposite direction. 
+
+total change in the length of the spring is 
+\[
+x+x=2x
+\]
+
+from the hint, if the length of a spring is halved, its effective spring constant doubles. 
+so, each half of the spring has spring constant 
+\[
+k_{\text{half}}=2k
+\]
+
+for one mass, the restoring force is $F=-2kx$
+
+using Newton's second law, 
+\[
+F=m\frac{d^2x}{dt^2}
+\]
+\[
+m\frac{d^2x}{dt^2}=-2kx
+\]
+
+rearranging, 
+\[
+\frac{d^2x}{dt^2}+\frac{2k}{m}x=0
+\]
+
+rhe standard equation for simple harmonic motion is 
+\[
+\frac{d^2x}{dt^2}+\omega^2x=0
+\]
+
+comparing the two equations gives
+\[ \omega^2=\frac{2k}{m}
+\]
+
+therefore
+\[
+\omega=\sqrt{\frac{2k}{m}}
+\]
+
+since $\omega=2\pi f$, we have 
+\[
+2\pi f=\sqrt{\frac{2k}{m}}
+\]
+
+therefore, the resonant frequency is
+\[
+\boxed{ f=\frac{1}{2\pi}\sqrt{\frac{2k}{m}} }
+\] 
+
+\subsection*{(b)}
+we are given $m=1\text{ AMU}$ and $f=125\text{ THz}$. Converting the mass into SI units,
+\[
+m=1.66054\times10^{-27}\text{ kg}
+\]
+\[
+f=125\times10^{12}\text{ Hz} =1.25\times10^{14}\text{ Hz}
+\]
+
+from part (a),
+\[
+f=\frac{1}{2\pi}\sqrt{\frac{2k}{m}}
+\]
+
+multiplying both sides by $2\pi$
+\[
+2\pi f=\sqrt{\frac{2k}{m}}
+\]
+
+squaring both sides,
+\[
+4\pi^2f^2=\frac{2k}{m}
+\]
+\[
+k=2\pi^2f^2m
+\]
+
+substituting the values,
+\[
+k = 2\pi^2 (1.25\times10^{14})^2 (1.66054\times10^{-27})
+\]
+\[
+k\approx510.6\text{ N/m}
+\]
+hence, 
+\[
+\boxed{k\approx5.11\times10^2\text{ N/m} \text{ or } k\approx511\text{ N/m}}
+\]
+
+\section{Question 2}
+
+we are given:
+\begin{itemize}
+    \item $r=0.05\text{kg/s}$
+    \item $x_0=10\text{cm} = 0.1\text{m}$
+    \item $v_0=0$
+    \item $k=5\text{N/m}$
+    \item $m=1\text{kg}$
+\end{itemize}
+
+\subsection*{(a)}
+
+the equation for a damped mass-spring system is
+
+\[
+m\frac{d^2x}{dt^2} + r\frac{dx}{dt} + kx=0
+\]
+
+substituting the given values,
+
+\[
+\frac{d^2x}{dt^2} + 0.05\frac{dx}{dt} + 5x=0
+\]
+
+the standard form is
+
+\[
+x''+2\gamma x'+\omega_0^2x=0
+\]
+
+comparing coefficients,
+\[
+2\gamma=0.05
+\]
+\[
+\gamma=0.025\text{ s}^{-1}
+\]
+
+the undamped angular frequency is
+\[
+\omega_0=\sqrt{\frac{k}{m}} = \sqrt{\frac{5}{1}} = \sqrt{5} \approx2.236\text{ rad/s}
+\]
+
+the damped angular frequency is
+\[
+\omega_d=\sqrt{\omega_0^2-\gamma^2}
+\]
+\[
+\omega_d=\sqrt{5-(0.025)^2}\]
+\[
+\omega_d \approx2.23593\text{ rad/s}
+\]
+
+for an underdamped oscillator, the general solution is
+\[
+x(t)=e^{-\gamma t}\left[A\cos(\omega_dt)+B\sin(\omega_dt)\right]
+\]
+
+therefore,
+\[
+x(t)=e^{-0.025t}\left[A\cos(2.23593t)+B\sin(2.23593t)\right]
+\]
+
+using the initial displacement,
+\[
+x(0)=0.10
+\]
+
+at $t=0$,
+
+\[
+0.1=A\cos(0)+B\sin(0)
+\]
+
+since $\cos(0)=1 \text{ and } \sin(0)=0$, we get
+
+\[
+A=0.10
+\]
+
+therefore,
+
+\[
+x(t) = e^{-0.025t}\left[0.10\cos(2.23593t)+B\sin(2.23593t)\right]
+\]
+
+differentiating to apply the initial velocity condition,
+
+\[
+v(t)=-\gamma e^{-\gamma t}\left[A\cos(\omega_dt)+B\sin(\omega_dt)\right]+e^{-\gamma t}\left[-A\omega_d\sin(\omega_dt)+B\omega_d\cos(\omega_dt)\right]
+\]
+
+at $t=0$,
+
+\[
+v(0)=-\gamma A+B\omega_d
+\]
+
+since $v(0)=0$,
+
+\[
+0=-\gamma A+B\omega_d
+\]
+\[
+B=\frac{\gamma A}{\omega_d}
+\]
+
+substituting the values,
+
+\[
+B=\frac{(0.025)(0.10)}{2.23593}
+\]
+\[
+B\approx0.001119
+\]
+
+therefore, the position as a function of time is
+
+\[
+\boxed{
+x(t)=e^{-0.025t}\left[0.10\cos(2.23593t)+0.001119\sin(2.23593t)\right]\text{ m}}
+\]
+
+\subsection*{(b)}
+
+
+
+\end{document}
