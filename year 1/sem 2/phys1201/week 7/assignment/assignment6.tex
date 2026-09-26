@@ -232,6 +232,223 @@ x(t)=e^{-0.025t}\left[0.10\cos(2.23593t)+0.001119\sin(2.23593t)\right]\text{ m}}
 
 \subsection*{(b)}
 
+initially, the mass is displaced by $x_0=0.10\text{ m}$ and has zero velocity.
 
+therefore, the initial energy is entirely spring potential energy
+
+\[
+E_0=\frac{1}{2}kx_0^2.
+\]
+
+substituting,
+
+\[
+E_0=\frac{1}{2}(5)(0.10)^2
+\]
+
+thus,
+
+\[
+E_0=\frac{1}{2}(5)(0.01)
+\]
+
+and
+
+\[
+E_0=0.025\text{ J}.
+\]
+
+the damped angular frequency is
+
+\[
+\omega_d=2.23593\text{ rad/s}
+\]
+
+therefore, the oscillation period is
+
+\[
+T=\frac{2\pi}{\omega_d}.
+\]
+
+substituting,
+
+\[
+T=\frac{2\pi}{2.23593}\approx2.8101\text{ s}
+\]
+
+after 10 periods,
+
+\[
+t=10T
+\]
+
+so
+
+\[
+t=10(2.8101)\approx28.101\text{ s}
+\]
+
+the amplitude decays according to
+
+\[
+A(t)=A_0e^{-\gamma t}
+\]
+
+since the energy is proportional to the square of the amplitude,
+
+\[
+E(t)=E_0e^{-2\gamma t}
+\]
+
+therefore,
+
+\[
+E(t)=0.025e^{-2(0.025)(28.101)}
+\]
+
+calculating the exponent,
+
+\[
+2(0.025)(28.101)=1.40505
+\]
+
+thus,
+
+\[
+E(t)=0.025e^{-1.40505}.
+\]
+
+this gives
+
+\[
+E(t)\approx0.006134\text{ J}
+\]
+
+therefore, the energy lost is
+
+\[
+\Delta E=E_0-E(t)
+\]
+
+hence,
+
+\[
+\Delta E=0.025-0.006134
+\]
+
+\[
+\boxed{\Delta E\approx0.01887\text{ J}}
+\]
+
+\section{Question 3}
+
+the pipe is closed at one end and open at the other. at the closed end there is a displacement node, 
+while at the open end there is a displacement antinode. for the fundamental mode, the pipe contains one quarter of a wavelength:
+
+\[
+L=\frac{\lambda_1}{4}
+\]
+\[
+\lambda_1=4L
+\]
+
+using $f=\frac{c}{\lambda}$,
+
+\[
+f_1=\frac{c}{4L}
+\]
+
+for higher modes, only odd harmonics are allowed. therefore,
+
+\[
+n=1,3,5,7,\ldots
+\]
+\[
+L=\frac{n\lambda_n}{4}
+\]
+\[
+4L=n\lambda_n,
+\]
+\[
+\lambda_n=\frac{4L}{n}
+\]
+
+we have,
+
+\[
+f_n
+=
+\frac{c}{\lambda_n}
+\]
+
+substituting for $\lambda_n$,
+
+\[
+f_n
+=
+\frac{c}{4L/n}
+\]
+
+hence,
+
+\[
+\boxed{
+    f_n=\frac{nc}{4L},\qquad n=1,3,5,7,\ldots
+    }
+\]
+
+PUT IMAGE-----------------------
+
+\section{Question 4}
+
+we have,
+
+\begin{itemize}
+    \item speed of dolphin, $v_s = 40\text{ km/h} = 40\left(\frac{1000}{3600}\right) = 11.111\text{ m/s}$
+    \item frequency produced by sound, $f_s = 1000\text{ Hz}$
+\end{itemize}
+
+the Doppler-shifted frequency is
+
+\[
+f_{\text{heard}}=f_s\frac{v}{v-v_s},
+\]
+
+where $v$ is the speed of sound in the medium.
+
+\subsection*{(a)}
+
+the speed of sound in water is approximately $v=1500\text{ m/s}$. therefore,
+
+\[
+f_{\text{heard}}=1000\left(\frac{1500}{1500-11.11}\right)
+\]
+\[
+f_{\text{heard}}\approx1007.5\text{ Hz}
+\]
+
+therefore,
+
+\[
+\boxed{f_{\text{heard}}\approx1008\text{ Hz}}
+\]
+
+
+\subsection*{(b)}
+
+taking the speed of sound in air to be approximately $v=343\text{ m/s}$ and substituting in $f_{\text{heard}}=f_s\frac{v}{v-v_s}$,
+
+\[
+f_{\text{heard}}=1000\left(\frac{343}{343-11.11}\right)
+\]
+\[
+f_{\text{heard}}\approx1033.5\text{ Hz}
+\]
+
+therefore,
+
+\[
+\boxed{f_{\text{heard}}\approx1034\text{ Hz}}
+\]
 
 \end{document}
