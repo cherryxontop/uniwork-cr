@@ -1,0 +1,32 @@
+---
+title: "Lab Report: Week 8 - Interference and Diffraction of Light"
+subtitle: "_Chhaya Ramnani (UID: u8336188)_"
+author: "_Lab partners: Tsz Wing Candice Ng, Chinatsu Komada_"
+date: "2026-09-30"
+format: 
+  typst:
+    toc: false
+editor:
+  render-on-save: true
+jupyter: python3
+---
+
+# Pre-Lab Question
+
+From equation 3, 
+$$y_{dark}=L\left(\frac{m+\frac{1}{2}}{d}\right), \quad m=0, \pm1, \pm2, \dots$$
+
+The first dark fringe on either side of the central maximum corresponds to $m = 0$ (positive side) and $m = -1$ (negative side), which are equidistant from the centre
+
+$$y_{\text{dark}}(m=0) = L\frac{\tfrac{1}{2}\lambda}{d}, \qquad y_{\text{dark}}(m=-1) = -L\frac{\tfrac{1}{2}\lambda}{d}$$
+
+So the separation between the two symmetric first dark fringes is:
+
+$$\Delta y = 2\,y_{\text{dark}}(m=0) = \frac{L\lambda}{d}$$
+
+Substituting values:
+$L = 1\ \text{m}, \lambda = 650\ \text{nm} = 650\times10^{-9}\ \text{m}, d = 0.3\ \text{mm} = 3\times10^{-4}\ \text{m}$,
+
+$$\Delta y = \frac{(1)(650\times10^{-9})}{3\times10^{-4}} = 2.1667\times10^{-3}\ \text{m}$$
+
+$$\boxed{\Delta y \approx 2.17\ \text{mm}}$$
