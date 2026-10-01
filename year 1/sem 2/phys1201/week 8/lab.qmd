@@ -11,22 +11,327 @@ editor:
 jupyter: python3
 ---
 
+# Imports and Functions
+
+Every fringe position was read by eye, directly off the calibrated ImageJ Plot Profile cursor (see Procedure for why). The functions here just turn those cursor readings into physical quantities.
+
+```{python}
+import numpy as np
+
+L, sL = 0.879, 0.003        # slit-to-screen distance (m)
+LAM, sLAM = 654e-9, 2e-9    # laser wavelength (m)
+POS = 0.0003                # uncertainty on reading one position off the plot (m) = 0.03 cm
+TOL = 0.05                  # 5% slit tolerance
+```
+
+```{python}
+def sigma_test(k1, sk1, k2, sk2, label="parameter"):
+    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
+    print(f"\nSIGMA TEST ({label})")
+    print(f"measured value    : {k1:.3f} +/- {sk1:.3f}")
+    print(f"theoretical value : {k2:.3f} +/- {sk2:.3f}")
+    print(f"discrepancy       : {sigma_diff:.2f} sigma")
+    print("results AGREE within experimental uncertainty" if sigma_diff <= 3.0 else "results DISAGREE")
+    return sigma_diff
+
+
+def half_separation(x_left, x_right):
+    y = (x_right - x_left) / 2 * 0.01
+    sy = POS / np.sqrt(2)
+    return y, sy
+
+
+def single_slit(x_left, x_right, w=0.04e-3, m=1):
+    y, sy = half_separation(x_left, x_right)
+    lam = w * y / (m * L)
+    rel = np.sqrt((sy / y) ** 2 + TOL**2 + (sL / L) ** 2)
+    print(f"\nSingle slit: \ny_{m} = {y * 100:.3f} cm")
+    print(f"wavelength = {lam * 1e9:.1f} +/- {lam * rel * 1e9:.1f} nm")
+    sigma_test(lam * 1e9, lam * rel * 1e9, LAM * 1e9, sLAM * 1e9, "wavelength, nm")
+
+
+def double_slit(x_first, x_last, n_gaps, d_stated=0.25e-3):
+    dy = (x_last - x_first) * 0.01 / n_gaps
+    sdy = np.sqrt(2) * POS / n_gaps
+    d = LAM * L / dy
+    rel = np.sqrt((sdy / dy) ** 2 + (sLAM / LAM) ** 2 + (sL / L) ** 2)
+    print(f"\nDouble slit: \nfringe spacing = {dy * 1e3:.3f} mm")
+    print(f"d = {d * 1e6:.1f} +/- {d * rel * 1e6:.1f} um")
+    sigma_test(d * 1e6, d * rel * 1e6, d_stated * 1e6, TOL * d_stated * 1e6, "slit separation, um")
+
+
+def width_from_minima(x_left, x_right, m):
+    y, sy = half_separation(x_left, x_right)
+    w = m * LAM * L / y
+    rel = np.sqrt((sy / y) ** 2 + (sLAM / LAM) ** 2 + (sL / L) ** 2)
+    return w, w * rel
+
+
+def babinet(x_left, x_right, m, w_nominal=0.08e-3):
+    w, sw = width_from_minima(x_left, x_right, m)
+    print(f"\nBabinet slit (m={m} minima): \nwidth = {w * 1e6:.1f} +/- {sw * 1e6:.1f} um")
+    sigma_test(w * 1e6, sw * 1e6, w_nominal * 1e6, TOL * w_nominal * 1e6, f"slit width vs nominal, m={m}, um")
+
+
+def hair(x_left, x_right, m, micrometer=None, s_micrometer=0.005e-3):
+    w, sw = width_from_minima(x_left, x_right, m)
+    print(f"\nHair (m={m} minima):\nthickness = {w * 1e6:.1f} +/- {sw * 1e6:.1f} um")
+    if micrometer is not None:
+        sigma_test(w * 1e6, sw * 1e6, micrometer * 1e6, s_micrometer * 1e6, f"hair thickness, m={m}, um")
+```
+
+All four measurement functions are called further down, inside their own Results subsection, so that each subsection's output and its sigma test is next to the manual working it's checking.
+
 # Pre-Lab Question
 
 From equation 3, 
-$$y_{dark}=L\left(\frac{m+\frac{1}{2}}{d}\right), \quad m=0, \pm1, \pm2, \dots$$
+$$y_{dark}=L\,\frac{\left(m+\frac{1}{2}\right)\lambda}{d}, \quad m=0, \pm1, \pm2, \dots$$
 
-The first dark fringe on either side of the central maximum corresponds to $m = 0$ (positive side) and $m = -1$ (negative side), which are equidistant from the centre
+The two dark fringes closest to the center (one on each side of the central bright fringe) correspond to $m = 0$ and $m = -1$:
 
-$$y_{\text{dark}}(m=0) = L\frac{\tfrac{1}{2}\lambda}{d}, \qquad y_{\text{dark}}(m=-1) = -L\frac{\tfrac{1}{2}\lambda}{d}$$
+First dark fringe on one side ($m = 0$):$$y_1 = \left(0 + \frac{1}{2}\right) \frac{(650 \times 10^{-9} \text{ m})(1 \text{ m})}{0.3 \times 10^{-3} \text{ m}} = 0.001083 \text{ m}$$
+
+First dark fringe on the other side ($m = -1$):$$y_2 = \left(-1 + \frac{1}{2}\right) \frac{(650 \times 10^{-9} \text{ m})(1 \text{ m})}{0.3 \times 10^{-3} \text{ m}} = -0.001083 \text{ m}$$
 
 So the separation between the two symmetric first dark fringes is:
 
-$$\Delta y = 2\,y_{\text{dark}}(m=0) = \frac{L\lambda}{d}$$
-
-Substituting values:
-$L = 1\ \text{m}, \lambda = 650\ \text{nm} = 650\times10^{-9}\ \text{m}, d = 0.3\ \text{mm} = 3\times10^{-4}\ \text{m}$,
-
-$$\Delta y = \frac{(1)(650\times10^{-9})}{3\times10^{-4}} = 2.1667\times10^{-3}\ \text{m}$$
+$$\Delta y = y_1 - y_2 \approx 2.17 \text{ mm}$$
 
 $$\boxed{\Delta y \approx 2.17\ \text{mm}}$$
+
+# Aim
+
+To measure the wavelength of the red laser using single slit diffraction, the spacing of a double slit using its interference pattern, to verify Babinet's principle by comparing a slit and an opaque line of the same width, and to measure the thickness of a strand of hair by treating it as a single-slit-type diffractor.
+
+# Theory
+
+For a single slit of width $w$, the dark fringes fall at
+
+$$y_{\text{dark}} = L\frac{m\lambda}{w}, \quad m = \pm1, \pm2, \dots \qquad \text{(Eq. 8)}$$
+
+For a double slit (or any slit pair) of spacing $d$, the bright fringes fall at
+
+$$y_{\text{bright}} = L\frac{m\lambda}{d}, \quad m = 0, \pm1, \pm2, \dots \qquad \text{(Eq. 2)}$$
+
+Both are the same $y = (\text{slope})\cdot m$ relation, just with $\text{slope} = L\lambda/w$ or $L\lambda/d$ - so measuring fringe position against fringe order gives us the slope, and from there whichever quantity ($\lambda$, $w$, or $d$) we're solving for, since the other two are known.
+
+Babinet's principle says the diffraction pattern of an opaque obstacle is identical to that of an aperture of the same size and shape, away from the central spot - so a $0.08$ mm opaque line and a $0.08$ mm slit should trace out the same pattern of secondary minima and maxima.
+
+To compare a measured value $k_1\pm\sigma_1$ with a reference value $k_2\pm\sigma_2$, the difference is divided by the combined uncertainty, $\dfrac{|k_1-k_2|}{\sqrt{\sigma_1^2+\sigma_2^2}}$, giving the discrepancy in units of $\sigma$. A discrepancy of $3\sigma$ or less is taken to mean the two values agree within experimental uncertainty; anything larger is a disagreement.
+
+# Procedure
+
+The frosted glass screen was positioned as far from the laser as the rail allowed and squared up perpendicular to the rail axis, with the laser rotated so its spot sat at the centre of the screen. The slit assembly was mounted as close as possible to the laser. For each measurement, the relevant slit/line was selected and the webcam (in manual focus) was used to capture an image of the pattern on the screen.
+
+Each image was opened in ImageJ, a narrow cross-section through the pattern was selected with the rectangle tool, and Plot Profile (Analyse menu) was used to get the intensity distribution. The pixel scale was calibrated against a known length of tape stuck to the screen, and this calibration was applied (Set Scale) before exporting each profile, so the exported CSVs already report distance in cm rather than pixels. The slit-to-screen distance was measured directly with a ruler: $L = 0.879\pm0.003$ m.
+
+### Reading fringe positions
+
+Every fringe position was located by eye on the Plot Profile window and read off directly: hovering the cursor over the centre of a dip or peak gave its calibrated x-position (in cm) in the readout at the bottom of the plot window. Automatic peak-finding was tried first, but it picked the wrong points on these noisy profiles (and on the profiles with a saturated centre), so the positions were read manually instead.
+
+Each single cursor reading carries a position uncertainty of $\text{POS} = 0.3$ mm  (our estimate of how precisely the centre of a dip/peak can be located by eye on the profile (given the width of the feature and the resolution of the cursor readout)).
+
+### Getting a fringe's distance from the centre
+
+For a single slit or single obstacle (hair, Babinet's slit), the two minima on either side of the central maximum at order $m$ are symmetric: $y_m$ and $-y_m$. Rather than trying to locate the true centre of the pattern independently, it's more precise to read the positions of both minima, $x_{\text{left}}$ and $x_{\text{right}}$, and take half their separation:
+
+$$y_m = \frac{x_{\text{right}} - x_{\text{left}}}{2}$$
+
+This is what `half_separation()` computes. Its uncertainty follows from standard error propagation for a difference of two independent readings, each with uncertainty POS:
+
+$$\sigma_{y_m}^2 = \left(\frac{\partial y_m}{\partial x_{\text{right}}}\right)^2\sigma_{\text{POS}}^2 + \left(\frac{\partial y_m}{\partial x_{\text{left}}}\right)^2\sigma_{\text{POS}}^2 = \left(\frac{1}{2}\right)^2\text{POS}^2 + \left(\frac{1}{2}\right)^2\text{POS}^2 = \frac{\text{POS}^2}{2}$$
+
+$$\Rightarrow \quad \sigma_{y_m} = \frac{\text{POS}}{\sqrt{2}}$$
+
+which is exactly `sy = POS / np.sqrt(2)` in the code.
+
+#### Single slit: solving for $\lambda$
+
+Rearranging Eq. 8 for the wavelength, with the slit width $w$ known:
+
+$$\lambda = \frac{w\,y_m}{mL}$$
+
+their relative uncertainties are:
+
+$$\left(\frac{\sigma_\lambda}{\lambda}\right)^2 = \left(\frac{\sigma_{y_m}}{y_m}\right)^2 + \left(\frac{\sigma_w}{w}\right)^2 + \left(\frac{\sigma_L}{L}\right)^2$$
+
+where $\sigma_w/w = \text{TOL} = 5\%$ (the manufacturer's stated slit tolerance) stands in for $\sigma_w$ directly, since only the slit's relative uncertainty is given. This is the `rel` calculation in `single_slit()`.
+
+#### Double slit: solving for $d$
+
+For bright fringes, the spacing between adjacent orders is constant: $y_{k+1}-y_k = L\lambda/d$ for every $k$. Rather than reading every individual fringe, it's more precise to read just the *first* and *last* clearly resolvable fringe positions, $x_{\text{first}}$ and $x_{\text{last}}$, count how many fringe-to-fringe gaps lie between them ($n_{\text{gaps}}$), and divide:
+
+$$\Delta y = \frac{x_{\text{last}} - x_{\text{first}}}{n_{\text{gaps}}}$$
+
+This spreads the two endpoint reading uncertainties over all $n_{\text{gaps}}$ gaps at once, rather than compounding a separate reading uncertainty onto every individual fringe position (nice because, the more gaps spanned, the smaller the relative effect of any one cursor reading). By the same propagation as above (two independent endpoint readings, each POS):
+
+$$\sigma_{\Delta y} = \frac{\sqrt{2}\,\text{POS}}{n_{\text{gaps}}}$$
+
+Then, rearranging Eq. 2 for the spacing $d$ (with $\lambda$ known):
+
+$$d = \frac{L\lambda}{\Delta y}, \qquad \left(\frac{\sigma_d}{d}\right)^2 = \left(\frac{\sigma_{\Delta y}}{\Delta y}\right)^2 + \left(\frac{\sigma_\lambda}{\lambda}\right)^2 + \left(\frac{\sigma_L}{L}\right)^2$$
+
+#### Babinet's slit and hair: solving for $w$
+
+Both of these are "unknown obstacle width" measurements - the same Eq. 8 relation as the single slit, just rearranged the other way, with $\lambda$ now the known quantity:
+
+$$w = \frac{mL\lambda}{y_m}, \qquad \left(\frac{\sigma_w}{w}\right)^2 = \left(\frac{\sigma_{y_m}}{y_m}\right)^2 + \left(\frac{\sigma_\lambda}{\lambda}\right)^2 + \left(\frac{\sigma_L}{L}\right)^2$$
+
+with $\sigma_\lambda/\lambda\approx0.3\%$ this time, since $\lambda$ is the known input rather than $w$. `width_from_minima()` implements this once, and both `babinet()` and `hair()` call it - for Babinet's slit it's run twice, once each for the $m=1$ and $m=2$ minima pairs, as a cross-check that both orders give a consistent width; for hair, the $m=1$ minima weren't resolved from the central peak, so $m=2$ and $m=3$ are used instead.
+
+```{=typst}
+#figure(
+  image("images/setup.png", width: 80%),
+  caption: [Drawn setup],
+)
+```
+
+# Results
+
+### Single slit diffraction (wavelength)
+
+By hand, from the $m=\pm1$ minima read off at $x_{\text{left}}=1.067$ cm and $x_{\text{right}}=3.544$ cm:
+
+$$y_1 = \frac{3.544 - 1.067}{2}\text{ cm} = 1.239\text{ cm}$$
+
+$$\lambda = \frac{(0.040\text{ mm})(1.239\text{ cm})}{(1)(0.879\text{ m})} = 563.6\text{ nm}$$
+
+```{=typst}
+#figure(
+  image("images/singleslit.jpg", width: 80%),
+  caption: [image captured],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/plot1.png", width: 80%),
+  caption: [Single slit (0.04 mm) diffraction pattern, with the $m = \pm 1$ minima used],
+)
+```
+
+Checking that against the full calculation, with the sigma test against the stated wavelength:
+
+```{python}
+single_slit(1.067, 3.544)
+```
+
+Only the $m=\pm1$ minima were clearly identifiable in this capture, so there's no second, independent fringe pair to check this result against.
+
+### Double slit interference (slit spacing)
+
+By hand, spanning ten fringe-to-fringe gaps between the first and last clearly resolvable bright fringes ($x_{\text{first}}=1.193$ cm, $x_{\text{last}}=3.154$ cm):
+
+$$\Delta y = \frac{3.154 - 1.193}{10}\text{ cm} = 1.961\text{ mm}$$
+
+$$d = \frac{(0.879\text{ m})(654\text{ nm})}{1.961\text{ mm}} = 293.1\ \mu\text{m}$$
+
+```{=typst}
+#figure(
+  image("images/doubleslit.jpg", width: 80%),
+  caption: [image captured],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/plot2.png", width: 80%),
+  caption: [Double slit (0.04/0.25 mm) interference pattern, first and last fringes used marked],
+)
+```
+
+```{python}
+double_slit(1.193, 3.154, 10)
+```
+
+Spreading the reading uncertainty over 10 gaps keeps $\sigma_d$ small relative to the 5% slit tolerance on the stated value, so the disagreement above isn't from a loose measurement, it's an offset from the nominal spacing.
+
+### Babinet's principle
+
+By hand, the two independent width estimates from the $m=1$ and $m=2$ minima pairs:
+
+$$m=1: \quad y_1 = \frac{2.443-1.147}{2}\text{ cm} = 0.648\text{ cm}, \qquad w = \frac{(1)(0.879\text{ m})(654\text{ nm})}{0.648\text{ cm}} = 88.7\ \mu\text{m}$$
+
+$$m=2: \quad y_2 = \frac{3.022-0.545}{2}\text{ cm} = 1.239\text{ cm}, \qquad w = \frac{(2)(0.879\text{ m})(654\text{ nm})}{1.239\text{ cm}} = 92.8\ \mu\text{m}$$
+
+```{=typst}
+#figure(
+  image("images/babinet_slit.jpg", width: 80%),
+  caption: [image captured],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/plot3slit.png", width: 80%),
+  caption: [0.08 mm slit diffraction pattern],
+)
+```
+
+```{=typst}
+#figure(
+  image("images/babinet_opaque.jpg", width: 80%),
+  caption: [image captured],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/plot3opaque.png", width: 80%),
+  caption: [0.08 mm opaque line diffraction pattern],
+)
+```
+
+```{python}
+babinet(1.147, 2.443, 1)
+babinet(0.545, 3.022, 2)
+```
+
+The two orders agree with each other within their combined uncertainty, but both sit noticeably above the nominal $80\ \mu$m. The opaque line profile had no resolvable minima (its central maximum was saturated), so it could not be compared quantitatively with the slit.
+
+### Hair thickness
+
+By hand, from the $m=2$ and $m=3$ minima pairs (the $m=1$ minima weren't resolved from the central peak in this capture):
+
+$$m=2: \quad y_2 = \frac{3.234-1.313}{2}\text{ cm} = 0.960\text{ cm}, \qquad w = \frac{(2)(0.879\text{ m})(654\text{ nm})}{0.960\text{ cm}} = 119.7\ \mu\text{m}$$
+
+$$m=3: \quad y_3 = \frac{3.653-0.866}{2}\text{ cm} = 1.393\text{ cm}, \qquad w = \frac{(3)(0.879\text{ m})(654\text{ nm})}{1.393\text{ cm}} = 123.8\ \mu\text{m}$$
+
+The orders were assigned from the spacing of the minima: consecutive minima are about 0.45 cm apart, but the innermost visible pair is about 0.96 cm from the centre, so that pair is $m=2$.
+
+```{=typst}
+#figure(
+  image("images/hair.jpg", width: 80%),
+  caption: [image captured],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/plot4.png", width: 80%),
+  caption: [Diffraction pattern from a strand of hair, treated as a single slit]
+)
+```
+
+```{python}
+hair(1.313, 3.234, 2, micrometer=115e-6)
+hair(0.866, 3.653, 3, micrometer=115e-6)
+```
+
+An estimated micrometer reading of $115\pm5\ \mu\text{m}$ was taken on the same strand for comparison. Both diffraction-derived orders agree with it comfortably (0.83$\sigma$ and 1.63$\sigma$), and with each other. The diffraction values sit a little above the micrometer reading, which makes sense if the hair isn't perfectly uniform along its length and the laser happened to scan across a slightly thicker point than where the micrometer clamped it.
+
+# Limitations & Possible Sources of Discrepancy
+
+**1. Manual cursor reading.** Every fringe position here was located by eye (POS ($0.3$ mm) being an estimate of that reading precision), so it's treated as approximate.
+
+**2. Single slit rests on one fringe pair.** With no second-order minima resolved, there's no independent check that the $y\propto m$ relationship actually held for this particular capture.
+
+**3. Calibration and alignment consistency across captures.** The pixel-to-cm scale was applied once per image; if the rail, screen, or webcam shifted between captures, each pattern's effective scale could differ slightly.
+
+**4. Hair thickness assumption.** Treating the hair as a clean single slit of uniform width assumes a flat, opaque strand of constant thickness; real hair is ~cylindrical and can vary in thickness along its length.
+
+# Conclusion
+
+The slit-width measurement agreed with the nominal value. Both the $(m=1)$ and $(m=2)$ minima gave widths of $(88.7\pm2.9\ \mu\text{m})$ and $(92.8\pm1.6\ \mu\text{m})$, which agree with the nominal $(80\pm4\ \mu\text{m})$ value, although both are slightly high, and the $(m=2)$ result is only just within $(3\sigma)$. Babinet's principle itself couldn't be tested, since the opaque line profile had no resolvable minima (its central maximum was saturated). The single-slit wavelength $(563.6\pm29.8\ \text{nm})$, $(3.02\sigma)$, and double-slit spacing $(293.1\pm6.5\ \mu\text{m})$, $(3.06\sigma)$, both marginally disagreed with their stated values. These are most likely the same error rather than opposite ones: the fringes were consistently about 10-15% closer together than predicted, which gives a wavelength that is too low but a slit spacing and width that are too high. That points to a common systematic error, most likely in the pixel-to-cm calibration or in $L$.
+
+The hair thickness measurements of $(119.7$--$123.8\ \mu\text{m})$ were consistent with each other and agreed with the micrometer measurement of $(115\pm5\ \mu\text{m})$, at $(0.83\sigma)$ and $(1.63\sigma)$, making it the strongest agreement of any measurement in the lab(!!). This is probably because the hair measurement is less affected by the manufacturer's loose 5% slit-width tolerance (which limits the precision of the other measurements).
