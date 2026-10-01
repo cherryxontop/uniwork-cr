@@ -26,3 +26,6 @@ __pycache__/
 **/*lab_files
 **/*.quarto
 **/*.ipnyb
+
+#unwanted
+**/integdec.pdf
