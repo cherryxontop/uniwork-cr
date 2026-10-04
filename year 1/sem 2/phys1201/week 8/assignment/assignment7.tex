@@ -1,0 +1,355 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+
+\title{Assignment 7}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle
+
+\section*{Question 1}
+
+\subsection*{(a)}
+
+we are given:
+
+\begin{itemize}
+    \item intensity of the light: $I=1\,\mathrm{W\,m^{-2}}$
+    \item binding energy: $E_{\mathrm{bind}}=1.8\,\mathrm{eV}$
+    \item Bohr radius: $r=5.3\times10^{-11}\,\mathrm{m}$
+\end{itemize}
+
+we assume that the atom absorbs all the radiation that falls within its Bohr radius.
+
+the area of the atom is approximately the area of a circle,
+
+\[
+A=\pi r^2
+\]
+
+substituting,
+
+\[
+A=\pi(5.3\times10^{-11})^2
+\]
+\[
+A\approx8.82\times10^{-21}\,\mathrm{m^2}
+\]
+
+the intensity is power per unit area,
+
+\[
+I=\frac{P}{A}
+\]
+
+so,
+
+\[
+P=IA
+\]
+
+substituting,
+
+\[
+P=(1)(8.82\times10^{-21})
+\]
+\[
+P=8.82\times10^{-21}\,\mathrm{W}
+\]
+
+the binding energy is given in eV, so we convert it to joules.
+
+\[
+1\,\mathrm{eV}=1.602\times10^{-19}\,\mathrm{J}
+\]
+
+therefore,
+
+\[
+E_{\mathrm{bind}}
+=
+1.8(1.602\times10^{-19})
+\]
+\[
+E_{\mathrm{bind}}\approx2.884\times10^{-19}\,\mathrm{J}
+\]
+
+using
+
+\[
+E=Pt
+\]
+\[
+t=\frac{E}{P}
+\]
+
+substituting,
+
+\[
+t=
+\frac{2.884\times10^{-19}}
+{8.82\times10^{-21}}
+\]
+
+\[
+t\approx32.7\,\mathrm{s}
+\]
+
+hence,
+
+\[
+\boxed{t\approx33\,\mathrm{s}}
+\]
+
+so, it would take about 33 seconds to collect enough energy to eject an electron.
+
+\subsection*{(b)}
+
+the calculation in part (a) treats light as a continuous wave, so the electron slowly builds up energy until it has enough to escape.
+ 
+in reality, light comes in packets called photons, each with energy $E=hf$. an electron absorbs one whole photon at a time. if one photon has enough energy ($hf\geq\phi$), the electron is ejected immediately.
+ 
+making the light weaker only means fewer photons arrive, not that each photon has less energy. so emission still starts instantly.
+
+\section*{Question 2}
+
+\subsection*{(a)}
+
+we have light travelling from a medium with refractive index
+
+\[
+n_1(\lambda)
+\]
+
+into a medium with
+
+\[
+n_2=1.
+\]
+
+using Snell's law,
+
+\[
+n_1\sin\theta_1=n_2\sin\theta_2
+\]
+
+since $n_2=1$,
+
+\[
+n_1\sin\theta_1=\sin\theta_2
+\]
+
+therefore,
+
+\[
+\theta_2=\arcsin(n_1\sin\theta_1)
+\]
+
+we want to find how much the refracted angle changes when the refractive index changes.
+
+differentiate with respect to $n_1$,
+
+\[
+\boxed{
+\frac{d\theta_2}{dn_1}
+=
+\frac{\sin\theta_1}
+{\sqrt{1-n_1^2\sin^2\theta_1}}
+}
+\]
+
+as $\theta_1$ increases, the denominator becomes smaller, so the change in $\theta_2$ becomes larger.
+
+however, the light must still be transmitted into the second medium.
+
+from Snell's law,
+
+\[
+\sin\theta_2=n_1\sin\theta_1
+\]
+
+and since $\sin\theta_2\leq1$, we have
+
+\[
+n_1\sin\theta_1\leq1
+\]
+
+the maximum possible value occurs when
+
+\[
+n_1\sin\theta_1=1
+\]
+\[
+\sin\theta_1=\frac{1}{n_1}
+\]
+\[
+\theta_1=\arcsin\left(\frac{1}{n_1}\right)
+\]
+
+this is the critical angle.
+
+hence $\boxed{\theta_1=\theta_c}$ is the best choice of incident angle to maximise the dispersion.
+
+at this angle, $\theta_2=90^\circ$
+
+\subsection*{(b)}
+
+we are given:
+
+\[
+n_{400}=1.8
+\]
+
+and
+
+\[
+n_{700}=1.7
+\]
+
+the incident angle should be the critical angle for the larger refractive index, since both wavelengths need to be transmitted.
+
+from part (a),
+
+\[
+\theta_1 = \arcsin\left(\frac{1}{1.8}\right)
+\]
+\[
+\theta_1\approx33.75^\circ
+\]
+
+\begin{itemize}
+    \item for the $400\,\mathrm{nm}$ light,
+
+\[
+1.8\sin(33.75^\circ)=\sin\theta_{2,400}
+\]
+
+since $33.75^\circ$ is the critical angle,
+
+\[
+1.8\sin(33.75^\circ)=1
+\]
+
+so,
+
+\[
+\theta_{2,400}=90^\circ
+\]
+
+\item for the $700\,\mathrm{nm}$ light,
+
+\[
+1.7\sin(33.75^\circ)=\sin\theta_{2,700}
+\]
+\[
+\sin\theta_{2,700}
+=
+1.7(0.5556)
+\]
+
+\[
+\sin\theta_{2,700}\approx0.9444
+\]
+\[
+\theta_{2,700}=\arcsin(0.9444)
+\]
+\[
+\theta_{2,700}\approx70.8^\circ
+\]
+\end{itemize}
+
+the angle between the two ends of the optical spectrum is therefore
+
+\[
+\Delta\theta
+=
+90^\circ-70.8^\circ
+\]
+
+\[
+\Delta\theta\approx19.2^\circ
+\]
+
+\[
+\boxed{\Delta\theta\approx19^\circ}
+\]
+
+\section*{Question 3}
+
+the thin lens equation is
+
+\[
+\frac{1}{f}=\frac{1}{u}+\frac{1}{v}
+\]
+
+since the sun is very far away,
+
+\[
+u\rightarrow\infty
+\]
+\[
+\frac{1}{u}\rightarrow0
+\]
+
+so,
+
+\[
+\frac{1}{f}=\frac{1}{v}
+\]
+\[
+\boxed{v=f}
+\]
+
+so the image of the sun forms one focal length behind the lens.
+
+the sun has an angular diameter of
+
+\[
+0.5^\circ
+\]
+
+so the angle from the centre of the sun to its edge is
+
+\[
+\theta=\frac{0.5^\circ}{2}=0.25^\circ
+\]
+
+consider the ray from the centre of the lens to the edge of the solar image.
+
+using the right triangle,
+
+\[
+\tan\theta=\frac{r}{f}
+\]
+\[
+r=f\tan\theta
+\]
+
+substituting $\theta=0.25^\circ$,
+
+\[
+r=f\tan(0.25^\circ)
+\]
+
+the diameter is
+
+\[
+D=2r
+\]
+
+therefore,
+
+\[
+D=2f\tan(0.25^\circ)
+\]
+\[
+D=0.008726f
+\]
+\[
+\boxed{D\approx8.73\times10^{-3}f}
+\]
+
+where $D$ and $f$ are in the same units.
+
+\end{document}
