@@ -1,0 +1,319 @@
+---
+title: "Lab Report: Week 9 - Acoustic Resonance"
+subtitle: "_Chhaya Ramnani (UID: u8336188)_"
+author: "_Lab partners: Tsz Wing Candice Ng, Chinatsu Komada_"
+date: "2026-10-07"
+format: 
+  typst:
+    toc: false
+editor:
+  render-on-save: true
+jupyter: python3
+---
+
+# Imports and Functions
+
+All fits are straight lines by orthogonal distance regression, so the uncertainty on both axes is included.
+
+```{python}
+from dataclasses import dataclass
+from math import pi, log
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import odr
+from uncertainties import ufloat
+
+
+@dataclass
+class odr_fit_result:
+    parameters: np.ndarray
+    parameter_errors: np.ndarray
+    r_squared: float
+    x_nom: np.ndarray
+    y_nom: np.ndarray
+    x_err: np.ndarray
+    y_err: np.ndarray
+
+
+def linear_model(p, x):
+    return p[0] * x + p[1]
+
+
+def proportional_model(p, x):
+    return p[0] * x
+
+
+def odr_fit(x, y, model_func, beta0):
+    x_nom, x_err = np.array([v.n for v in x]), np.array([v.s for v in x])
+    y_nom, y_err = np.array([v.n for v in y]), np.array([v.s for v in y])
+
+    data = odr.RealData(x_nom, y_nom, sx=x_err, sy=y_err)
+    odr_result = odr.ODR(data, odr.Model(model_func), beta0=beta0).run()
+
+    residuals = y_nom - model_func(odr_result.beta, x_nom)
+    r_squared = 1 - np.sum(residuals**2) / np.sum((y_nom - np.mean(y_nom)) ** 2)
+
+    return odr_fit_result(odr_result.beta, odr_result.sd_beta, r_squared, x_nom, y_nom, x_err, y_err)
+
+
+def sigma_test(k1, sk1, k2, sk2, label="parameter"):
+    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
+    print(f"\nSIGMA TEST ({label})")
+    print(f"value 1 : {k1:.3f} +/- {sk1:.3f}")
+    print(f"value 2 : {k2:.3f} +/- {sk2:.3f}")
+    print(f"discrepancy: {sigma_diff:.2f} sigma -> {'AGREE' if sigma_diff <= 3 else 'DISAGREE'}")
+    return sigma_diff
+
+
+def plot_fit(result, model_func, xlabel, ylabel, title, filename):
+    x_smooth = np.linspace(min(result.x_nom), max(result.x_nom), 200)
+    residuals = result.y_nom - model_func(result.parameters, result.x_nom)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7, 7), sharex=True, gridspec_kw={"height_ratios": [3, 1]})
+    ax1.errorbar(result.x_nom, result.y_nom, xerr=result.x_err, yerr=result.y_err, fmt="o", capsize=3, label="Data")
+    ax1.plot(x_smooth, model_func(result.parameters, x_smooth), "k--", label=f"ODR fit ($R^2$={result.r_squared:.4f})")
+    ax1.set_ylabel(ylabel)
+    ax1.set_title(title)
+    ax1.grid(True, alpha=0.6)
+    ax1.legend()
+
+    ax2.errorbar(result.x_nom, residuals, yerr=result.y_err, fmt="o", capsize=3, color="crimson")
+    ax2.axhline(0, color="black", linestyle="--")
+    ax2.set_xlabel(xlabel)
+    ax2.set_ylabel("Residual")
+    ax2.grid(True, alpha=0.6)
+
+    plt.tight_layout()
+    plt.savefig(f"graphs/{filename}.png", dpi=300)
+    plt.close()
+```
+
+# Pre-Lab Questions
+
+## Question 2
+
+At the closed end of the pipe, air molecules cannot move freely, creating a displacement node (pressure antinode). At the open end, the air pressure is constrained to equal atmospheric pressure, creating a pressure node (displacement antinode).
+
+The effective length of a pipe closed at one end is
+$$L_{\text{eff}}=L+0.6a$$
+
+standing waves inside a pipe closed at one end = odd number of $\frac{\lambda}{4}$
+
+$$L+0.6a=\frac{n\lambda}{4}$$
+
+   
+$$\lambda_n=\frac{4(L+0.6a)}{n}$$
+
+using $f=\frac{c}{\lambda}$,
+
+$$f_n=\frac{nc}{4(L+0.6a)}$$
+
+$$\boxed{f_n=\frac{nc}{4(L+0.6a)}, \quad n=1,3,5,...}$$
+
+## Question 3
+
+```{=typst}
+#figure(
+  image("images/q3.png", width: 80%),
+  caption: [spectrum plotted],
+)
+```
+reading off the graph and the peak indicator, we see that the highest peak is at $1199 \text{Hz}$.
+$$\boxed{f_{\text{peak}}=1199 \text{Hz}}$$
+
+# Aim
+
+To find the speed of sound from the resonances of a pipe open at both ends and of a pipe closed at one end, and to measure the half-life and quality factor of the first three resonances of the open pipe.
+
+# Theory
+
+A pipe open at both ends has a pressure node about $0.6a$ beyond each end ($a$ is the pipe radius), so $L$ becomes $L + 1.2a$. The closed-open pipe has only one open end and is derived in the pre-lab:
+
+$$f_n = \frac{n\,c}{2\,(L + 1.2a)} \quad \text{(open-open)}, \qquad f_n = \frac{(2n-1)\,c}{4\,(L + 0.6a)} \quad \text{(closed-open)}$$
+
+Both have the form $f = c\,x$, so a plot of frequency against $x$ is a line through the origin with slope $c$. The theoretical speed of sound in dry air at $T$ ($^\circ$C) is $c = 331.3 + 0.606\,T$ m/s.
+
+Resonance intensity decays as $I_0 e^{-\alpha t}$, a drop of 3 dB per half-life $T_{1/2}$, so the level falls linearly, $L(t) = L_0 - 3t/T_{1/2}$ and $T_{1/2} = 3/(-m)$ for slope $m$. The quality factor is $Q = \pi f_r T_{1/2} / \ln 2$.
+
+Two values are compared as $|k_1 - k_2| / \sqrt{\sigma_1^2 + \sigma_2^2}$, and agree if this is at most $3\sigma$.
+
+# Procedure
+
+First, we set up the PVC pipe like in the diagram, and taped the joint in the middle twice so air wouldn't leak. Then we measured the pipe's length, $L = 100.4 \pm 0.25$ cm, and radius, $a = 4.3 \pm 0.25$ cm, and estimated the room temperature, $T = 22 \pm 1\,^\circ$C.
+
+For the first part, we tested the open end. We clamped the pipe horizontally to a table and positioned a microphone right near the end. We recorded acoustic responses generated by claps, physical taps, and loud white noise played from a phone at the far end. We repeated the exact same procedure using the closed-end cap (which had a small pre-drilled hole for the mic). In Audacity, each recording was analysed with Plot Spectrum and the peak frequencies were read with the cursor. Each peak was taken to be uncertain by $\sigma_f = 15$ Hz, about a third of the width of the the bins.
+
+for the decay, we used the recording from the first open-end clap experiment, with the first window starting at the clap and 30 ms windows after it. The level of each mode in a window was taken as the band level within $\pm 25$ Hz of the mode.
+
+```{=typst}
+#figure(
+  image("images/setup.png", width: 80%),
+  caption: [Experimental setup],
+)
+```
+
+# Results
+
+## Choice of excitation method
+
+The number of modes that could be read from each method is below. The clap gave the most modes on both pipes, so it was used as the best method and for the decay. The white-noise spectrum of the open pipe had peaks below 700 Hz that probably came from the phone speaker and not the pipe, so only modes 5 to 7 were used from it.
+
+| Method | Open pipe modes | Closed pipe modes |
+|---|---|---|
+| Clap | 6 (1 to 6) | 7 (2 to 8) |
+| Tap | 3 (1 to 3) | 5 |
+| White noise | 3 (5 to 7) | 7 (2 to 8) |
+
+## Speed of sound
+
+Each recording (clap, tap, white noise on each pipe) is fitted for its own $c$, and the six are averaged and compared with the theoretical value.
+
+```{python}
+L = ufloat(1.004, 0.0025)     # m, pipe length
+a = ufloat(0.043, 0.0025)     # m, pipe radius
+sigma_f = 15                  # Hz, uncertainty on one peak frequency
+T_room = ufloat(22, 1)        # deg C
+
+open_data = [
+    {1: 166.6, 2: 326.5, 3: 465.6, 4: 655.1, 5: 817.8, 6: 982.3},
+    {1: 161.0, 2: 322.1, 3: 472.3},
+    {5: 819, 6: 982, 7: 1125},
+]
+closed_data = [
+    {2: 258.3, 3: 413.9, 4: 595.5, 5: 758.9, 6: 931.2, 7: 1098.0, 8: 1263.7},
+    {2: 257.4, 3: 415.7, 4: 578.3, 6: 930.0, 8: 1240.7},
+    {2: 259, 3: 419, 4: 590, 5: 753, 6: 930, 7: 1110, 8: 1252},
+]
+
+# f = c * x
+x_open = lambda modes: [n / (2 * (L + 1.2 * a)) for n in modes]
+x_closed = lambda modes: [(2 * n - 1) / (4 * (L + 0.6 * a)) for n in modes]
+
+c_methods = []
+for pipe, data, x_func in [("open", open_data, x_open), ("closed", closed_data, x_closed)]:
+    for label, d in zip(["clap", "tap", "white noise"], data):
+        modes = sorted(d)
+        f = [ufloat(d[n], sigma_f) for n in modes]
+        res = odr_fit(x_func(modes), f, proportional_model, beta0=[340])
+        c = ufloat(res.parameters[0], res.parameter_errors[0])
+        print(f"{pipe} {label}: c = {c:.2f} m/s, R^2 = {res.r_squared:.4f}")
+        if label == "clap":    # the three methods give near-identical graphs, so only the clap is plotted
+            plot_fit(res, proportional_model, "x (1/m)", "Resonant frequency (Hz)",
+                     f"{pipe.capitalize()} pipe, clap", f"speed_{pipe}_clap")
+        c_methods.append(c)
+
+c_open, c_closed, c_mean = sum(c_methods[:3]) / 3, sum(c_methods[3:]) / 3, sum(c_methods) / 6
+print(f"\nopen pipe average: c = {c_open:.2f} m/s")
+print(f"closed pipe average: c = {c_closed:.2f} m/s")
+print(f"average of all six: c = {c_mean:.2f} m/s")
+
+c_theory = 331.3 + 0.606 * T_room    # m/s
+print(f"theoretical c at {T_room} C = {c_theory:.2f} m/s")
+sigma_test(c_open.n, c_open.s, c_closed.n, c_closed.s, label="open vs closed")
+sigma_test(c_mean.n, c_mean.s, c_theory.n, c_theory.s, label="average c vs theory")
+```
+
+
+| Pipe | Method | $c$ (m/s) |
+|---|---|---|
+| Open | clap | $343.77 \pm 2.44$ |
+| Open | tap | $335.11 \pm 2.58$ |
+| Open | white noise | $342.86 \pm 2.23$ |
+| Closed | clap | $347.71 \pm 0.74$ |
+| Closed | tap | $343.20 \pm 1.86$ |
+| Closed | white noise | $347.14 \pm 1.35$ |
+| Open average | | $340.58 \pm 1.40$ |
+| Closed average | | $346.02 \pm 0.80$ |
+| **Average of all six** | | $\mathbf{343.30 \pm 0.81}$ |
+
+The average of all six agrees with the theoretical $344.63 \pm 0.61$ m/s at $22 \pm 1\,^\circ$C ($1.32\sigma$). The open and closed averages differ by $3.37\sigma$, just past the $3\sigma$ cut-off, so the two pipes do not quite agree within error.
+
+```{=typst}
+#figure(
+  image("graphs/speed_open_clap.png", width: 70%),
+  caption: [Open pipe, clap: fit and residuals],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/speed_closed_clap.png", width: 70%),
+  caption: [Closed pipe, clap: fit and residuals],
+)
+```
+
+
+## Resonance decay
+
+```{python}
+decay_freqs = [166.6, 326.5, 465.6]   # Hz, open clap modes 1-3
+Dt = 0.03                     # s, window length
+sigma_t = 0.002               # s, uncertainty on each t_n
+sigma_L = 2.0                 # dB, uncertainty on one level
+# level (dB) of each mode in window n, t_n = n * Dt (band level within +/-25 Hz of the mode)
+decay_L = [
+    [-26.8, -28.1, -31.3, -43.7, -46.0, -53.8, -56.2],
+    [-23.5, -25.2, -35.7, -37.8, -44.4, -47.0],
+    [-27.8, -29.5, -36.2, -32.4, -41.7],
+]
+
+for i in range(3):
+    t = [ufloat(n * Dt, sigma_t) for n in range(len(decay_L[i]))]
+    L_db = [ufloat(v, sigma_L) for v in decay_L[i]]
+    res = odr_fit(t, L_db, linear_model, beta0=[-100, 0])
+    slope = ufloat(res.parameters[0], res.parameter_errors[0])
+    T_half = 3 / (-slope)
+    Q = pi * decay_freqs[i] * T_half / log(2)
+    print(f"\nmode {i + 1} ({decay_freqs[i]} Hz): slope = {slope:.1f} dB/s, R^2 = {res.r_squared:.4f}, "
+          f"T_1/2 = {T_half * 1000:.1f} ms, Q = {Q:.1f}")
+    plot_fit(res, linear_model, "$t_n$ (s)", "Level (dB)", f"Decay of mode {i + 1}", f"decay_mode{i + 1}")
+```
+
+
+| Mode | $f_r$ (Hz) | $T_{1/2}$ (ms) | $Q$ | $R^2$ |
+|---|---|---|---|---|
+| 1 | 166.6 | $16.3 \pm 1.6$ | $12.3 \pm 1.2$ | 0.956 |
+| 2 | 326.5 | $17.8 \pm 1.8$ | $26.3 \pm 2.6$ | 0.961 |
+| 3 | 465.6 | $29 \pm 10$ | $62 \pm 20$ | 0.759 |
+
+Modes 1 and 2 have about the same half-life, so $Q$ roughly doubles with frequency. Mode 3 has a longer half-life but a large uncertainty and a poor fit, and is within $1.2\sigma$ of mode 2.
+
+```{=typst}
+#figure(
+  image("graphs/decay_mode1.png", width: 70%),
+  caption: [Decay of mode 1: fit and residuals],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/decay_mode2.png", width: 70%),
+  caption: [Decay of mode 2: fit and residuals],
+)
+```
+
+```{=typst}
+#figure(
+  image("graphs/decay_mode3.png", width: 70%),
+  caption: [Decay of mode 3: fit and residuals],
+)
+```
+
+
+# Limitations & Possible Sources of Discrepancy
+
+Several steps were taken to reduce the uncertainties. The joint was taped twice to avoid leaks and reflections, and the end corrections were included when calculating the effective length. Each pipe was measured with three excitation methods, and the speed of sound was taken from fits through many modes (up to 8) rather than from one, using orthogonal distance regression so the uncertainty in $L$ and $a$ is included, and the six results were averaged, giving a smaller uncertainty ($\pm 0.81$ m/s) than most of the individual ones. Readings that were not pipe modes, namely the white-noise speaker peaks and the 90 to 110 Hz hump on the closed pipe, were excluded so that they did not bias $c$. For the decay, the windows started at the clap, only levels above the background were fitted. Further improvement would come from reading the frequencies at a higher resolution to shrink $\sigma_f$, measuring $L$ and $a$ with finer instruments and repeating each recording.
+
+**1. Peak frequencies:** $\sigma_f = 15$ Hz is an estimate, and the spectra were read at coarse resolution. The open tap ($335.11 \pm 2.58$ m/s) and closed clap ($347.71 \pm 0.74$ m/s) are each more than $3\sigma$ from theory, on opposite sides, so the uncertainties on $c$ are probably underestimated.
+
+**2. Shared errors:** The six methods share $L$, $a$ and the pipe, so the uncertainty on their average is optimistic. A slight error in $L$ alone changes our values completely.
+
+**3. Closed pipe mode 1:** The expected fundamental of about 84 Hz was left out, because the 90 to 110 Hz hump appears in every spectrum, including the open pipe's.
+
+**4. Decay:** With 30 ms windows each fit has only 5 to 7 points, and the mode 3 fit is poor.
+
+# Conclusion
+
+The speed of sound was measured from the resonances of a pipe open at both ends and of a pipe closed at one end, using a clap, a tap and white noise on each. The average over the six measurements is $343.30 \pm 0.81$ m/s, which agrees with the theoretical $344.63 \pm 0.61$ m/s at $22\,^\circ$C ($1.32\sigma$). The open pipe average ($340.58 \pm 1.40$ m/s) and closed pipe average ($346.02 \pm 0.80$ m/s) differ by $3.37\sigma$, so the two pipes only just fail to agree within error. The most likely cause is that the peak frequency uncertainty is underestimated, since the open tap and closed clap results each sit more than $3\sigma$ from theory on opposite sides.
+
+The first three resonances of the open pipe decay with half-lives of $16.3 \pm 1.6$, $17.8 \pm 1.8$ and $29 \pm 10$ ms, giving quality factors of $12.3 \pm 1.2$, $26.3 \pm 2.6$ and $62 \pm 20$. $Q$ rises with frequency because the first two half-lives are similar and $Q \propto f_r T_{1/2}$. The mode 3 value is the least reliable ($R^2 = 0.76$).
