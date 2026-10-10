@@ -19,9 +19,9 @@ sigma_B_mT = 0.005  # given uncertainty on B
 # uncerts
 
 sigma_N_turns = 1          # miscounting a partial turn, etc.
-sigma_R_cm = 0.1           # calliper reading on coil windings
-sigma_h_cm = 0.2           # ruler reading on drop height (for computing s)
-sigma_emf_frac = 0.02      # fractional oscilloscope voltage reading uncertainty
+sigma_R_cm = 0.25          # ruler read in 0.5 cm increments, so half that
+sigma_h_cm = 0.25          # ruler read in 0.5 cm increments, so half that
+sigma_emf_frac = 0.02      # 2% of oscilloscope voltage reading
 
 # FUNCS
 
@@ -160,8 +160,6 @@ def theory_emf_peak(N, v, R):
 
 
 def compare_to_theory(x_vals, y_measured_v, y_theory, title):
-    """Stats only, no plotting - chi-squared + ratio diagnostic against the
-    zero-free-parameter theory prediction."""
     x_nom = np.array([v.n for v in x_vals])
     x_err = np.array([v.s for v in x_vals])
     sigma_y = y_measured_v * sigma_emf_frac
@@ -196,10 +194,6 @@ def power_model(p, x):
 
 def plot_with_bestfit(x_nom, x_err, y_nom, sigma_y, y_theory, best_fit_result,
                        model_func, xlabel, title, filename_prefix):
-    """One plot: data, the fixed zero-parameter theory curve, and a genuine
-    best-fit curve (model allowed to flex) - lets you see whether a
-    discrepancy is a scale/offset thing or the shape itself is wrong,
-    without needing a separate residuals panel."""
     order = np.argsort(x_nom)
     x_smooth = np.linspace(min(x_nom), max(x_nom), 200)
     y_bestfit_smooth = model_func(best_fit_result.parameters, x_smooth)
@@ -223,13 +217,13 @@ def plot_with_bestfit(x_nom, x_err, y_nom, sigma_y, y_theory, best_fit_result,
 
 #emf vs no. of turns
 
-R_fixed_N = ufloat((3.4)/2, sigma_R_cm) / 100   # m #3.4 is diameter
+R_fixed_N = ufloat(((3.4)/2), sigma_R_cm) / 100   # m
 h_fixed_N = ufloat(48.4, sigma_h_cm) / 100   # m
 v_fixed_N = np.sqrt(2 * constants.g * h_fixed_N.n)  # speed at coil, from free fall
 
 turns_list = [10, 15, 20, 25, 30, 35, 40, 45, 50]
 turns_N = [ufloat(n, sigma_N_turns) for n in turns_list]
-emf_vs_N_measured = np.array([66, 116, 128, 166, 174, 226, 252, 260, 276]) / 2 / 1000  # V - one peak reading per turn count, same convention as R/s below
+emf_vs_N_measured = np.array([66, 116, 128, 166, 174, 226, 252, 260, 276]) / 2 / 1000  # V 
 
 y_theory_N = np.array([theory_emf_peak(N, v_fixed_N, R_fixed_N.n) for N in turns_list])
 xN, xerrN, yN, syN = compare_to_theory(
@@ -267,7 +261,7 @@ xR, xerrR, yR, syR = compare_to_theory(
 # emf vs magnet speed s
 
 N_fixed_s = 10
-R_fixed_s = ufloat((4.8)/ 2, sigma_R_cm) / 100  # m
+R_fixed_s = ufloat(((4.8) / 2), sigma_R_cm) / 100  # m
 
 heights_cm = [44.9, 39.9, 34.9, 29.9, 24.9, 19.9, 14.9, 9.9, 4.9]  # cm
 heights_m = [ufloat(hh / 100, sigma_h_cm / 100) for hh in heights_cm]
@@ -284,7 +278,7 @@ xs, xerrs, ys, sys_ = compare_to_theory(
 
 
 
-print("\n\n~~~ LINE OF BEST FIT (model allowed to flex) ~~~")
+print("\n\n~~~ LINE OF BEST FIT ~~~")
 
 print("\n-- N: linear fit emf = a*N + b --")
 res_N = odr_fit(turns_N, [ufloat(v, s) for v, s in zip(yN, syN)], linear_model, beta0=[0.001, 0])
@@ -309,33 +303,3 @@ print(f"b (offset) = {res_s.parameters[1]:.6f} +/- {res_s.parameter_errors[1]:.6
 print(f"R^2 = {res_s.r_squared:.4f}")
 plot_with_bestfit(xs, xerrs, ys, sys_, y_theory_s, res_s, linear_model,
                    "Magnet speed $s$ (m/s)", "Peak emf vs Magnet Speed", "graphs/emf_vs_s")
-
-
-
-print("\n\n~~~ALL MEASUREMENTS~~~")
-
-print("\n-- Number of turns (N) sub-experiment --")
-print(f"{'trial':>5} {'N':>5} {'emf(V)':>10}")
-for i in range(len(turns_list)):
-    print(f"{i+1:>5} {turns_list[i]:>5} {emf_vs_N_measured[i]:>10.4f}")
-print(f"held fixed: R = {R_fixed_N.n*100:.3f} cm, h = {h_fixed_N.n*100:.1f} cm")
-
-print("\n-- Coil radius (R) sub-experiment --")
-print(f"{'trial':>5} {'diam(cm)':>10} {'R(cm)':>8} {'h(cm)':>8} "
-      f"{'v(m/s)':>8} {'emf(mV)':>10} {'emf(V)':>10}")
-
-for i in range(len(d_cm)):
-    print(f"{i+1:>5} {d_cm[i]:>10.1f} {radii_cm[i]:>8.3f} "
-          f"{h:>8.2f} {speed_R:>8.3f} "
-          f"{emf_vs_R_measured[i]*1000:>10.1f} "
-          f"{emf_vs_R_measured[i]:>10.4f}")
-
-print("\n-- Magnet speed (s) sub-experiment --")
-print(f"{'trial':>5} {'h(cm)':>8} {'v(m/s)':>8} {'emf(mV)':>10} {'emf(V)':>10}")
-for i in range(len(heights_cm)):
-    print(f"{i+1:>5} {heights_cm[i]:>8} {speeds_s[i].n:>8.3f} "
-          f"{emf_vs_s_measured[i]*1000:>10.1f} {emf_vs_s_measured[i]:>10.4f}")
-print(f"held fixed: N = {N_fixed_s}, R = {R_fixed_s.n*100:.3f} +/- {R_fixed_s.s*100:.3f} cm")
-
-print(f"\n-- Dipole calibration --")
-print(f"m = {m_dipole:.4f} +/- {sigma_m:.4f} A m^2")
