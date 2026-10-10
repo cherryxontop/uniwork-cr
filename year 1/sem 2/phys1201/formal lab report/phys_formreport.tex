@@ -13,7 +13,7 @@
 
 \title{\textbf{Measuring Electromagnetic Induction: The Peak EMF Induced by a Magnet Falling Through a Coil}}
 \author{Chhaya Ramnani (u8336188)\\ \small Lab partners: Tsz Wing Candice Ng, Chinatsu Komada\\ \small PHYS1201 --- Physics 2, Week 5 Laboratory: Electromagnetic Induction}
-\date{Date of submission: 2026}
+\date{Date of submission: 9 October 2026}
 
 \begin{document}
 
@@ -21,7 +21,7 @@
 \thispagestyle{empty}
 
 \section*{1.0 Abstract}
-This experiment examined how the peak electromotive force (emf) induced in a coil by a falling magnet depends on the number of turns $N$, the coil radius $R$, and the magnet's speed $s$ at the coil. The magnet's dipole moment was calibrated from on-axis field measurements, giving $m = (1.18 \pm 0.07)$~A\,m$^2$, and this value was used to predict the peak emf without any fitted parameters. The measured emf increased roughly linearly with $N$ and $s$ and decreased roughly as $R^{-2}$, in line with the predicted proportionality $\varepsilon_{\text{peak}} \propto \frac{Ns}{R^2}$. The measured values did not match the predicted magnitudes, however. They were about 46\% of the prediction for $N$, 90\% for $R$, and 109\% for $s$. The differences were attributed mainly to the magnet's finite size and, for the $N$ data, to an unresolved difference between two nominally identical setups.
+This experiment examined how the peak electromotive force (emf) induced in a coil by a falling magnet depends on the number of turns $N$, the coil radius $R$, and the magnet's speed $s$ at the coil. The magnet's dipole moment was calibrated from on-axis field measurements, giving $m = (1.18 \pm 0.07)$~A\,m$^2$, and this value was used to predict the peak emf without any fitted parameters. The measured emf increased roughly linearly with $N$ and $s$ and decreased with $R$, in line with the predicted proportionality $\varepsilon_{\text{peak}} \propto \frac{Ns}{R^2}$, although the fitted $R$ exponent ($-1.53 \pm 0.07$) was weaker than the predicted $-2$. The measured values did not match the predicted magnitudes, however. They were about 46\% of the prediction for $N$, 90\% for $R$, and 109\% for $s$. The $R$ differences were attributed mainly to the magnet's finite size, the $s$ difference to an underestimated oscilloscope uncertainty, and the $N$ difference to an unresolved difference between two nominally identical setups.
 
 \section*{2.0 Introduction}
 
@@ -51,11 +51,11 @@ m = \frac{2\pi \bar{k}}{\mu_0} .
 \begin{equation}
 \Phi(z) = \frac{\mu_0 m R^2}{2(R^2 + z^2)^{3/2}} .
 \end{equation}
-For a coil of $N$ turns, Faraday's law combined with the chain rule and $v = dz/dt$ gives
+For a coil of $N$ turns, Faraday's law combined with the chain rule and $v = \frac{dz}{dt}$ gives
 \begin{equation}
 \varepsilon = -N\frac{d\Phi}{dt} = -Nv\frac{d\Phi}{dz} = \frac{3}{2} \, \frac{Nv\mu_0 m R^2 z}{(R^2+z^2)^{5/2}} .
 \end{equation}
-This is greatest at $z = R/2$, where
+This is greatest at $z = \frac{R}{2}$, where
 \begin{equation}
 \varepsilon_{\text{peak}} = \frac{3}{4}\left(\frac{4}{5}\right)^{5/2} \frac{Nv\mu_0 m}{R^2} \;\approx\; 0.4293\,\frac{Nv\mu_0 m}{R^2} .
 \end{equation}
@@ -72,29 +72,29 @@ s = \sqrt{2gh} .
 
 The dipole moment was determined first, using 19 on-axis field measurements $B(z)$ supplied for the experiment. Three sub-experiments followed, each varying one parameter while the others were held fixed:
 
-\begin{figure}[H]
+\begin{figure}
 \centering
 \includegraphics[width=0.75\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/images/setup.jpg}
 \caption{Experimental set-up. The coil, wound around the lower end of the Perspex tube, was connected to the oscilloscope. The magnet was released from a measured drop height $h$ above the coil.}
 \label{fig:setup}
 \end{figure}
 
-\begin{description}
-\item[Number of turns, $N$:] The coil radius and drop height were fixed, and the peak emf was recorded for nine turn counts between 10 and 50.
-\item[Coil radius, $R$:] With the magnet's north pole facing up, five coils of increasing diameter were wound in turn, each with $N=10$. Re-winding shifted the coil's position slightly, so the drop height was measured separately for each coil.
-\item[Magnet speed, $s$:] With $N=10$ and $R$ fixed, the drop height was varied in steps of roughly 5~cm from 4.9~cm to 44.9~cm.
-\end{description}
+\begin{itemize}
+    \item \textbf{Number of turns, $N$:} The coil radius and drop height were fixed, and the peak emf was recorded for nine turn counts between 10 and 50.
+    \item \textbf{Coil radius, $R$:} With the magnet's north pole facing up, five coils of increasing diameter were wound in turn, each with $N=10$. Re-winding shifted the coil's position slightly, so the drop height was measured separately for each coil.
+    \item \textbf{Magnet speed, $s$:} With $N=10$ and $R$ fixed, the drop height was varied in steps of roughly 5~cm from 4.9~cm to 44.9~cm.
+\end{itemize}
 
 \subsection*{3.1 Uncertainties}
 The reading uncertainties of the instruments are listed in Table~\ref{tab:unc}. The ruler used for coil radius and drop height was marked in 0.5~cm increments, and half that interval was adopted as the uncertainty.
 
-\begin{table}[h]
+\begin{table}
 \centering
 \caption{Instrument reading uncertainties adopted throughout the analysis.}
 \label{tab:unc}
 \begin{tabular}{ll}
 \toprule
-\textbf{Quantity} & \textbf{Uncertainty} \\
+\textbf{Quantity} & \textbf{uncertainty} \\
 \midrule
 Number of turns, $N$ & $\pm 1$ turn \\
 Coil radius, $R$ & $\pm 0.25$~cm \\
@@ -114,22 +114,22 @@ The speed depends on $h$ alone ($g$ being taken as exact), so its uncertainty wa
 \section*{4.0 Results and discussion}
 
 \subsection*{4.1 Dipole moment calibration}
-The quantity $k = Bz^3$ was calculated at each of the 19 calibration points. The values varied most at the smallest distances, where the magnet's finite size has the greatest effect on the point-dipole approximation. Their mean gave
+The quantity $k = Bz^3$ was calculated at each of the 19 calibration points. The values were not constant: they had a spread of about 27\% of their mean. In relative terms the largest deviations were at the largest distances (above about 10~cm), where $k$ fell well below the plateau and the field readings are small, with a further drop at the closest distances (3--3.5~cm), where the magnet's finite size affects the point-dipole approximation. Their mean gave
 \begin{equation}
 m = (1.18 \pm 0.07)~\text{A m}^2 ,
 \end{equation}
 which was used in every prediction that follows.
 
-Figure~\ref{fig:calib} compares the calibration data with the point-dipole curve for this $m$, and Figure~\ref{fig:resid} shows the residuals. The curve follows the data closely at larger distances and departs from it at small $z$, as expected.
+Figure~\ref{fig:calib} compares the calibration data with the point-dipole curve for this $m$, and Figure~\ref{fig:resid} shows the residuals. In absolute terms the residuals are largest at small $z$, as expected from the finite size of the magnet. Because $B$ is small at large $z$, the relative deviation at large distances is not visible on these axes.
 
-\begin{figure}[H][h]
+\begin{figure}
 \centering
 \includegraphics[width=0.62\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/graphs/dipole_calibration_fit.png}
 \caption{On-axis magnetic field of the magnet as a function of axial distance $z$, compared against the point-dipole prediction $B(z) = (\mu_0/2\pi)(m/z^3)$ using the calibrated dipole moment $m = 1.18$~A\,m$^2$.}
 \label{fig:calib}
 \end{figure}
 
-\begin{figure}[H][h]
+\begin{figure}
 \centering
 \includegraphics[width=0.62\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/graphs/dipole_calibration_residuals.png}
 \caption{Residuals of the dipole field calibration fit shown in Figure~\ref{fig:calib}.}
@@ -139,7 +139,7 @@ Figure~\ref{fig:calib} compares the calibration data with the point-dipole curve
 \subsection*{4.2 Peak emf versus number of turns, $N$}
 Peak emf was recorded for nine turn counts between 10 and 50, with $R = (1.70 \pm 0.25)$~cm and $h = 48.4$~cm held fixed (Table~\ref{tab:N}).
 
-\begin{table}[h]
+\begin{table}
 \centering
 \caption{Peak emf as a function of number of turns $N$, with $R$ and $h$ held fixed.}
 \label{tab:N}
@@ -160,9 +160,9 @@ $N$ (turns) & Peak emf, $\varepsilon$ (V) \\
 \end{tabular}
 \end{table}
 
-As predicted, the emf rose roughly linearly with $N$ (Figure~\ref{fig:N}). The size of the emf, however, was only about 46\% of the predicted value. This is the largest disagreement of the three sub-experiments.
+As predicted, the emf rose roughly linearly with $N$ (Figure~\ref{fig:N}); a straight-line fit had $R^2 = 0.973$, a slope of $(2.72 \pm 0.16)\times10^{-3}$~V per turn and an intercept of $(0.011 \pm 0.005)$~V. The size of the emf, however, was only about 46\% of the predicted value. This is the largest disagreement of the three sub-experiments.
 
-\begin{figure}[H][h]
+\begin{figure}
 \centering
 \includegraphics[width=0.62\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/graphs/emf_vs_N_fit.png}
 \caption{Peak emf as a function of number of turns $N$. The dashed line shows the theoretical prediction; the solid line is a linear best fit shown for shape comparison only.}
@@ -170,9 +170,9 @@ As predicted, the emf rose roughly linearly with $N$ (Figure~\ref{fig:N}). The s
 \end{figure}
 
 \subsection*{4.3 Peak emf versus coil radius, $R$}
-With $N=10$ and the magnet's north pole facing up, the peak emf was recorded for five coil radii between 1.25~cm and 4.45~cm. Re-winding shifted the coil along the tube, so the drop height was measured for each coil (mean $h = 49.0$~cm). The data are given in Table~\ref{tab:R}.
+With $N=10$ and the magnet's north pole facing up, the peak emf was recorded for five coil radii between 1.25~cm and 4.45~cm. Re-winding shifted the coil along the tube, so the drop height was measured for each coil (individual values 48.3 to 49.4~cm). The mean, $h = 49.0$~cm, was used for every coil in the analysis, since this changes the speed by only about 1\%. The data are given in Table~\ref{tab:R}.
 
-\begin{table}[h]
+\begin{table}
 \centering
 \caption{Peak emf as a function of coil radius $R$, with $N=10$ held fixed.}
 \label{tab:R}
@@ -189,9 +189,9 @@ Diameter (cm) & Radius, $R$ (cm) & Drop height, $h$ (cm) & Speed, $s$ (m/s) & Pe
 \end{tabular}
 \end{table}
 
-The emf dropped sharply as the radius increased (Figure~\ref{fig:R}), but more slowly than the expected $R^{-2}$ trend. A power-law fit gave an exponent of $-1.53 \pm 0.07$ instead of $-2$. The measured values were about 90\% of the prediction overall. The smallest radii, down to 1.25~cm, approach the magnet's own length of roughly 2~cm, which is where the point-dipole approximation would be expected to fail.
+The emf dropped sharply as the radius increased (Figure~\ref{fig:R}), but more slowly than the expected $R^{-2}$ trend. A power-law fit gave an exponent of $-1.53 \pm 0.07$ instead of $-2$. The measured values were about 90\% of the prediction overall (a weighted mean), but the point ratios were not constant, rising from about 0.68 at $R = 1.25$~cm to about 1.33 at $R = 4.45$~cm. The smallest radii, down to 1.25~cm, approach the magnet's own width of roughly 2~cm, which is where the point-dipole approximation would be expected to fail.
 
-\begin{figure}[H][h]
+\begin{figure}
 \centering
 \includegraphics[width=0.62\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/graphs/emf_vs_R_fit.png}
 \caption{Peak emf as a function of coil radius $R$. The dashed line is the theoretical prediction; the solid line is a power-law best fit shown for shape comparison only.}
@@ -201,7 +201,7 @@ The emf dropped sharply as the radius increased (Figure~\ref{fig:R}), but more s
 \subsection*{4.4 Peak emf versus magnet speed, $s$}
 With $N=10$ and $R = (2.40 \pm 0.25)$~cm fixed, the drop height was varied from 4.9~cm to 44.9~cm in steps of roughly 5~cm, which gave speeds at the coil between 0.98 and 2.97~m\,s$^{-1}$ (Table~\ref{tab:s}).
 
-\begin{table}[h]
+\begin{table}
 \centering
 \caption{Peak emf as a function of magnet speed $s$, with $N$ and $R$ held fixed.}
 \label{tab:s}
@@ -222,9 +222,9 @@ Drop height, $h$ (cm) & Speed, $s$ (m/s) & Peak emf (mV) \\
 \end{tabular}
 \end{table}
 
-The emf rose roughly linearly with speed (Figure~\ref{fig:s}). This was the only sub-experiment in which the measured values exceeded the prediction, by about 9\%. The gap is small, so it more likely reflects an underestimated oscilloscope uncertainty.
+The emf rose roughly linearly with speed (Figure~\ref{fig:s}); a straight-line fit had $R^2 = 0.950$, a slope of $(10.4 \pm 0.9)\times10^{-3}$~V\,s\,m$^{-1}$ and an intercept of $(3.0 \pm 1.8)$~mV. This was the only sub-experiment in which the measured values exceeded the prediction, by about 9\%. The gap is small, so it more likely reflects an underestimated oscilloscope uncertainty.
 
-\begin{figure}[H][h]
+\begin{figure}
 \centering
 \includegraphics[width=0.62\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/graphs/emf_vs_s_fit.png}
 \caption{Peak emf as a function of magnet speed $s$. The dashed line is the theoretical prediction; the solid line is a linear best fit shown for shape comparison only.}
@@ -232,9 +232,9 @@ The emf rose roughly linearly with speed (Figure~\ref{fig:s}). This was the only
 \end{figure}
 
 \subsection*{4.5 Overall comparison and anomalous results}
-All three datasets followed their expected shapes with little scatter, even where the absolute size disagreed with theory. Table~\ref{tab:ratios} summarises how the measured values compared with the predictions.
+The $N$ and $s$ data followed approximately linear trends and the $R$ data fell with radius, although more slowly than $R^{-2}$, even where the absolute size disagreed with theory. Table~\ref{tab:ratios} summarises how the measured values compared with the predictions (weighted mean of the point ratios). Formal tests against the prediction, which carries no uncertainty of its own and uses only the 2\% oscilloscope error, gave $\chi^2 = 30664$ ($N$, 9 degrees of freedom), $723$ ($R$, 5) and $307$ ($s$, 9), with the ratios differing from 1 by $175\sigma$, $12\sigma$ and $12\sigma$ respectively. These very large values mainly reflect the small oscilloscope uncertainty and the absence of an uncertainty on the prediction, rather than a large physical disagreement for $R$ and $s$.
 
-\begin{table}[h]
+\begin{table}
 \centering
 \caption{Measured-to-theory ratios for each sub-experiment.}
 \label{tab:ratios}
@@ -248,11 +248,11 @@ Ratio & 0.46 & 0.90 & 1.09 \\
 \end{table}
 
 The ratios differ too much for the mismatch to be explained by the shared dipole moment alone. If $m$ were the main source of error, the three experiments should have shifted by roughly the same factor.
-The $N$ and $R$ experiments both included an identical configuration with $N=10$ and $R=1.70$~cm, with drop heights differing by only 0.6~cm. However, the recorded peak-to-peak voltages were 66~mV and 124~mV respectively. Since the coil was rewound between the experiments, possible causes include differences in winding tightness or turn spacing, magnet orientation, or lead/contact quality. This suggests that the inconsistent setup was the main reason for the large disagreement in the $N$ data, and not a failure with regard to theory.
+The $N$ and $R$ experiments both included an identical configuration with $N=10$ and $R=1.70$~cm, with drop heights differing by at most 1.0~cm (0.6~cm from the mean for the $R$ data). However, the recorded peak-to-peak voltages were 66~mV and 124~mV respectively. Since the coil was rewound between the experiments, possible causes include differences in winding tightness or turn spacing, magnet orientation, or lead/contact quality. This suggests that the inconsistent setup was the main reason for the large disagreement in the $N$ data, and not a failure with regard to theory.
 \subsection*{4.6 Waveform and polarity}
 The induced emf changed sign partway through the trace, producing the two-lobed waveform in Figure~\ref{fig:scope}. Before the magnet reached the coil's centre the flux through the coil was increasing, and afterwards it was decreasing, which reversed the sign of $\frac{d\Phi_B}{dt}$ and therefore of the emf. Reversing the magnet's polarity inverted the waveform and left its size roughly unchanged for a given drop height. The trace was not symmetric about its zero crossing, because the magnet was still accelerating and moved at different speeds on either side of the coil.
 
-\begin{figure}[H]
+\begin{figure}
 \centering
 \includegraphics[width=0.38\linewidth]{/Users/chhaya/Documents/uniwork-cr/year 1/sem 2/phys1201/week 5and6/images/reverse.png}
 \caption{Oscilloscope trace of the induced emf with the magnet polarity reversed, showing the characteristic two-lobed waveform.}
@@ -263,7 +263,7 @@ The induced emf changed sign partway through the trace, producing the two-lobed 
 Apart from the anomaly in Section~4.5, several factors probably contributed to the mismatch between measured and predicted emf:
 
 \begin{itemize}
-    \item \textbf{Finite magnet size:} The magnet was not a true point dipole, so the approximation weakens when the coil radius or calibration distance approaches the magnet's dimensions. This appears in the calibration residuals at small $z$ and in the $R$ sub-experiment.
+    \item \textbf{Finite magnet size:} The magnet was not a true point dipole, so the approximation weakens when the coil radius or calibration distance approaches the magnet's dimensions. This appears in the calibration at small $z$ and in the $R$ sub-experiment. The calibration also departs from $z^{-3}$ at the largest distances, where the field readings are smallest.
     \item \textbf{Off-axis motion:} The theory assumes the magnet falls exactly along the coil's axis, but it may have wobbled or brushed the tube wall, changing the flux through the coil.
     \item \textbf{Calculated speed:} The ideal free-fall speed ignores air resistance, friction against the tube and release effects, any of which could make the true speed differ from $\sqrt{2gh}$.
     \item \textbf{Non-ideal coil geometry:} The coil was modelled as circular loops of a single radius $R$, whereas the wire had finite thickness and successive turns sat at slightly different radii.
@@ -272,11 +272,11 @@ Apart from the anomaly in Section~4.5, several factors probably contributed to t
 \end{itemize}
 
 \section*{5.0 Conclusion}
-The peak emf induced by a falling magnet increased roughly linearly with $N$ and $s$ and decreased roughly as $R^{-2}$, which supports the predicted relationship
+The peak emf induced by a falling magnet increased roughly linearly with $N$ and $s$ and decreased with $R$, which broadly supports the predicted relationship
 \begin{equation}
 \varepsilon_{\text{peak}} \propto \frac{Ns}{R^2} .
 \end{equation}
-Although the trends agreed with theory, the predicted magnitudes were less accurate. Using the calibrated dipole moment of $m = (1.18 \pm 0.07)$~A,m$^2$, the measured values were about 46\% of the prediction for $N$, 90\% for $R$, and 109\% for $s$. The $R$ data also showed a slightly different dependence, with a fitted exponent of $-1.53$ compared with the predicted $-2$, likely due to the point-dipole approximation becoming less accurate at smaller radii. The larger disagreement in the $N$ data was likely caused by an inconsistency between the two identical setups rather than a failure of the theory. Overall, the experiment supported the predicted qualitative relationship between emf, $N$, $R$, and $s$, while showing that the point-dipole approximation and the assumption of ideal free fall limited the accuracy of the model.
+Although the trends agreed with theory, the predicted magnitudes were less accurate. Using the calibrated dipole moment of $m = (1.18 \pm 0.07)$~A\,m$^2$, the measured values were about 46\% of the prediction for $N$, 90\% for $R$, and 109\% for $s$. The $R$ data also showed a weaker dependence, with a fitted exponent of $-1.53 \pm 0.07$ compared with the predicted $-2$, likely due to the point-dipole approximation becoming less accurate at smaller radii. The larger disagreement in the $N$ data was likely caused by an inconsistency between the two identical setups rather than a failure of the theory. Overall, the experiment supported the predicted qualitative relationship between emf, $N$, $R$, and $s$, while showing that the point-dipole approximation and the assumption of ideal free fall limited the accuracy of the model.
 
 \section*{6.0 References}
 \begin{enumerate}
