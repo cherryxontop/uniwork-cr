@@ -1,0 +1,352 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Assignment 8}
+
+\begin{document}
+\maketitle
+
+\section*{Question 1}
+ 
+\subsection*{(a)}
+
+we are given:
+
+\begin{itemize}
+    \item pressure: $P=29\,\mathrm{atm}$
+    \item temperature: $T=210^\circ\mathrm{C}=483.15\,\mathrm{K}$
+    \item heat capacity ratio: $\gamma=1.3$
+    \item molar mass of ammonia ($\mathrm{NH_3}$): $M=17.03\times10^{-3}\,\mathrm{kg\,mol^{-1}}$
+    \item required resolution: $d=1\,\mathrm{mm}$
+\end{itemize}
+
+first we need the speed of sound in the ammonia atmosphere. treating ammonia as an ideal gas,
+
+\[
+v=\sqrt{\frac{\gamma P}{\rho}}=\sqrt{\frac{\gamma RT}{M}}
+\]
+
+substituting,
+
+\[
+v=\sqrt{\frac{(1.3)(8.314)(483.15)}{17.03\times10^{-3}}}
+\]
+\[
+v\approx554\,\mathrm{m\,s^{-1}}
+\]
+
+the smallest spot that can be resolved is given by Abbe's limit,
+
+\[
+d=\frac{\lambda}{2\sin\theta}
+\]
+
+where $\theta$ is the half angle of the diffracted waves collected by the alien's body. the alien is very close to the object ($\ll1\,\mathrm{m}$ while its body is about $1\,\mathrm{m}$ across), so it collects waves from almost all angles up to
+
+\[
+\theta\rightarrow90^\circ
+\]
+\[
+\sin\theta\rightarrow1
+\]
+
+so,
+
+\[
+d=\frac{\lambda}{2}
+\]
+\[
+\lambda=2d=2(1\times10^{-3})=2\times10^{-3}\,\mathrm{m}
+\]
+
+using $v=f\lambda$,
+
+\[
+f=\frac{v}{\lambda}=\frac{554}{2\times10^{-3}}
+\]
+\[
+f\approx2.77\times10^{5}\,\mathrm{Hz}
+\]
+
+\[
+\boxed{f\approx277\,\mathrm{kHz}}
+\]
+
+so the alien needs to hear up to about 277 kHz.
+
+\subsection*{(b)}
+
+now the object is $2\,\mathrm{m}$ away. the alien's body has diameter $D=1\,\mathrm{m}$, so it only collects waves up to a smaller angle.
+
+\[
+\tan\theta=\frac{D}{2f_{\mathrm{d}}}
+\]
+\[
+\theta = \arctan\left(\frac{D}{2f_d}\right)
+\]
+
+where $f_{\mathrm{d}}=2\,\mathrm{m}$ is the distance to the object
+
+\[
+\theta=\arctan\left(\frac{1}{2\times2}\right)=\arctan(0.25)\approx14.04^\circ
+\]
+\[
+\sin\theta\approx0.2425
+\]
+ 
+rearranging Abbe's limit,
+ 
+\[
+\lambda=2d\sin\theta
+\]
+\[
+\lambda=2(1\times10^{-3})(0.2425)
+\]
+\[
+\lambda\approx4.85\times10^{-4}\,\mathrm{m}
+\]
+ 
+then,
+ 
+\[
+f=\frac{v}{\lambda}
+=\frac{554}{4.85\times10^{-4}}
+\]
+\[
+f\approx1.14\times10^{6}\,\mathrm{Hz}
+\]
+
+therefore, 
+
+\[
+\boxed{f\approx1.1\,\mathrm{MHz}}
+\]
+ 
+\section*{Question 2}
+
+\subsection*{(a)}
+
+for a diffraction grating at normal incidence,
+
+\[
+m\lambda=d\sin\theta
+\]
+
+so for each order the diffraction angle is
+
+\[
+\theta=\arcsin\left(\frac{m\lambda}{d}\right)
+\]
+ 
+we want the angle between $400\,\mathrm{nm}$ and $700\,\mathrm{nm}$ to be as large as possible. using the first order ($m=1$) for the best separation,
+
+\[
+\Delta\theta
+=
+\arcsin\left(\frac{700\,\mathrm{nm}}{d}\right)
+-
+\arcsin\left(\frac{400\,\mathrm{nm}}{d}\right)
+\]
+
+this increases as $d$ gets smaller because the angles get larger. however, we need $\sin\theta\leq1$ for the red light to be diffracted so
+
+\[
+\frac{700\,\mathrm{nm}}{d}\leq1
+\]
+\[
+d\geq700\,\mathrm{nm}
+\]
+
+the best separation is at the smallest allowed period,
+
+\[
+\boxed{d\approx700\,\mathrm{nm}}
+\]
+ 
+\subsection*{(b)}
+ 
+using $d=700\,\mathrm{nm}$ and $m=1$:
+
+\begin{itemize}
+    \item for the $400\,\mathrm{nm}$ light,
+
+\[
+\sin\theta_{400}=\frac{400}{700}=0.5714
+\]
+\[
+\theta_{400}\approx34.85^\circ
+\]
+
+\item for the $700\,\mathrm{nm}$ light,
+
+\[
+\sin\theta_{700}=\frac{700}{700}=1
+\]
+\[
+\theta_{700}=90^\circ
+\]
+\end{itemize}
+
+the spectrum is therefore spread over
+
+\[
+\Delta\theta=90^\circ-34.85^\circ
+\]
+\[
+\boxed{\Delta\theta\approx55^\circ}
+\]
+
+from about $35^\circ$ to $90^\circ$.
+
+\section*{Question 3}
+
+\subsection*{(a)}
+
+the input splits into two waves that go round the loop in opposite directions,
+
+\[
+E_A=tE_{in}e^{-i\phi_A}
+\qquad
+E_B=rE_{in}e^{-i\phi_B}
+\]
+
+each output gets one transmitted and one reflected part,
+ 
+\[
+E_1=rE_A+tE_B
+\qquad
+E_2=tE_A-rE_B
+\]
+
+the optical path length is the same both ways, so $\phi_A=\phi_B=\phi$,
+
+\[
+E_1=2rt\,E_{in}e^{-i\phi}
+\qquad
+E_2=(t^2-r^2)E_{in}e^{-i\phi}
+\]
+
+for $r=t=\frac{1}{\sqrt2}$, $2rt=1$ and $t^2-r^2=0$,
+
+\[
+\boxed{E_1=E_{in}, \quad E_2=0}
+\]
+
+\subsection*{(b)}
+
+the fibre length is $L=2\pi NR$ and the coupler moves at $\Omega R$. light travels at $c/n$.
+
+let $t_0=\dfrac{2\pi NnR}{c}$ (the travel time with no rotation) and $x=\dfrac{\Omega nR}{c}\ll1$.
+
+\begin{itemize}
+    \item clockwise ($t_{CC}$):
+    
+the coupler moves away from the light, so in time $t_{CC}$ the light must cover the fibre plus the extra distance the coupler moves,
+
+\[
+\frac{c}{n}t_{CC}=2\pi NR+\Omega R\,t_{CC}
+\]
+\[
+t_{CC}\left(\frac{c}{n}-\Omega R\right)=2\pi NR
+\]
+\[
+t_{CC}=\frac{2\pi NR}{\frac{c}{n}-\Omega R}
+\]
+
+taking out $\frac{c}{n}$ from the bottom,
+
+\[
+t_{CC}=\frac{2\pi NnR}{c}\,\frac{1}{1-\frac{\Omega nR}{c}}
+=\frac{t_0}{1-x}
+\]
+
+since $x\ll1$ we use $\frac{1}{1-x}\approx1+x$,
+
+\[
+\boxed{t_{CC}\approx\frac{2\pi NnR}{c}\left(1+\frac{\Omega nR}{c}\right)}
+\]
+
+    \item anticlockwise ($t_{AC}$): 
+    
+the coupler moves towards the light, so the sign of $\Omega$ flips,
+
+\[
+\frac{c}{n}t_{AC}=2\pi NR-\Omega R\,t_{AC}
+\]
+\[
+t_{AC}=\frac{2\pi NR}{\frac{c}{n}+\Omega R}
+=\frac{t_0}{1+x}
+\]
+
+using $\frac{1}{1+x}\approx1-x$,
+
+\[
+\boxed{t_{AC}\approx\frac{2\pi NnR}{c}\left(1-\frac{\Omega nR}{c}\right)}
+\]
+
+together these are the result we were asked to show,
+
+\[
+t=\frac{2\pi NnR}{c}\left(1\pm\frac{\Omega nR}{c}\right)
+\]
+
+    \item difference:
+
+\[
+\Delta t=t_{CC}-t_{AC}
+=t_0(1+x)-t_0(1-x)=2xt_0
+\]
+
+\[
+\Delta t=\frac{2\pi NnR}{c}\cdot\frac{2\Omega nR}{c}
+=\frac{4\pi N\Omega n^2R^2}{c^2}
+\]
+
+the area inside the loop is $A=\pi R^2$, so
+
+\[
+\boxed{\Delta t=\frac{4\Omega Nn^2A}{c^2}}
+\]
+
+\end{itemize}
+
+\subsection*{(c)}
+
+given:
+
+\begin{itemize}
+    \item $\lambda = 1550 \text{ nm}$
+    \item $n=1.5$
+    \item $R=1\text{ m}$
+    \item $\Omega=1\,\mathrm{rev/hr}=\frac{2\pi}{3600}=1.745\times10^{-3}\,\mathrm{rad\,s^{-1}}$
+    \item $r=t=\frac{1}{\sqrt{2}}$
+    \item $A=\pi\,\mathrm{m^2}$,
+\end{itemize}
+ 
+\[
+\Delta t=\frac{4(1.745\times10^{-3})(1000)(1.5)^2\pi}{(3.00\times10^8)^2}
+\approx5.49\times10^{-16}\,\mathrm{s}
+\]
+ 
+\[
+\omega=\frac{2\pi c}{\lambda}\approx1.22\times10^{15}\,\mathrm{rad\,s^{-1}}
+\]
+ 
+\[
+\Delta\phi=\omega\Delta t\approx0.667\,\mathrm{rad}
+\]
+ 
+for $r=t=\frac{1}{\sqrt2}$ the output is $E_2=\frac{E_{in}}{2}\left(e^{-i\phi_A}-e^{-i\phi_B}\right)$, so
+ 
+\[
+\frac{|E_2|^2}{E_{in}^2}=\sin^2\left(\frac{\Delta\phi}{2}\right)
+=\sin^2(0.3336)\approx0.107
+\]
+ 
+\[
+\boxed{\approx11\%}
+\]
+
+\end{document}

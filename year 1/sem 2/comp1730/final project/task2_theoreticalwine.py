@@ -157,11 +157,7 @@ def plot_theoretical_wines(model, perfect_wine, awful_wine, output_file=TSNE_FIL
 
     scaled_properties = StandardScaler().fit_transform(combined_properties)
     perplexity = min(60, len(scaled_properties) - 1)
-    # init="random" rather than the default "pca": the theoretical wines can
-    # be extreme enough on a low-variance feature (e.g. density) to overflow
-    # the PCA initialisation step.
-    tsne = TSNE(n_components=2, perplexity=perplexity, random_state=0,
-                init="random")
+    tsne = TSNE(n_components=2, perplexity=perplexity, random_state=0)
     embedding = tsne.fit_transform(scaled_properties)
 
     real_embedding = embedding[:-2]
