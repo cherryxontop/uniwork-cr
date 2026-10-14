@@ -1,0 +1,269 @@
+---
+title: "Lab Report: Week 10 - Diffraction Grating Spectrometer"
+subtitle: "_Chhaya Ramnani (UID: u8336188)_"
+author: "_Lab partners: Tsz Wing Candice Ng, Chinatsu Komada_"
+date: "2026-10-14"
+format: 
+  typst:
+    toc: false
+editor:
+  render-on-save: true
+jupyter: python3
+---
+
+# Imports and Functions
+
+Every angle was read by eye off the degree scale of the spectrometer. The functions in python turn those readings into wavelengths and compare them with the accepted values in Table 1.
+
+```{python}
+import numpy as np
+
+d = 1e-3 / 600              # grating spacing (m), 600 lines/mm
+sANG = 0.33                 # uncertainty on reading one angle off the degree scale (one division, deg), from the demonstrator
+
+# from the lab notes: (wavelength nm, element)
+spectral_lines = [
+    (706.5, "He"),
+    (703.2, "Ne"),
+    (670.8, "Li"),
+    (667.8, "He"),
+    (650.6, "Ne"),
+    (643.8, "Cd"),
+    (640.2, "Ne"),
+    (636.2, "Zn"),
+    (633.4, "Ne"),
+    (610, "Eu"),
+    (589.0, "Na"),
+    (589.6, "Na"),
+    (587.5, "He"),
+    (579, "Hg"),
+    (576.9, "Hg"),
+    (546.1, "Hg"),
+    (508.6, "Cd"),
+    (501.5, "He"),
+    (481, "Zn"),
+    (480, "Cd"),
+    (472, "Zn"),
+    (467.8, "Cd"),
+    (460.3, "Li"),
+    (447.1, "He"),
+    (435.8, "Hg"),
+    (404.6, "Hg"),
+    (388.8, "He"),
+    (365.4, "Hg"),
+    (360, "Cd")
+]
+
+
+def sigma_test(k1, sk1, k2, sk2):
+    sigma_diff = abs(k1 - k2) / np.sqrt(sk1**2 + sk2**2)
+
+    print(f"\nSIGMA TEST")
+    print(f"measured value    : {k1:.3f} +/- {sk1:.3f}")
+    print(f"accepted value    : {k2:.3f} +/- {sk2:.3f}")
+    print(f"discrepancy       : {sigma_diff:.2f} sigma")
+
+    if sigma_diff <= 3.0:
+        print("results AGREE within experimental uncertainty")
+    else:
+        print("results DISAGREE")
+
+    return sigma_diff
+
+
+# centre of the pattern from the mercury line read on both sides
+def centre(left, right):
+    mid = (left + right) / 2
+    smid = sANG / np.sqrt(2)
+    print(f"\ncentre = {mid:.4f} +/- {smid:.4f} deg")
+    return mid, smid
+
+
+def centre_wavelength(x_left, x_right, n):
+    theta = np.radians(abs(x_left - x_right) / 2)
+    stheta = np.radians(sANG / np.sqrt(2))
+    lam = d * np.sin(theta) / n * 1e9
+    slam = d * np.cos(theta) * stheta / n * 1e9
+    print(f"\nlambda = {lam:.1f} +/- {slam:.1f} nm")
+    return lam, slam
+
+
+# first order wavelength of one reading, measured from the centre
+def wavelength(x, mid, smid):
+    theta = np.radians(abs(x - mid))
+    stheta = np.radians(np.sqrt(sANG**2 + smid**2))
+    lam = d * np.sin(theta) * 1e9
+    slam = d * np.cos(theta) * stheta * 1e9
+    return lam, slam
+
+
+# closest line to each reading of lamp
+def identify(readings, mid, smid):
+    for x in readings:
+        lam, slam = wavelength(x, mid, smid)
+        w, el = min(spectral_lines, key=lambda line: abs(line[0] - lam))
+        print(f"centre {mid:.2f} deg")
+        print(f"wavelength: {lam:.1f} +/- {slam:.1f} nm")
+        print(f"closest line in list : {el} {w} nm")
+        sigma_test(lam, slam, w, 0)
+```
+
+# Pre-Lab Questions
+
+## Question 1
+
+Equation that relates the diffraction angle $\theta$, line spacing $d$, interference-order $n$, and wavelength of light $\lambda$ for a diffraction grating spectrometer:
+$$d\sin\theta = n\lambda$$
+
+## Question 2
+
+$$d = \frac{1\text{cm}}{4000} = 2.5\times10^{-6}\text{m}$$
+
+For $n=1$ and $\lambda = 440$ nm,
+
+$$\theta = \arcsin\left(\frac{n\lambda}{d}\right) = \arcsin\left(\frac{440\times10^{-9}}{2.5\times10^{-6}}\right) = \arcsin(0.176)$$
+
+$$\boxed{\theta \approx 10.14^\circ}$$
+
+# Aim
+
+To identify the element in an unknown gas discharge lamp by measuring the wavelengths of its spectral lines with a diffraction grating spectrometer and comparing them with the accepted wavelengths in the given reference table.
+
+# Theory
+
+For a grating of line spacing $d$, bright lines appear at angles $\theta$ where $d\sin\theta = n\lambda$. Only the brightest lines were used, so these are taken to be first order ($n=1$), giving
+
+$$\lambda = d\sin\theta, \qquad d = \frac{1\text{ mm}}{600}$$
+
+The angle is measured from the centre of the pattern. The uncertainty on $\lambda$ follows from the uncertainty on $\theta$:
+
+$$\sigma_\lambda = d\cos\theta\,\sigma_\theta$$
+
+
+# Procedure
+
+At the collimator end of the spectrometer, we place the known gas discharge lamp, which in this case is Mercury (Hg). We then record the angles of any slits that appear on either side of the n=0 slit, then average out the reading to find the centre.
+
+The mercury lamp was then replaced by an unknown lamp of our choice (we chose #unknown 2, it was a rock paper scissors thing :D). We read the angles of the brightest slits visible by eye. All measurements were taken in the dark.
+
+For the mercury lamp, the first-order ($n=1$) violet line was tried first, but since it is at the very end of the visible spectrum and was too faint to read reliably. The readings from it did not give a sensible wavelength, so the brighter green line was used instead, in second order ($n=2$). Only the $n=2$ values are used to find the centre.
+
+```{=typst}
+#figure(
+  image("images/setup.png", width: 70%),
+  caption: [Experimental Setup],
+)
+```
+
+### Reading uncertainty
+
+The uncertainty on a single angle reading is one division of the degree scale, which the demonstrator gave as $\sigma_x = 0.33^\circ$ ($0.0058$ rad). The same value is used for every angle reading below, and it is the starting point for all of the uncertainties that follow. The accepted wavelengths in Table 1 are given without uncertainties, so they are treated as exact when comparing.
+
+### Centre of the pattern
+
+The centre is the average of the two readings of the same mercury line on either side:
+
+$$x_0 = \frac{x_{\text{left}} + x_{\text{right}}}{2}$$
+
+Each reading has uncertainty $\sigma_x$ and the two are independent, so
+
+$$\sigma_{x_0} = \frac{1}{2}\sqrt{\sigma_x^2 + \sigma_x^2} = \frac{\sigma_x}{\sqrt{2}} = 0.23^\circ$$
+
+### Wavelength of the mercury line
+
+The line was read on both sides of the centre, so its angle is half the difference of the two readings, $\theta = \frac{(x_{\text{left}} - x_{\text{right}})}{2}$. By the same argument as for the centre, $\sigma_\theta = \frac{\sigma_x}{\sqrt{2}}$. The wavelength then follows from $d\sin\theta = n\lambda$, and its uncertainty from $\sigma_\theta$ (in radians):
+
+$$\lambda = \frac{d\sin\theta}{n}, \qquad \sigma_\lambda = \frac{d\cos\theta\,\sigma_\theta}{n}$$
+
+this is what `centre_wavelength()` computes.
+
+### Wavelength of reading from the unknown lamp
+
+The unknown lamp's lines were read on one side only, so the angle is measured from the centre found above.
+
+$$\theta = |x - x_0|, \qquad \sigma_\theta = \sqrt{\sigma_x^2 + \sigma_{x_0}^2} = 0.33^\circ\sqrt{1.5} = 0.40^\circ$$
+
+$$\lambda = d\sin\theta, \qquad \sigma_\lambda = d\cos\theta\,\sigma_\theta$$
+
+which is what `wavelength()` computes. This is not the same as the mercury line calculation above, because there the centre was made from the same two readings as the angle, so adding $\sigma_{x_0}$ again would count the same readings twice.
+
+
+# Results
+
+All angles are written as $degrees + \frac{minutes}{60}$. Here $$d = \frac{10^{-3}}{600} = 1.667\times10^{-6}m$$
+
+### Mercury: first-order violet line ($n=1$)
+
+The first-order violet line was tried first. Its readings were $107^\circ 6'$ and $92^\circ 0'$.
+
+By hand:
+
+$$\theta = \frac{107.10^\circ - 92.00^\circ}{2} = 7.55^\circ, \qquad x_0 = \frac{107.10^\circ + 92.00^\circ}{2} = 99.55^\circ$$
+
+$$\lambda = d\sin\theta = 1.667\times10^{-6}\times\sin(7.55^\circ) = 219.0\text{ nm}$$
+
+$$\sigma_\lambda = d\cos\theta\,\sigma_\theta = 1.667\times10^{-6}\times0.9913\times0.00407 = 6.7\text{ nm}$$
+
+```{python}
+centre(107 + 6 / 60, 92)
+centre_wavelength(107 + 6 / 60, 92, 1)
+```
+
+The result is $219.0 \pm 6.7$ nm, which is not a visible wavelength. For Hg violet at 435.8 nm the expected angle is $\arcsin(\lambda/d) = 15.16^\circ$, but we measured $7.55^\circ$, and the centre it gives ($99.55^\circ$) is $8^\circ$ from the second-order centre below. The violet line was faint at the end of the visible spectrum, so these readings were unreliable and were not used. It is also possible that one of the two angles was misread or recorded wrongly.
+
+The second-order green line was used instead. It is brighter and so easier to place, and its larger angle also gives a smaller fractional uncertainty.
+
+### Mercury: second-order green line ($n=2$) and the centre
+
+The readings were $148^\circ 8'$ on the left and $67^\circ 3'$ on the right.
+
+By hand:
+
+$$\theta = \frac{148.133^\circ - 67.050^\circ}{2} = 40.54^\circ, \qquad x_0 = \frac{148.133^\circ + 67.050^\circ}{2} = 107.59^\circ$$
+
+$$\lambda = \frac{d\sin\theta}{n} = \frac{1.667\times10^{-6}\times\sin(40.54^\circ)}{2} = 541.7\text{ nm}$$
+
+$$\sigma_\lambda = \frac{d\cos\theta\,\sigma_\theta}{n} = \frac{1.667\times10^{-6}\times0.7599\times0.00407}{2} = 2.6\text{ nm}$$
+
+```{python}
+mid, smid = centre(148 + 8 / 60, 67 + 3 / 60)
+lam, slam = centre_wavelength(148 + 8 / 60, 67 + 3 / 60, 2)
+sigma_test(lam, slam, 546.1, 0)
+```
+
+The centre is $107.5917 \pm 0.2333^\circ$. The green line comes out at $541.7 \pm 2.6$ nm, which agrees with the accepted Hg line at 546.1 nm ($1.7\sigma$). So the centre can be trusted for the unknown lamp, and the whole method is giving sensible wavelengths.
+
+### Unknown lamp 2
+
+The first-order ($n=1$, red) reading at $84^\circ 30'$ was measured from this centre.
+
+By hand:
+
+$$\theta = |84.50^\circ - 107.59^\circ| = 23.09^\circ, \qquad \sigma_\theta = 0.40^\circ = 0.00705\text{ rad}$$
+
+$$\lambda = d\sin\theta = 1.667\times10^{-6}\times\sin(23.09^\circ) = 653.7\text{ nm}$$
+
+$$\sigma_\lambda = d\cos\theta\,\sigma_\theta = 1.667\times10^{-6}\times0.9199\times0.00705 = 10.8\text{ nm}$$
+
+and then compared with every line in Table 1:
+
+```{python}
+identify([84 + 30/60], mid, smid)
+```
+
+The measured wavelength is $653.7 \pm 10.8$ nm. The closest line is Ne at 650.6 nm, a discrepancy of $0.28\sigma$, so they agree. Because the uncertainty is large, other lines also agree within $3\sigma$: Cd 643.8 nm ($0.91\sigma$), Ne 640.2 nm ($1.25\sigma$), He 667.8 nm ($1.31\sigma$), Li 670.8 nm ($1.58\sigma$), Zn 636.2 nm ($1.62\sigma$) and Ne 633.4 nm ($1.9\sigma$).
+
+# Limitations & Possible Sources of Discrepancy
+
+1. Lines were chosen by eye and assumed to be first order. Nothing checks this.
+2. The scale was hard to see in the dark, which adds error that is not included in the $0.33^\circ$ uncertainty.
+3. Only one line measured for the unknown lamp. The lamp showed many bunched-up lines at first order, but only one was distinct and bright enough to read, and none were distinct at second order. With $\pm 10.8$ nm on that line, seven lines from five elements (Ne, Cd, He, Li, Zn) agree within $3\sigma$, so the wavelength alone cannot identify the element. The bunched-up pattern fits neon but is not proof. With no readable second-order line, we could not tighten the uncertainty.
+4. Size of the angle uncertainty. One division ($0.33^\circ$) is the main contribution to every wavelength uncertainty and its a large ground covered for every reading.
+5. First-order violet readings. These were unusable (or possibly misread), so the centre rests on the second-order readings alone.
+6. Centre taken from a different lamp. If the setup moved when the lamps were swapped, every angle would shift and the sigma test would not show it.
+
+# Conclusion
+
+The centre was found from the second-order green mercury line as $107.5917 \pm 0.2333^\circ$. That line came out at $541.7 \pm 2.6$ nm, which agrees with the accepted 546.1 nm ($1.7\sigma$), so we trust the centre. The first-order violet readings gave $219.0 \pm 6.7$ nm and were discarded.
+
+For unknown lamp 2, the line at $84^\circ 30'$ is $653.7 \pm 10.8$ nm. The closest match is Neon at 650.6 nm ($0.28\sigma$), so the lamp is consistent with Neon. The lamp’s lines were bunched up together like a barcode- it has many electrons and many closely spaced energy levels, so it gives off lots of lines at nearby wavelengths. This is not conclusive, since Cd, He, Li and Zn lines also agree within $3\sigma$. We would need finer angle readings, or a second line measured, to be sure.
