@@ -31,8 +31,6 @@ def correlation_matrix(input):
     """
     Calculate Pearson correlations between all properties and quality.
 
-    plot .
-
     Returns the correlation matrix.
 
     Assumption: every column in the data file is numeric (true for this
@@ -41,7 +39,7 @@ def correlation_matrix(input):
     # Read with pandas (rather than winequality.load_data()) so the column
     # names survive and can label the heatmap.
     table = pd.read_csv(input, sep=winequality.SEP)
-    return table.corr()
+    return table.corr(method="pearson")
 
 def plot_heatmap(correlation_matix, output_file=HEATMAP_FILE):
     """
