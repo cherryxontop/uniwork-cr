@@ -27,5 +27,3 @@ __pycache__/
 **/*.quarto
 **/*.ipnyb
 
-#unwanted
-**/integdec.pdf
