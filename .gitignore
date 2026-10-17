@@ -1,0 +1,31 @@
+#latex clutter
+**/*.aux
+**/*.log
+**/*.toc
+**/*.synctex.gz
+**/*.fdb_latexmk
+**/*.fls
+**/*.bbl
+**/*.bcf
+**/*.blg
+**/*.run.xml
+
+#macOS clutter
+**/.DS_Store
+
+#py clutter (idk google said to)
+__pycache__/
+*.pyc
+
+#virtual environments
+**/*.venv/
+**/*venv/
+**/*ENV/
+
+#quarto cache
+**/*lab_files
+**/*.quarto
+**/*.ipnyb
+
+#unwanted
+**/integdec.pdf
