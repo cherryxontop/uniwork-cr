@@ -26,4 +26,4 @@ perplexity makes a big difference, so i tried a few values. turns out it's rough
 
 the groups still overlap a lot, with a big mixed middle, so the properties tell us something about quality but not enough to separate the wines cleanly. that fits the correlations from the heatmap, where no single property was strongly linked to quality (alcohol was the highest at about 0.48).
 
-i wouldn't read too much into the exact shapes. the layout changes with perplexity and the random seed, and the distances between groups on a tSNE plot aren't meaningful. quality is also a subjective score from tasters, so some of the overlap could be down to that.
+the layout changes with perplexity and the random seed, and the distances between groups on a tSNE plot aren't meaningful. quality is also a subjective score from tasters, so some of the overlap could be down to that.

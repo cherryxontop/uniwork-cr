@@ -36,8 +36,8 @@ def correlation_matrix(input):
     Assumption: every column in the data file is numeric (true for this
     dataset), so all of them go into the correlation.
     """
-    # Read with pandas (rather than winequality.load_data()) so the column
-    # names survive and can label the heatmap.
+    # Read with pandas (rather than winequality.load_data())
+    # column names survive and can label the heatmap.
     table = pd.read_csv(input, sep=winequality.SEP)
     return table.corr(method="pearson")
 
