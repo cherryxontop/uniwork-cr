@@ -46,22 +46,29 @@ def _search(model, maximise, start_fraction=0.5):
     range, since a random forest can't meaningfully extrapolate beyond
     the values it was fitted on.
     """
+    # allowed range of each property (its min and max in the training file).
     names = list(model.feature_names_in_)
     data = winequality.load_data(winequality.TRAIN_FILE)
     low = data[:, :len(names)].min(axis=0)
     high = data[:, :len(names)].max(axis=0)
 
+    # starting wine (each property placed between its min and max) and its score.
     wine = {name: float(low[i] + start_fraction * (high[i] - low[i]))
             for i, name in enumerate(names)}
     score = winequality.predict(model, wine)
 
+    # sweep every property PASSES times, trying GRID_POINTS values each
+    # with the others held fixed.
     for _ in range(PASSES):
         for i, name in enumerate(names):
+            # GRID_POINTS values have GRID_POINTS - 1 gaps between them.
             step = (high[i] - low[i]) / (GRID_POINTS - 1)
             best_value = wine[name]
             for j in range(GRID_POINTS):
                 wine[name] = float(low[i] + j * step)
                 candidate_score = winequality.predict(model, wine)
+
+                # "Better" means higher for perfect(), lower for awful().
                 if maximise:
                     improves = candidate_score > score
                 else:
@@ -69,8 +76,11 @@ def _search(model, maximise, start_fraction=0.5):
                 if improves:
                     score = candidate_score
                     best_value = wine[name]
+
+            # the loop leaves the property at the last value tried, so reset it to the best.
             wine[name] = best_value
 
+    # return the best wine and its score.
     return wine, score
 
 
@@ -87,12 +97,16 @@ def _best_of_three_starts(model, maximise):
     Returns (wine, score).
     """
     best_wine, best_score = None, None
+
+    # run the search from each start and keep the best result so far
+    # (higher for perfect(), lower for awful()).
     for start_fraction in (0.0, 0.5, 1.0):
         wine, score = _search(model, maximise, start_fraction)
         better = best_score is None or (
             score > best_score if maximise else score < best_score)
         if better:
             best_wine, best_score = wine, score
+
     return best_wine, best_score
 
 
@@ -104,8 +118,11 @@ def perfect(model=None):
     Returns (wine, score): the physicochemical properties as a dict keyed for
     winequality.predict(), and the quality score it predicts.
     """
+    # model=None is optional: build one here if none is passed in
+    # (__main__ passes one in, so it is only trained once).
     if model is None:
         model = winequality.build_model()
+    # maximise=True looks for the highest predicted quality.
     return _best_of_three_starts(model, maximise=True)
 
 
@@ -116,6 +133,7 @@ def awful(model=None):
     """
     if model is None:
         model = winequality.build_model()
+    # maximise=False looks for the lowest predicted quality.
     return _best_of_three_starts(model, maximise=False)
 
 
@@ -132,22 +150,28 @@ def plot_theoretical_wines(model, perfect_wine, awful_wine, output_file=TSNE_FIL
 
     Saves the plot to output_file.
     """
+    # load the real wines.
     values = winequality.load_data(winequality.DATA_FILE)
     properties = values[:, :-1]
     quality = values[:, -1]
 
+    # turn the two invented wines into rows, in the same property order.
     names = list(model.feature_names_in_)
     perfect_row = [perfect_wine[name] for name in names]
     awful_row = [awful_wine[name] for name in names]
-    combined = np.vstack([properties, perfect_row, awful_row])
 
+    # stack them under the real wines (the last two rows) and standardise together.
+    combined = np.vstack([properties, perfect_row, awful_row])
     scaled = StandardScaler().fit_transform(combined)
+
+    # fit t-SNE on all the rows together.
     # init="random" rather than the default "pca": the theoretical wines can
     # be extreme enough on a low-variance feature (e.g. density) to overflow
     # the PCA initialisation step.
     embedding = TSNE(n_components=2, perplexity=60, random_state=0,
                       init="random").fit_transform(scaled)
 
+    # plot the real wines by quality, then perfect (star) and awful (X).
     figure, axes = plt.subplots(figsize=(8, 6))
     points = axes.scatter(embedding[:-2, 0], embedding[:-2, 1], c=quality,
                            cmap="viridis", s=15)
@@ -159,15 +183,20 @@ def plot_theoretical_wines(model, perfect_wine, awful_wine, output_file=TSNE_FIL
     axes.legend()
     figure.colorbar(points, ax=axes, label="quality")
 
+    # save.
     figure.savefig(output_file, bbox_inches="tight")
     plt.close(figure)
 
 
 if __name__ == "__main__":
+    # build the model once.
     model = winequality.build_model()
+
+    # find the best and worst wines.
     perfect_wine, perfect_score = perfect(model)
     awful_wine, awful_score = awful(model)
 
+    # print them and mark them on the t-SNE plot.
     print("perfect:", perfect_wine, perfect_score)
     print("awful:", awful_wine, awful_score)
 
